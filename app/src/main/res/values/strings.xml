@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">SomelAI</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="login_title">Bienvenidos a SomelAI!</string>
+    <string name="login_mail_hint">Dirección de e-mail</string>
+    <string name="login_password_hint">Contraseña</string>
+    <string name="login_button_description">Acceder</string>
+    <string name="signup_button_description">Todavia no tengo cuenta</string>
+    <string name="sign_up_title">Súmate a SomelAI</string>
+    <string name="sign_up_user_name_hint">Nombre de usuario</string>
+    <string name="sign_up_name_hint"> Nombre y apellidos </string>
+    <string name="sign_up_mail_hint">Dirección de e-mail</string>
+    <string name="sign_up_password_hint">Contraseña</string>
+    <string name="sign_up_button_description">Crear cuenta</string>
+
+    <string name="error_message_empty_fields">Por favor, rellena todos los campos.</string>
+</resources>
