@@ -15,4 +15,12 @@
     <string name="sign_up_button_description">Crear cuenta</string>
 
     <string name="error_message_empty_fields">Por favor, rellena todos los campos.</string>
+    <string name="profile_log_out_button">Cerrar sesión</string>
+    <string name="btn_delete_account">Borrar cuenta</string>
+    <string name="feed_botton">Historial</string>
+    <string name="search_bottom">Buscar</string>
+    <string name="profile_bottom">Perfil</string>
+    <string name="default_username">UserName</string>
+    <string name="default_text">defaul_text</string>
+    <string name="loading">Cargando</string>
 </resources>

@@ -1,4 +1,4 @@
-package com.blanco.somelai.ui
+package com.blanco.somelai.ui.login
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle

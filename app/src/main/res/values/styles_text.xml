@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="ViewTitle">
+        <item name="android:textSize">24sp</item>
+        <item name="android:fontFamily">@font/poppins_semibold</item>
+    </style>
+
+    <style name="ViewSubTitle">
+        <item name="android:textSize">18sp</item>
+        <item name="android:fontFamily">@font/poppins</item>
+    </style>
+
+    <style name="PriceItem">
+        <item name="android:textSize">22sp</item>
+        <item name="android:fontFamily">@font/poppins</item>
+    </style>
+    <style name="SmallDescription">
+        <item name="android:textSize">12sp</item>
+        <item name="android:fontFamily">@font/poppins</item>
+    </style>
+
+    <style name="ItemTitle">
+        <item name="android:textSize">12sp</item>
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="android:textColor">@color/md_theme_light_outline</item>
+    </style>
+
+</resources>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="CustomButton">
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+    </style>
+    <style name="DangerButton" parent="CustomButton">
+        <item name="android:backgroundTint">@color/md_theme_dark_onError</item>
+    </style>
+
+</resources>
