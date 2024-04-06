@@ -5,8 +5,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.blanco.somelai.R
-import com.blanco.somelai.databinding.FragmentFeedBinding
 import com.blanco.somelai.databinding.FragmentSearchBinding
 import com.blanco.somelai.ui.adapter.WineCountryAdapter
 import com.blanco.somelai.ui.adapter.WineTypeAdapter

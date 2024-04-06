@@ -20,6 +20,7 @@
 
             <!-- Media -->
             <ImageView
+                android:id="@+id/iv_country_wine"
                 android:layout_width="150dp"
                 android:layout_height="100dp"
                 android:contentDescription="@string/img_description"
