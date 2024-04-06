@@ -6,7 +6,7 @@
     android:layout_height="wrap_content">
 
     <com.google.android.material.card.MaterialCardView
-        android:id="@+id/card"
+        android:id="@+id/mcv_wine_type"
         style="?attr/materialCardViewElevatedStyle"
         app:cardBackgroundColor="@color/md_theme_light_background"
         android:layout_width="0dp"
@@ -192,8 +192,8 @@
         android:contentDescription="@string/todo"
         android:rotation="180"
         android:translationZ="2dp"
-        app:layout_constraintBottom_toBottomOf="@+id/card"
-        app:layout_constraintEnd_toEndOf="@+id/card"
+        app:layout_constraintBottom_toBottomOf="@+id/mcv_wine_type"
+        app:layout_constraintEnd_toEndOf="@+id/mcv_wine_type"
         app:srcCompat="@drawable/ic_baseline_arrow_back_ios_24"
         tools:ignore="DuplicateSpeakableTextCheck,TouchTargetSizeCheck" />
 

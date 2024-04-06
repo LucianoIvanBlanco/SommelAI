@@ -20,7 +20,12 @@
     <string name="feed_botton">Historial</string>
     <string name="search_bottom">Buscar</string>
     <string name="profile_bottom">Perfil</string>
-    <string name="default_username">UserName</string>
+    <string name="default_username">Nombre de usuario</string>
     <string name="default_text">defaul_text</string>
     <string name="loading">Cargando</string>
+    <string name="title_wine_type">Tipo de vino</string>
+    <string name="search_wine_hint">Busca cualquier vino</string>
+    <string name="conuntry_title">Pais del vino</string>
+    <string name="secondary_title">Descripcion</string>
+    <string name="img_description">Imagen</string>
 </resources>
