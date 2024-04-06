@@ -35,17 +35,29 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <ScrollView
+    <TextView
+        android:id="@+id/tv_wine_type_title"
         android:layout_width="0dp"
-        android:layout_height="400dp"
-        android:layout_marginTop="12dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="@string/title_category_wine_type"
         app:layout_constraintEnd_toEndOf="@+id/textField"
         app:layout_constraintStart_toStartOf="@+id/textField"
-        app:layout_constraintTop_toBottomOf="@+id/textField">
+        app:layout_constraintTop_toBottomOf="@+id/textField"
+        android:textAppearance="?attr/textAppearanceTitleMedium"/>
+
+    <ScrollView
+        android:id="@+id/sv_wine_type"
+        android:layout_width="0dp"
+        android:layout_height="160dp"
+        android:layout_marginTop="24dp"
+        app:layout_constraintEnd_toEndOf="@+id/tv_wine_type_title"
+        app:layout_constraintStart_toStartOf="@+id/tv_wine_type_title"
+        app:layout_constraintTop_toBottomOf="@+id/tv_wine_type_title">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="match_parent"
             android:orientation="horizontal">
 
             <androidx.recyclerview.widget.RecyclerView
@@ -58,6 +70,49 @@
                 app:layout_constraintTop_toBottomOf="@+id/textField" />
         </LinearLayout>
     </ScrollView>
+
+    <TextView
+        android:id="@+id/tv_wine_country_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="54dp"
+        android:text="@string/title_wine_country"
+        android:textAppearance="?attr/textAppearanceTitleMedium"
+        app:layout_constraintEnd_toEndOf="@+id/sv_wine_type"
+        app:layout_constraintStart_toStartOf="@+id/sv_wine_type"
+        app:layout_constraintTop_toBottomOf="@+id/sv_wine_type" />
+
+    <ScrollView
+        android:id="@+id/sv_wine_country"
+        android:layout_width="0dp"
+        android:layout_height="160dp"
+        android:layout_marginTop="24dp"
+        app:layout_constraintEnd_toEndOf="@+id/tv_wine_country_title"
+        app:layout_constraintStart_toStartOf="@+id/tv_wine_country_title"
+        app:layout_constraintTop_toBottomOf="@+id/tv_wine_country_title">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_wine_country"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </LinearLayout>
+    </ScrollView>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/floatingActionButton3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="50dp"
+        android:layout_marginBottom="50dp"
+        android:clickable="true"
+        android:src="@drawable/photo_camera_24px"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
