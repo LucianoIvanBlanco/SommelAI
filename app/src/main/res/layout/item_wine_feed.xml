@@ -57,7 +57,7 @@
                                 android:id="@+id/iv_save"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:contentDescription="@string/todo"
+                                android:contentDescription=""
                                 app:srcCompat="@drawable/ic_baseline_bookmark_border_24" />
                         </LinearLayout>
 
@@ -102,10 +102,10 @@
                             android:textColor="@color/md_theme_light_primary" />
 
                         <ImageView
-                            android:id="@+id/imageView2"
+                            android:id="@+id/iv_icon_fav"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:contentDescription="@string/todo"
+                            android:contentDescription=""
                             app:srcCompat="@drawable/ic_baseline_star_24" />
                     </LinearLayout>
 
@@ -121,10 +121,9 @@
                         android:id="@+id/iv_review_image"
                         android:layout_width="match_parent"
                         android:layout_height="235dp"
-                        android:contentDescription="@string/image_description"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/grad_default_img"
-                        app:layout_constraintDimensionRatio="W, 3:4" />
+                        app:layout_constraintDimensionRatio="W, 3:4"
+                        app:srcCompat="@drawable/ic_baseline_star_24"/>
                 </LinearLayout>
 
                 <LinearLayout
@@ -189,7 +188,7 @@
         android:layout_marginBottom="16dp"
         android:background="@android:color/transparent"
         android:backgroundTint="@android:color/transparent"
-        android:contentDescription="@string/todo"
+        android:contentDescription=""
         android:rotation="180"
         android:translationZ="2dp"
         app:layout_constraintBottom_toBottomOf="@+id/mcv_wine_type"

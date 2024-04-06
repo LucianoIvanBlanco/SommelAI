@@ -6,15 +6,25 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.blanco.somelai.R
+import com.blanco.somelai.databinding.FragmentFeedBinding
+import com.blanco.somelai.databinding.FragmentSearchBinding
+import com.blanco.somelai.ui.adapter.WineCountryAdapter
+import com.blanco.somelai.ui.adapter.WineTypeAdapter
 
 class SearchFragment : Fragment() {
+
+    private lateinit var _binding: FragmentSearchBinding
+    private val binding get() = _binding
+
+    private lateinit var wineCountryAdapter: WineCountryAdapter
+    private lateinit var wineTypeAdapter: WineTypeAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_search, container, false)
+        _binding = FragmentSearchBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
 }

@@ -30,4 +30,5 @@
     <string name="img_description">Imagen</string>
     <string name="title_wine_country">Vinos por pais:</string>
     <string name="title_category_wine_type">Vinos por tipo:</string>
+    <string name="default_score">5.5</string>
 </resources>
