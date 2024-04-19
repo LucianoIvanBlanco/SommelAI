@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "585013173239",
+    "firebase_url": "https://somelai-6809d-default-rtdb.firebaseio.com",
+    "project_id": "somelai-6809d",
+    "storage_bucket": "somelai-6809d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:585013173239:android:8ebdab81e7942ae535ecf2",
+        "android_client_info": {
+          "package_name": "com.blanco.somelai"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCy_xEXSnRJQgNDtBCl2dNz3BvQJxGEkss"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

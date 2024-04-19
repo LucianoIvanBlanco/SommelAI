@@ -21,7 +21,7 @@ object WineApi {
         .build()
 
     private val retrofit = Retrofit.Builder()
-        .baseUrl("") // TODO poner el url de la API //El url base siempre debe acabar en /
+        .baseUrl("https://api.sampleapis.com/wines/")
         .client(client)//Intercepta por consola los datos enviados y recibidos de las peticiones
         .addConverterFactory(GsonConverterFactory.create())//Parsea el json recibido a nuestras data class
         .build()

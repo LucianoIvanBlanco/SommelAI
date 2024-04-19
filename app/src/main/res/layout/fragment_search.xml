@@ -40,79 +40,443 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
+        android:paddingStart="12dp"
         android:text="@string/title_category_wine_type"
+        android:textAppearance="?attr/textAppearanceTitleMedium"
         app:layout_constraintEnd_toEndOf="@+id/textField"
         app:layout_constraintStart_toStartOf="@+id/textField"
-        app:layout_constraintTop_toBottomOf="@+id/textField"
-        android:textAppearance="?attr/textAppearanceTitleMedium"/>
+        app:layout_constraintTop_toBottomOf="@+id/textField" />
 
-    <ScrollView
-        android:id="@+id/sv_wine_type"
-        android:layout_width="0dp"
-        android:layout_height="160dp"
-        android:layout_marginTop="24dp"
+    <LinearLayout
+        android:id="@+id/linearLayoutH1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="@+id/tv_wine_type_title"
         app:layout_constraintStart_toStartOf="@+id/tv_wine_type_title"
         app:layout_constraintTop_toBottomOf="@+id/tv_wine_type_title">
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="horizontal">
+            android:id="@+id/linearLayoutV1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:clipToPadding="false"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="@+id/tv_wine_type_title"
+            app:layout_constraintTop_toBottomOf="@+id/tv_wine_type_title">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_wine_type"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:layout_constraintEnd_toEndOf="@+id/textField"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="@+id/textField"
-                app:layout_constraintTop_toBottomOf="@+id/textField" />
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/mcv_wine_red"
+                style="?attr/materialCardViewElevatedStyle"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                app:cardElevation="2dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <LinearLayout
+                    android:id="@+id/linearLayouH2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/iv_wine_red"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:scaleType="centerCrop"
+                        tools:srcCompat="@drawable/tinto" />
+
+                    <TextView
+                        android:id="@+id/tv_wine_red"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:paddingStart="6dp"
+                        android:text="@string/red_wine_title"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/mcv_wine_white"
+                style="?attr/materialCardViewElevatedStyle"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardElevation="2dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <LinearLayout
+                    android:id="@+id/linearLayoutH4"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/iv_wine_white"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:scaleType="centerCrop"
+                        tools:srcCompat="@drawable/blanco" />
+
+                    <TextView
+                        android:id="@+id/tv_wine_white"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:paddingStart="6dp"
+                        android:text="@string/white_wine_title"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
         </LinearLayout>
-    </ScrollView>
-
-    <TextView
-        android:id="@+id/tv_wine_country_title"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="54dp"
-        android:text="@string/title_wine_country"
-        android:textAppearance="?attr/textAppearanceTitleMedium"
-        app:layout_constraintEnd_toEndOf="@+id/sv_wine_type"
-        app:layout_constraintStart_toStartOf="@+id/sv_wine_type"
-        app:layout_constraintTop_toBottomOf="@+id/sv_wine_type" />
-
-    <ScrollView
-        android:id="@+id/sv_wine_country"
-        android:layout_width="0dp"
-        android:layout_height="160dp"
-        android:layout_marginTop="24dp"
-        app:layout_constraintEnd_toEndOf="@+id/tv_wine_country_title"
-        app:layout_constraintStart_toStartOf="@+id/tv_wine_country_title"
-        app:layout_constraintTop_toBottomOf="@+id/tv_wine_country_title">
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:id="@+id/linearLayoutV2"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="@+id/tv_wine_type_title"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="@+id/tv_wine_type_title"
+            app:layout_constraintTop_toBottomOf="@+id/tv_wine_type_title">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/rv_wine_country"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/mcv_wine_sparkling"
+                style="?attr/materialCardViewElevatedStyle"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                app:cardElevation="2dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <LinearLayout
+                    android:id="@+id/linearLayoutH5"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/iv_wine_sparkling"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:scaleType="centerCrop"
+                        tools:srcCompat="@drawable/aaddvc" />
+
+                    <TextView
+                        android:id="@+id/tv_wine_sparkling"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:paddingStart="10dp"
+                        android:text="@string/sparkling_wine_title"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/mcv_wine_rose"
+                style="?attr/materialCardViewElevatedStyle"
+                android:layout_width="160dp"
+                android:layout_height="wrap_content"
+                app:cardElevation="2dp"
+                android:layout_marginTop="16dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <LinearLayout
+                    android:id="@+id/linearLayoutH6"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/iv_wine_rose"
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:scaleType="centerCrop"
+                        tools:srcCompat="@drawable/rosado" />
+
+                    <TextView
+                        android:id="@+id/tv_wine_rose"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:paddingStart="6dp"
+                        android:paddingTop="0dp"
+                        android:text="@string/rose_wine_title"
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
-    </ScrollView>
+
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tv_wine_country_type"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:paddingStart="12dp"
+        android:textAppearance="?attr/textAppearanceTitleMedium"
+        android:text="@string/title_wine_country"
+        app:layout_constraintEnd_toEndOf="@+id/tv_wine_type_title"
+        app:layout_constraintStart_toStartOf="@+id/tv_wine_type_title"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayoutH1" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/floatingActionButton3"
+        android:id="@+id/fab_camera"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="50dp"
-        android:layout_marginBottom="50dp"
+        android:layout_marginBottom="30dp"
         android:clickable="true"
         android:src="@drawable/photo_camera_24px"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/linearLayoutH7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="@+id/tv_wine_country_type"
+        app:layout_constraintHorizontal_bias="0.50"
+        app:layout_constraintStart_toStartOf="@+id/tv_wine_country_type"
+        app:layout_constraintTop_toBottomOf="@+id/tv_wine_country_type">
+
+        <LinearLayout
+            android:id="@+id/linearLayoutV3"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingRight="12dp">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/mcv_country_spain"
+                style="?attr/materialCardViewElevatedStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                tools:ignore="MissingConstraints"
+                tools:layout_editor_absoluteX="8dp">
+
+                <LinearLayout
+                    android:id="@+id/linearLayoutV4"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Media -->
+                    <ImageView
+                        android:id="@+id/iv_country_spain"
+                        android:layout_width="130dp"
+                        android:layout_height="60dp"
+                        android:contentDescription="@string/img_description"
+                        android:scaleType="fitXY"
+                        app:srcCompat="@drawable/spain" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <!-- Title, secondary and supporting text -->
+                        <TextView
+                            android:id="@+id/tv_wine_country_spain"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center_horizontal"
+                            android:text="España"
+                            android:textAppearance="?attr/textAppearanceTitleMedium" />
+
+                    </LinearLayout>
+
+                    <!-- Buttons -->
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/mcv_country_france"
+                style="?attr/materialCardViewElevatedStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                tools:ignore="MissingConstraints"
+                tools:layout_editor_absoluteX="8dp">
+
+                <LinearLayout
+                    android:id="@+id/linearLayoutV5"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Media -->
+                    <ImageView
+                        android:id="@+id/iv_country_france"
+                        android:layout_width="130dp"
+                        android:layout_height="60dp"
+                        android:contentDescription="@string/img_description"
+                        android:scaleType="centerCrop"
+                        app:srcCompat="@drawable/francia" />
+
+                    <LinearLayout
+                        android:id="@+id/linearLayoutV6"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <!-- Title, secondary and supporting text -->
+                        <TextView
+                            android:id="@+id/tv_wine_country_france"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Francia"
+                            android:textAppearance="?attr/textAppearanceTitleMedium" />
+
+                    </LinearLayout>
+
+                    <!-- Buttons -->
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/linerLayoutV7"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingLeft="12dp">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/mcv_country_portugal"
+                style="?attr/materialCardViewElevatedStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                tools:ignore="MissingConstraints"
+                tools:layout_editor_absoluteX="8dp">
+
+                <LinearLayout
+                    android:id="@+id/linearLayoutV8"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Media -->
+                    <ImageView
+                        android:id="@+id/iv_country_portugal"
+                        android:layout_width="130dp"
+                        android:layout_height="60dp"
+                        android:contentDescription="@string/img_description"
+                        android:scaleType="centerCrop"
+                        app:srcCompat="@drawable/portugal" />
+
+                    <LinearLayout
+                        android:id="@+id/linearLayoutV9"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <!-- Title, secondary and supporting text -->
+                        <TextView
+                            android:id="@+id/tv_wine_country_portugal"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Portugal"
+                            android:textAppearance="?attr/textAppearanceTitleMedium" />
+
+                    </LinearLayout>
+
+                    <!-- Buttons -->
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/mcv_country_italy"
+                style="?attr/materialCardViewElevatedStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                tools:ignore="MissingConstraints"
+                tools:layout_editor_absoluteX="8dp">
+
+                <LinearLayout
+                    android:id="@+id/linearLayoutV10"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <!-- Media -->
+                    <ImageView
+                        android:id="@+id/iv_country_italy"
+                        android:layout_width="130dp"
+                        android:layout_height="60dp"
+                        android:contentDescription="@string/img_description"
+                        android:scaleType="centerCrop"
+                        app:srcCompat="@drawable/italy" />
+
+                    <LinearLayout
+                        android:id="@+id/linearLayoutV11"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <!-- Title, secondary and supporting text -->
+                        <TextView
+                            android:id="@+id/tv_wine_country_italy"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Italia"
+                            android:textAppearance="?attr/textAppearanceTitleMedium" />
+
+                    </LinearLayout>
+
+                    <!-- Buttons -->
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+
+        </LinearLayout>
+    </LinearLayout>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
