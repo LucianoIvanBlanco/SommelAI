@@ -2,6 +2,7 @@ package com.blanco.somelai.data.firebase.realtime_database
 
 import android.util.Log
 import com.blanco.somelai.data.firebase.realtime_database.model.UserData
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.tasks.await
 
@@ -10,10 +11,10 @@ class RealTimeDatabaseManager {
     private val databaseReference = FirebaseDatabase.getInstance().reference
 
     // No la vamos a usar ya que solo almacenaremos el id de cada vino en la lista (historial)
+    //Nos conectamos la nodo de "faves" mediante ".child("faves")". Si quisieramos almacenar
+    // más objetos en otras funciones, deberíamos conectarnos a otro child para tener la
+    // información separada. Si el nodo no está creado en la base de datos, lo crea al conectarnos.
      suspend fun addUser(user: UserData): UserData? {
-        //Nos conectamos la nodo de "faves" mediante ".child("faves")". Si quisieramos almacenar
-        // más objetos en otras funciones, deberíamos conectarnos a otro child para tener la
-        // información separada. Si el nodo no está creado en la base de datos, lo crea al conectarnos.
         val connection = databaseReference.child("users")
         //Creamos una key
         val key = connection.push().key
@@ -34,7 +35,7 @@ class RealTimeDatabaseManager {
         }
     }
 
-    fun deleteUser(userId: String) {
+    suspend fun deleteUser(userId: String) {
         val connection = databaseReference.child("users")
         connection.child(userId).removeValue()
         Log.i("Usuario", "Borrado")
@@ -47,24 +48,23 @@ class RealTimeDatabaseManager {
         connection.child(user.key!!).setValue(user)
     }
 
-//    suspend fun readUser(userName: String): UserData? {
-//        val connection = databaseReference.child("users")
-//
-//        val snapshot = connection.get()
-//        snapshot.await()
-//
-//        snapshot.children.mapNotNull { dataSnapshot ->
-//            val user = dataSnapshot.getValue(UserData::class.java)
-//            Log.i("User", "$user")
-//            if (user != null && user.userId == userName) {
-//                return user
-//            }
-//        }
-//        return null
-//    }
+    suspend fun readUser(userId: String): UserData? {
+        val connection = databaseReference.child("users")
 
+        val snapshot = connection.get()
+        snapshot.await()
 
+        snapshot.result.children.mapNotNull { dataSnapshot ->
+            val user = dataSnapshot.getValue(UserData::class.java)
+            Log.i("User", "$user")
+            if (user != null && user.uid == userId) {
+                return user
+            }
+        }
+        return null
     }
+
+}
 
 
 //    fun updateFavourite(favourite: FavouriteAdvertisement) {
@@ -76,25 +76,7 @@ class RealTimeDatabaseManager {
 //        connection.child(favourite.advertisementId).setValue(favourite)
 //    }
 
-//    suspend fun readFavourite(advertisementId: String): FavouriteAdvertisement? {
-//        //Nos conectamos la nodo de "faves" mediante ".child("faves")"
-//        val connection = databaseReference.child("faves")
-//
-//        val snapshot = connection.get()
-//        //Esperamos la conexión para recoger la lista
-//        snapshot.await()
-//
-//        snapshot.result.children.mapNotNull { dataSnapshot ->
-//            //Recogemos cada favorito y le asignamos su key si no son nulos
-//            val favourite = dataSnapshot.getValue(FavouriteAdvertisement::class.java)
-//            Log.i("Fave", "$favourite")
-//            if (favourite != null && favourite.advertisementId == advertisementId) {
-//                //Si encontramos el anuncio que coincida el ID, lo retornamos
-//                return favourite
-//            }
-//        }
-//        //Si NO encontramos el anuncio que coincida el ID, devolvemos un nulo
-//        return null
-//    }
+
+
 
 

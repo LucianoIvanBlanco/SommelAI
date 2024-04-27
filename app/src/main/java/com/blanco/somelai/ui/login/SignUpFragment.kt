@@ -31,6 +31,7 @@ class SignUpFragment : Fragment() {
     private lateinit var realTimeDatabaseManager: RealTimeDatabaseManager
     private lateinit var auth: FirebaseAuth
     private lateinit var reference: DatabaseReference
+    private lateinit var dataStoreManager: DataStoreManager
 
     private lateinit var _binding: FragmentSignUpBinding
     private val binding: FragmentSignUpBinding get() = _binding
@@ -46,6 +47,7 @@ class SignUpFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        dataStoreManager = DataStoreManager(requireContext())
         realTimeDatabaseManager = RealTimeDatabaseManager() // Inicializa tu RealTimeDatabaseManager
         auth = FirebaseAuth.getInstance()
         setClicks()
@@ -67,8 +69,10 @@ class SignUpFragment : Fragment() {
         binding.btnSignUp.setOnClickListener {
             val userEmail = binding.etSignUpEmail.text.toString().trim()
             val userPassword = binding.etLoginPassword.text.toString().trim()
+            val h_userName: String = binding.etUserName.text.toString().trim()
+            val h_fullName: String = binding.etSignUpName.text.toString().trim()
             if (isDataValid()) {
-                createFirebaseUser(userEmail, userPassword)
+                createFirebaseUser(userEmail, userPassword, h_userName, h_fullName)
             } else {
                 showInvalidDataMessage()
             }
@@ -78,32 +82,34 @@ class SignUpFragment : Fragment() {
     //endregion --- UI Related ---
 
     //region --- Firebase ---
-    private fun createFirebaseUser(email: String, password: String) {
+    private fun createFirebaseUser(email: String, password: String, userName: String, fullName: String) {
         val firebaseAuth = EmailAndPasswordAuthenticationManager()
         lifecycleScope.launch(Dispatchers.IO) {
             if (email.isNotEmpty() && password.isNotEmpty()) {
                 val resultIsSuccessful =
                     firebaseAuth.createUserFirebaseEmailAndPassword(email, password)
                 if (resultIsSuccessful) {
-
+// TODO Si el email ya esta registrado y lo queremos registrar nuevamente, la app peta
                     // Si la respuesta es exitosa, cojemos el UID y usandol oguardamos el resto de campos del user
                     var uid: String = ""
                     uid = auth.currentUser!!.uid
                     reference = FirebaseDatabase.getInstance().reference.child("users").child(uid)
 
                     val hashMap = HashMap<String, Any>()
-                    val h_userName: String = binding.etUserName.text.toString()
-                    val h_fullName: String = binding.etSignUpName.text.toString()
-
                     hashMap["uid"] = uid
-                    hashMap["userName"] = h_userName
+                    hashMap["userName"] = userName
                     hashMap["userEmail"] = email
-                    hashMap["userPasswprd"] = password
-                    hashMap["userFullname"] = h_fullName
+                    hashMap["userPassword"] = password
+                    hashMap["userFullname"] = fullName
 
                     reference.updateChildren(hashMap).addOnCompleteListener {}
                         .addOnFailureListener {}
                     Log.i("createFirebaseMailAndPasswordUser", "Usuario creado en Firebase")
+
+                    // Creamos usuario en dataStore
+                    dataStoreManager.saveUserData(email, password, uid, fullName, userName)
+                    Log.i("saveUserData", "Usuario creado en DataStore")
+
                     requireActivity().runOnUiThread {
                         Toast.makeText(requireContext(), R.string.sign_up_saved_user_message, Toast.LENGTH_SHORT).show()
                     }

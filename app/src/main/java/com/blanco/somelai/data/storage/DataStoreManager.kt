@@ -17,11 +17,14 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "SO
 class DataStoreManager (val context: Context) {
 
     private val emailKey = "EMAIL"
+    private val passwordKey = "PASSWORD"
     private val jwtKey = "JWT"
     private val userNameKey = "USERNAME"
     private val fullNameKey = "FULLNAME"
+    private val userPhotoUrl = "PHTOTO_URL"
     private val userIdKey = "USER_ID"
     private val isLoggedKey = "IS_LOGGED"
+
     private val wine = "WINE"
     private val winery = "WINERY"
     private val location = "LOCATION"
@@ -68,17 +71,18 @@ class DataStoreManager (val context: Context) {
         }
     }
 
-    suspend fun saveUser(email: String, jwt: String) {
+    suspend fun saveUser(email: String, password: String) {
         putString(emailKey, email)
-        putString(jwtKey, jwt)
+        putString(passwordKey, password)
         putBoolean(isLoggedKey, true)
     }
 
-    suspend fun saveUserData(user: UserDataResponse) {
-        putString(emailKey, user.email)
-        putString(userIdKey, user.id)
-        putString(fullNameKey, user.fullName)
-        putString(userNameKey, user.userName)
+    suspend fun saveUserData(email: String, password: String, id: String, fullName: String, userName: String) {
+        putString(emailKey, email)
+        putString(passwordKey, password)
+        putString(userIdKey, id)
+        putString(fullNameKey, fullName)
+        putString(userNameKey, userName)
     }
 
     suspend fun getToken(): String? {
@@ -86,18 +90,13 @@ class DataStoreManager (val context: Context) {
         return preferences[stringPreferencesKey(jwtKey)]
     }
 
-    suspend fun getUserData(): UserDataResponse? {
+    suspend fun getUserData(){
         val preferences = context.dataStore.data.first()
         val userName = preferences[stringPreferencesKey(userNameKey)] ?: ""
         val fullName = preferences[stringPreferencesKey(fullNameKey)] ?: ""
         val email = preferences[stringPreferencesKey(emailKey)] ?: ""
         val id = preferences[stringPreferencesKey(userIdKey)] ?: ""
-        return UserDataResponse(
-            userName = userName,
-            fullName = fullName,
-            email = email,
-            id = id
-        )
+        val photo = preferences[stringPreferencesKey(userPhotoUrl)] ?: ""
     }
 
     suspend fun isUserLogged(): Boolean {

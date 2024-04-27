@@ -10,6 +10,7 @@ import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.blanco.somelai.R
 import com.blanco.somelai.data.firebase.authentification.EmailAndPasswordAuthenticationManager
+import com.blanco.somelai.data.storage.DataStoreManager
 import com.blanco.somelai.databinding.FragmentLoginBinding
 import com.blanco.somelai.ui.home.HomeActivity
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
@@ -21,6 +22,7 @@ class LoginFragment : BottomSheetDialogFragment() {
     private lateinit var _binding: FragmentLoginBinding
     private val binding: FragmentLoginBinding get() = _binding
     val firebaseAuth = EmailAndPasswordAuthenticationManager()
+    private lateinit var dataStoreManager: DataStoreManager
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,7 +35,13 @@ class LoginFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        dataStoreManager = DataStoreManager(requireContext())
         setClicks()
+    }
+
+    private fun cleanData(){
+        binding.etLoginEmail.setText("")
+        binding.etLoginPassword.setText("")
     }
 
     private fun isDataValid(): Boolean {
@@ -55,7 +63,10 @@ class LoginFragment : BottomSheetDialogFragment() {
                 showEmptyError()
             }
         }
-        binding.btnLoginGoToSignUp.setOnClickListener { navigateToSignUp() }
+        binding.btnLoginGoToSignUp.setOnClickListener {
+            navigateToSignUp()
+            cleanData()
+        }
     }
 
     private fun navigateToSignUp() {
@@ -72,6 +83,7 @@ class LoginFragment : BottomSheetDialogFragment() {
             val resultIsSuccessful =
                 firebaseAuth.signInFirebaseEmailAndPassword(email, password)
             if (resultIsSuccessful) {
+                dataStoreManager.saveUser(email, password)
                 navigateToHome()
             } else {
                 // TODO Manejar que pasa cuando el useuario pone una contraseña incorrecta
