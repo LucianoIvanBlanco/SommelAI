@@ -144,7 +144,7 @@ class ProfileFragment : Fragment() {
 
     //region --- DataStore ---
 
-    // Borramos de dataStor
+    // Borramos de dataStore
     private fun deleteUserStoredData() {
         lifecycleScope.launch(Dispatchers.IO) {
             dataStoreManager.logOut()

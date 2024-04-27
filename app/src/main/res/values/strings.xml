@@ -48,4 +48,7 @@
     <string name="account_delete_dialog_message">¿Estás seguro?</string>
     <string name="account_delete_positive_button">Sí, quiero eliminar mi cuenta</string>
     <string name="account_delete_dialog_negative_button">No, lo he pensado mejor</string>
+    <string name="profile_edit_bouton">Editar perfil</string>
+    <string name="profile_save_changes_button">Guardar cambios</string>
+    <string name="go_back_button">Volver atrás</string>
 </resources>

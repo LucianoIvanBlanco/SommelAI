@@ -63,7 +63,7 @@
         app:layout_constraintTop_toBottomOf="@+id/til_sign_up_user_name">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/et_sign_up_name"
+            android:id="@+id/et_profile_sign_up_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/sign_up_name_hint"
@@ -112,7 +112,7 @@
         app:passwordToggleEnabled="true">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/et_login_password"
+            android:id="@+id/et_profile_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/sign_up_password_hint"

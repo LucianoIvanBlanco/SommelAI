@@ -52,14 +52,12 @@
         style="@style/CustomButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
         android:layout_marginBottom="24dp"
+        android:backgroundTint="@color/md_theme_light_secondary"
         android:text="@string/profile_log_out_button"
         app:layout_constraintBottom_toTopOf="@+id/btn_delete_account"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintEnd_toEndOf="@+id/btn_edit_profile"
+        app:layout_constraintStart_toStartOf="@+id/btn_edit_profile" />
 
     <Button
         android:id="@+id/btn_delete_account"
@@ -71,4 +69,17 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/btn_log_out"
         app:layout_constraintStart_toStartOf="@+id/btn_log_out" />
+
+    <Button
+        android:id="@+id/btn_edit_profile"
+        style="@style/CustomButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="24dp"
+        android:text="@string/profile_edit_bouton"
+        app:layout_constraintBottom_toTopOf="@+id/btn_log_out"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
