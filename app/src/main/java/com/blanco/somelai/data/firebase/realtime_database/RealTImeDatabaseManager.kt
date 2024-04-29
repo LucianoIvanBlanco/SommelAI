@@ -45,7 +45,7 @@ class RealTimeDatabaseManager {
     fun updateUser(user: UserData) {
         //Nos conectamos la nodo de "users" mediante ".child("users")
         val connection = databaseReference.child("users")
-        connection.child(user.key!!).setValue(user)
+        connection.child(user.uid!!).setValue(user)
     }
 
     suspend fun readUser(userId: String): UserData? {
@@ -65,16 +65,6 @@ class RealTimeDatabaseManager {
     }
 
 }
-
-
-//    fun updateFavourite(favourite: FavouriteAdvertisement) {
-//        //Nos conectamos la nodo de "faves" mediante ".child("faves")"
-//        val connection = databaseReference.child("faves")
-//        //Actualizamos este favorito por su id, si os dais cuenta es la misma función
-//        // que para crear un nuevo dato. Solo que en este caso el key ya existía
-//        // previamente y sobreescribimos la información
-//        connection.child(favourite.advertisementId).setValue(favourite)
-//    }
 
 
 
