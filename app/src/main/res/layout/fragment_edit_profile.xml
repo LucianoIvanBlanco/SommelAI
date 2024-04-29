@@ -51,7 +51,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textInputLayout2">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/et_profile_sign_up_name"
+            android:id="@+id/et_profile_full_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/sign_up_name_hint"
@@ -89,22 +89,10 @@
         style="@style/CustomButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="60dp"
         android:text="@string/profile_save_changes_button"
-        app:layout_constraintBottom_toTopOf="@+id/btn_back"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/til_login_password"
         app:layout_constraintStart_toStartOf="@+id/til_login_password" />
-
-    <Button
-        android:id="@+id/btn_back"
-        style="@style/CustomButton"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
-        android:backgroundTint="@color/md_theme_light_secondary"
-        android:text="@string/go_back_button"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/btn_save_changes"
-        app:layout_constraintStart_toStartOf="@+id/btn_save_changes" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.blanco.somelai.R
 import com.blanco.somelai.data.firebase.authentification.EmailAndPasswordAuthenticationManager
 import com.blanco.somelai.data.firebase.realtime_database.RealTimeDatabaseManager
@@ -66,6 +67,14 @@ class ProfileFragment : Fragment() {
         binding.btnLogOut.setOnClickListener {
             logOut()
         }
+
+        binding.btnEditProfile.setOnClickListener {
+            navigateToEditProfile()
+        }
+    }
+
+    private fun navigateToEditProfile() {
+        findNavController().navigate(R.id.editProfileFragment)
     }
 
     // leemos los datos del usuario en fireBase
