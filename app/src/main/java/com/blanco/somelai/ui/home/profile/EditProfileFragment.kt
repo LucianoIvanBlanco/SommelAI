@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
@@ -12,6 +13,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -47,6 +49,7 @@ class EditProfileFragment : Fragment() {
     private var uploadedImageUrl: String? = null
 
     private lateinit var cloudStorageManager: CloudStorageManager
+    private lateinit var profileImageButton: ImageButton
 
 
     //region --- Launchers ---
@@ -94,28 +97,36 @@ class EditProfileFragment : Fragment() {
         realTimeDatabaseManager = RealTimeDatabaseManager()
         auth = FirebaseAuth.getInstance()
 
+
+        // Inicializa tu ImageButton
+        profileImageButton = view.findViewById(R.id.img_btn_profile)
+
+        // Carga la foto de perfil del usuario logueado
+        loadUserProfilePicture()
+
         setClicks()
         getUserData()
     }
+
+
 
     //region --- UI Related ---
     private fun setClicks() {
         binding.btnSaveChanges.setOnClickListener {
             if (isDataValid()) {
-                updateUserProfile()
-                showMessage("Datos actualizados")
+                if (uploadedImageUrl!= null) {
+                    updateUserProfile()
+                    showMessage("Datos actualizados")
+                } else {
+                    // Manejar el caso en que uploadedImageUrl es null
+                    showMessage("No se ha subido ninguna imagen.")
+                }
                 findNavController().popBackStack()
             } else {
                 showMessage("Error, debes completar todos los campos")
             }
         }
 
-        binding.imgBtnProfile.setImageDrawable(
-            resources.getDrawable(
-                R.drawable.bg_image_selection_gradient,
-                requireContext().theme
-            )
-        )
 
         binding.imgBtnProfile.setOnClickListener{
             // TODO logica para abrir galeria y seleccionar foto
@@ -129,11 +140,31 @@ class EditProfileFragment : Fragment() {
 
     }
 
+    private fun loadUserProfilePicture() {
+        lifecycleScope.launch {
+            val userPhotoUrl = cloudStorageManager.getUserProfilePicture()
+            if (userPhotoUrl!= null) {
+                // Usa Glide para cargar la foto de perfil
+                Glide.with(requireContext())
+                    .load(userPhotoUrl)
+                    .into(profileImageButton)
+            } else {
+                // Carga una imagen por defecto si no hay foto de perfil
+                Glide.with(requireContext())
+                    .load(R.drawable.ic_emoji) // Asegúrate de que ic_emoji exista en tus recursos de drawable
+                    .into(profileImageButton)
+            }
+        }
+    }
+
+
 
     private fun setImagePreview(uploadedImageResponse: String) {
-        Glide.with(binding.imgBtnProfile).load(uploadedImageResponse)
+        Glide.with(binding.imgBtnProfile)
+            .load(uploadedImageResponse)
             .centerCrop()
-            .placeholder(R.drawable.bg_divider)
+            .placeholder(R.drawable.bg_divider) // Imagen de marcador de posición
+            .fallback(R.drawable.ic_emoji) // Imagen a mostrar si la carga falla
             .into(binding.imgBtnProfile)
     }
 
@@ -142,7 +173,7 @@ class EditProfileFragment : Fragment() {
     //region --- Firebase - CloudStorage ---
     private fun uploadImage(selectedImageUri: Uri?) {
         lifecycleScope.launch(Dispatchers.IO) {
-            val uploadedImageResponse = cloudStorageManager.uploadAdvertisementImage(selectedImageUri!!)
+            val uploadedImageResponse = cloudStorageManager.uploadProfileImage(selectedImageUri!!)
 
             withContext(Dispatchers.Main) {
                 if (uploadedImageResponse != null) {
@@ -161,7 +192,7 @@ class EditProfileFragment : Fragment() {
                 val wasDeleted: Boolean = CloudStorageManager().deleteImage(uploadedImageUrl!!)
 
                 if (wasDeleted) {
-                    Log.i("NewAdvertisementFragment", "Foto eliminada")
+                    Log.i("Users", "Foto eliminada")
                 }
                 openGallery()
             }
@@ -186,7 +217,8 @@ class EditProfileFragment : Fragment() {
                 userName.matches(userNamePattern) && userName.isNotEmpty()
     }
 
-    // TODO al subir la foto explota la app, te deja abrir la galeria y seleccioar foto pero ahi peta. De la camara ni rastro
+    // TODO se puede subir la foto pero no se puede ver desde profile ni desde editProfile una vez guardada. tampoco da opcion a
+    // abrir la camara
     fun updateUserProfile() {
         // Recopila los datos de los campos EditText
         val userName = binding.etProfileUserName.text.toString()
@@ -196,6 +228,7 @@ class EditProfileFragment : Fragment() {
         val userUid =
             auth.currentUser?.uid.toString()// Aquí debes obtener la clave del usuario actual
         val userEmail = auth.currentUser?.email.toString()
+
         val userPhotoUrl = uploadedImageUrl!!
 
         // Crea un objeto UserData con los datos recopilados
@@ -236,7 +269,13 @@ class EditProfileFragment : Fragment() {
         binding.etProfileUserName.setText(user.userName)
         binding.etProfileFullName.setText(user.userFullName)
         binding.etProfilePassword.setText(user.userPassword)
+        // Carga la foto de perfil del usuario si existe, de lo contrario muestra ic_emoji
+        Glide.with(requireContext())
+            .load(user.userPhotoUrl?: R.drawable.ic_emoji) // Usa Glide para cargar la foto de perfil
+            .into(binding.imgBtnProfile) // Asegúrate de que imgBtnProfile es el ID correcto de tu ImageButton
     }
+
+
 
     private fun showMessage(message: String) {
         lifecycleScope.launch(Dispatchers.Main) {

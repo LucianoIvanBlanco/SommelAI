@@ -2,6 +2,7 @@ package com.blanco.somelai.data.firebase.cloud_storage
 
 import android.net.Uri
 import android.util.Log
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.ListResult
 import com.google.firebase.storage.StorageReference
@@ -10,7 +11,7 @@ import kotlinx.coroutines.tasks.await
 class CloudStorageManager {
     private val storageReference: StorageReference = FirebaseStorage.getInstance().reference
 
-    suspend fun uploadAdvertisementImage(uri: Uri): String? {
+    suspend fun uploadProfileImage(uri: Uri): String? {
         val imageName = "$uri".replace(
             "/",
             "_"
@@ -18,10 +19,10 @@ class CloudStorageManager {
         //Creamos una variable para almacenar el enlace de descarga.
         var imageUrl: String? = null
         //Creamos la referencia dentro de la carpeta de advertisement a nuestra imagen
-        val advertisementReference = storageReference.child("advertisement/$imageName")
+        val photoReference = storageReference.child("profileImage/$imageName")
 
         //Mediante el método .putFile() subimos el archivo a Firebase
-        advertisementReference.putFile(uri).continueWithTask { task ->
+        photoReference.putFile(uri).continueWithTask { task ->
             // Si no se ha podido subir la foto lanzamos la excepción
             if (!task.isSuccessful) {
                 Log.e("CloudStorageManager", "No se ha podido subir la foto")
@@ -29,14 +30,14 @@ class CloudStorageManager {
             }
             // Añadimos a la Task enlace de descarga a la task para poder recuperarlo en
             // poder recuperarlo en el onCompleteListener
-            advertisementReference.downloadUrl
+            photoReference.downloadUrl
         }.addOnCompleteListener { task ->
             if (task.isSuccessful) {
                 //Recuperamos el enlace donde se subió la imagen
                 imageUrl = "${task.result}"
-                Log.i("NewAdv", "Enlace de la foto: $imageUrl")
+                Log.i("User", "Enlace de la foto: $imageUrl")
             } else {
-                Log.e("NewAdv", "No se ha podido subir la foto")
+                Log.e("User", "No se ha podido subir la foto")
             }
         }.await()
         //.await() hará que la función no continue hasta que termine la tarea
@@ -45,17 +46,29 @@ class CloudStorageManager {
 
     suspend fun getAllImages(): List<String> {
         //Accedemos al nodo de las imágenes de los anuncios
-        val advertisementReference = storageReference.child("advertisement")
+        val photoReference = storageReference.child("profileImage")
         //Creamos una lista vacía donde añadiremos los enlaces de las fotos
         val imageList = mutableListOf<String>()
         //Pedimos el result de la referencia
-        val result: ListResult = advertisementReference.listAll().await()
+        val result: ListResult = photoReference.listAll().await()
         //Iteramos la lista de items de la referencida con un forEach
         result.items.forEach { item ->
             //Añadimos a la lista vacía de los enlaces de descarga de cada item
             imageList.add(item.downloadUrl.toString())
         }
         return imageList
+    }
+
+    suspend fun getUserProfilePicture(): String? {
+        val user = FirebaseAuth.getInstance().currentUser
+        user?.let {
+            // Obtenemos la URL de la foto de perfil del usuario
+            val photoUrl = it.photoUrl
+            // Convertimos la URL a String si es necesario
+            return photoUrl.toString()
+        }
+        // Si no hay usuario logueado, retornamos null
+        return null
     }
 
     suspend fun deleteImage(url: String): Boolean {
@@ -75,7 +88,6 @@ class CloudStorageManager {
         }
         return wasSuccess
     }
-
-
-
 }
+
+

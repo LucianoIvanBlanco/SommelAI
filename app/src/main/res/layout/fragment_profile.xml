@@ -30,9 +30,7 @@
         app:contentPadding="32dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:shapeAppearance="@style/ShapeAppearanceOverlay.Circle"
-        app:tint="@color/md_theme_light_primaryContainer" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/tv_mail"

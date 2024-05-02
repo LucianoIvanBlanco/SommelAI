@@ -1,6 +1,7 @@
 package com.blanco.somelai.ui.home.profile
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -12,11 +13,13 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.blanco.somelai.R
 import com.blanco.somelai.data.firebase.authentification.EmailAndPasswordAuthenticationManager
+import com.blanco.somelai.data.firebase.cloud_storage.CloudStorageManager
 import com.blanco.somelai.data.firebase.realtime_database.RealTimeDatabaseManager
 import com.blanco.somelai.data.firebase.realtime_database.model.UserData
 import com.blanco.somelai.data.storage.DataStoreManager
 import com.blanco.somelai.databinding.FragmentProfileBinding
 import com.blanco.somelai.ui.login.MainActivity
+import com.bumptech.glide.Glide
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -39,6 +42,8 @@ class ProfileFragment : Fragment() {
 
     private lateinit var dataStoreManager: DataStoreManager
 
+    private lateinit var cloudStorageManager: CloudStorageManager
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -50,6 +55,7 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        cloudStorageManager = CloudStorageManager()
         dataStoreManager = DataStoreManager(requireContext())
         realTimeDatabaseManager = RealTimeDatabaseManager()
         auth = FirebaseAuth.getInstance()
@@ -99,11 +105,19 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    // TODO agregar funcion para que pinte la foto usuario
     private fun setUserData(user: UserData) {
         binding.tvMail.text = user.userEmail // Asegúrate de que UserData tenga un campo para el email
         binding.tvUserName.text = user.userName // Asegúrate de que UserData tenga un campo para el nombre de usuario
+
+        // TODO la imagen carga lento
+        Glide.with(requireContext())
+            .asBitmap() // Forzar a tratar la imagen como un bitmap
+            .load(user.userPhotoUrl?: R.drawable.ic_emoji)
+            .placeholder(R.drawable.ic_emoji)
+            .fallback(R.drawable.ic_emoji)
+            .into(binding.ivProfile)
     }
+
 
 
     // Borramos la cuenta de Database

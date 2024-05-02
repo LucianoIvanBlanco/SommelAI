@@ -53,7 +53,8 @@ class SignUpFragment : Fragment() {
         setClicks()
     }
 
-    // TODO FUNCIONA EL SIGN UP PERO SE PUEDE MEJORAR EL RENDIMIENTO
+    // TODO FUNCIONA EL SIGN UP PERO SE PUEDE MEJORAR EL RENDIMIENTO,
+    //TODO AGREGAR UN SEGUNDO CAMPO DE PSSWORD
 
     //region --- UI Related ---
     // Limpia los capos de texto
