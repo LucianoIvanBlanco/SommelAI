@@ -48,4 +48,14 @@
     <string name="account_delete_dialog_message">¿Estás seguro?</string>
     <string name="account_delete_positive_button">Sí, quiero eliminar mi cuenta</string>
     <string name="account_delete_dialog_negative_button">No, lo he pensado mejor</string>
+    <string name="profile_edit_bouton">Editar perfil</string>
+    <string name="profile_save_changes_button">Guardar cambios</string>
+    <string name="go_back_button">Volver atrás</string>
+
+    <string name="new_advertisement_permission_dialog_title">El permiso es necesario</string>
+    <string name="new_advertisement_permission_dialog_message">Es necesario para poder cargar tu imagen de tu proyecto.</string>
+    <string name="new_advertisement_permission_dialog_positive_button">Okay</string>
+    <string name="new_advertisement_permission_dialog_negative_button">Denegar</string>
+    <string name="new_advertisement_denied_permission">El permiso ha sido denegado</string>
+    <string name="new_advertisement_no_select_image_error">No has seleccionado ninguna imagen</string>
 </resources>

@@ -53,23 +53,24 @@ class SignUpFragment : Fragment() {
         setClicks()
     }
 
-    // TODO FUNCIONA EL SIGN UP PERO SE PUEDE MEJORAR EL RENDIMIENTO
+    // TODO FUNCIONA EL SIGN UP PERO SE PUEDE MEJORAR EL RENDIMIENTO,
+    //TODO AGREGAR UN SEGUNDO CAMPO DE PSSWORD
 
     //region --- UI Related ---
     // Limpia los capos de texto
     private fun cleanData() {
         binding.etSignUpEmail.setText("")
-        binding.etLoginPassword.setText("")
+        binding.etSignUpPassword.setText("")
         binding.etSignUpName.setText("")
-        binding.etUserName.setText("")
+        binding.etSignUpUserName.setText("")
     }
 
     // Maneja las funciones de los botones
     private fun setClicks() {
         binding.btnSignUp.setOnClickListener {
             val userEmail = binding.etSignUpEmail.text.toString().trim()
-            val userPassword = binding.etLoginPassword.text.toString().trim()
-            val h_userName: String = binding.etUserName.text.toString().trim()
+            val userPassword = binding.etSignUpPassword.text.toString().trim()
+            val h_userName: String = binding.etSignUpUserName.text.toString().trim()
             val h_fullName: String = binding.etSignUpName.text.toString().trim()
             if (isDataValid()) {
                 createFirebaseUser(userEmail, userPassword, h_userName, h_fullName)
@@ -133,10 +134,10 @@ class SignUpFragment : Fragment() {
     private fun isDataValid(): Boolean {
         // Expresiones regulares para email y password
         val emailPattern = "[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}".toRegex()
-        val passwordPattern = ".{6,}".toRegex()
+        val passwordPattern = ".{6,10}".toRegex()
         val email = binding.etSignUpEmail.text.toString().trim()
-        val password = binding.etLoginPassword.text.toString().trim()
-        val userName = binding.etUserName.text.toString().trim()
+        val password = binding.etSignUpPassword.text.toString().trim()
+        val userName = binding.etSignUpUserName.text.toString().trim()
         val fullName = binding.etSignUpName.text.toString().trim()
 
         return email.matches(emailPattern) && email.isNotEmpty() &&

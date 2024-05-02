@@ -39,7 +39,7 @@
         app:layout_constraintTop_toBottomOf="@+id/tv_sign_up_title">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/et_user_name"
+            android:id="@+id/et_sign_up_user_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/sign_up_user_name_hint"
@@ -112,7 +112,7 @@
         app:passwordToggleEnabled="true">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/et_login_password"
+            android:id="@+id/et_sign_up_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/sign_up_password_hint"
