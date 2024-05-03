@@ -95,7 +95,7 @@
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:scaleType="centerCrop"
-                        tools:srcCompat="@drawable/tinto" />
+                        android:src="@drawable/tinto" />
 
                     <TextView
                         android:id="@+id/tv_wine_red"
@@ -132,7 +132,7 @@
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:scaleType="centerCrop"
-                        tools:srcCompat="@drawable/blanco" />
+                        android:src="@drawable/blanco" />
 
                     <TextView
                         android:id="@+id/tv_wine_white"
@@ -189,7 +189,7 @@
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:scaleType="centerCrop"
-                        tools:srcCompat="@drawable/aaddvc" />
+                        android:src="@drawable/aaddvc" />
 
                     <TextView
                         android:id="@+id/tv_wine_sparkling"
@@ -229,7 +229,7 @@
                         android:layout_width="60dp"
                         android:layout_height="60dp"
                         android:scaleType="centerCrop"
-                        tools:srcCompat="@drawable/rosado" />
+                        android:src="@drawable/rosado" />
 
                     <TextView
                         android:id="@+id/tv_wine_rose"
@@ -498,7 +498,6 @@
                         android:orientation="vertical"
                         android:padding="16dp">
 
-                        <!-- Title, secondary and supporting text -->
                         <TextView
                             android:id="@+id/tv_wine_country_italy"
                             android:layout_width="wrap_content"
@@ -508,26 +507,11 @@
 
                     </LinearLayout>
 
-                    <!-- Buttons -->
-
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
 
         </LinearLayout>
     </LinearLayout>
-
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.452" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
