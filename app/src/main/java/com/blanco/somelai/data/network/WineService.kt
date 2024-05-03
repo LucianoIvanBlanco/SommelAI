@@ -44,7 +44,11 @@ interface WineService {
 
 
     //region --- Wine ---
-    @GET("wine")
+
+    @GET("{type}")
+    suspend fun getWines(@Path("type") type: String): Response<List<Wine>>
+
+@GET("wine")
     suspend fun getAllWine(): Response<List<Wine>>
 
 

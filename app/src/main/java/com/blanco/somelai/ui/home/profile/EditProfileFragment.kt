@@ -98,6 +98,7 @@ class EditProfileFragment : Fragment() {
         auth = FirebaseAuth.getInstance()
 
 
+        // TODO agregar icono de sellecion de imagen
         // Inicializa tu ImageButton
         profileImageButton = view.findViewById(R.id.img_btn_profile)
 

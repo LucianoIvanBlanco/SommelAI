@@ -19,14 +19,26 @@
         android:name="com.blanco.somelai.ui.home.feed.FeedFragment"
         android:label="fragment_feed"
         tools:layout="@layout/fragment_feed" />
-    <fragment
-        android:id="@+id/searchFragment"
-        android:name="com.blanco.somelai.ui.home.search.SearchFragment"
-        android:label="fragment_search"
-        tools:layout="@layout/fragment_search" />
+
     <fragment
         android:id="@+id/editProfileFragment"
         android:name="com.blanco.somelai.ui.home.profile.EditProfileFragment"
         android:label="fragment_edit_profile"
         tools:layout="@layout/fragment_edit_profile" />
+
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.blanco.somelai.ui.home.search.SearchFragment"
+        android:label="fragment_search"
+        tools:layout="@layout/fragment_search" >
+        <action
+            android:id="@+id/action_searchFragment_to_wineListFragment"
+            app:destination="@id/wineListFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/wineListFragment"
+        android:name="com.blanco.somelai.ui.home.search.WineListFragment"
+        android:label="fragment_wine_list"
+        tools:layout="@layout/fragment_wine_list" />
 </navigation>
