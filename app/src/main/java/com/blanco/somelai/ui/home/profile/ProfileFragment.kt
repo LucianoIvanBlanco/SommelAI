@@ -112,9 +112,9 @@ class ProfileFragment : Fragment() {
         // TODO la imagen carga lento
         Glide.with(requireContext())
             .asBitmap() // Forzar a tratar la imagen como un bitmap
-            .load(user.userPhotoUrl?: R.drawable.ic_emoji)
-            .placeholder(R.drawable.ic_emoji)
-            .fallback(R.drawable.ic_emoji)
+            .load(user.userPhotoUrl?: R.drawable.default_user)
+            .placeholder(R.drawable.default_user)
+            .fallback(R.drawable.default_user)
             .into(binding.ivProfile)
     }
 

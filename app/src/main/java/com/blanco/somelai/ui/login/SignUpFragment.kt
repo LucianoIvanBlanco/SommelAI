@@ -101,7 +101,7 @@ class SignUpFragment : Fragment() {
                     hashMap["userName"] = userName
                     hashMap["userEmail"] = email
                     hashMap["userPassword"] = password
-                    hashMap["userFullname"] = fullName
+                    hashMap["userFullName"] = fullName
 
                     reference.updateChildren(hashMap).addOnCompleteListener {}
                         .addOnFailureListener {}
