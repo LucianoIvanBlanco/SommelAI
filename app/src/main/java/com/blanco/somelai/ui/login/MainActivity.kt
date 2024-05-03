@@ -2,6 +2,7 @@ package com.blanco.somelai.ui.login
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.navigation.fragment.findNavController
 import com.blanco.somelai.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -26,6 +27,5 @@ class MainActivity : AppCompatActivity() {
 
         }
     }
-
 
 }

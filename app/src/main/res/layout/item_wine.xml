@@ -56,7 +56,8 @@
                             android:layout_height="wrap_content"
                             android:padding="6dp"
                             android:text="@string/default_score"
-                            android:textColor="@color/md_theme_light_primary" />
+                            android:textColor="@color/md_theme_light_primary"
+                            android:textStyle="bold" />
 
                         <ImageView
                             android:id="@+id/iv_wine_icon_fav"
@@ -69,18 +70,18 @@
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
                 <LinearLayout
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="235dp"
+                    android:gravity="center"
                     android:orientation="horizontal"
                     android:visibility="visible">
 
                     <ImageView
                         android:id="@+id/iv_wine_image"
-                        android:layout_width="match_parent"
-                        android:layout_height="235dp"
-                        android:scaleType="centerCrop"
-                        app:layout_constraintDimensionRatio="W, 3:4"
-                        app:srcCompat="@drawable/ic_baseline_star_24" />
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:scaleType="fitCenter"
+                        app:srcCompat="@drawable/tinto" />
 
                 </LinearLayout>
 
@@ -97,7 +98,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/default_text"
-                        android:textColor="@color/md_theme_light_onBackground" />
+                        android:textColor="@color/md_theme_light_onBackground"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/tv_winery"
@@ -105,7 +108,9 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:text="@string/loading"
-                        android:textColor="?android:attr/textColorSecondary" />
+                        android:textColor="?android:attr/textColorSecondary"
+                        android:textSize="16sp"
+                        android:textStyle="italic" />
 
                 </LinearLayout>
 
@@ -127,7 +132,8 @@
                         android:layout_weight="1"
                         android:maxLines="3"
                         android:text="@string/loading"
-                        android:textColor="?android:attr/textColorSecondary" />
+                        android:textColor="?android:attr/textColorSecondary"
+                        android:textSize="14sp" />
 
                 </LinearLayout>
 

@@ -17,14 +17,15 @@ class HomeActivity : AppCompatActivity() {
         _binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(binding.fcvHome.id)
-        val controller = navHostFragment?.findNavController()
+        setBottomNavigationView()
 
+    }
+
+    private fun setBottomNavigationView() {
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fcv_home)
+        val controller = navHostFragment?.findNavController()
         if (controller != null) {
             binding.bnvHome.setupWithNavController(controller)
         }
-
-
     }
 }

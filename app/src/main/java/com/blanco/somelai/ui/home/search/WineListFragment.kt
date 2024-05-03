@@ -22,7 +22,7 @@ class WineListFragment : Fragment() {
     val adapter = WineListAdapter()
 
 
-
+// TODO modificar la dimension de las imagenes
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

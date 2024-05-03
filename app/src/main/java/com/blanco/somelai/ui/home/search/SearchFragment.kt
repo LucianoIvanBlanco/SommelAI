@@ -56,19 +56,23 @@ class SearchFragment : Fragment() {
             viewModel.getWineForType("sparkling")
             navigateToWineListFragment()
         }
-//
-//        binding.mcvCountrySpain.setOnClickListener {
-//            viewModel.getWineForType("Spain")
-//        }
-//        binding.mcvCountryFrance.setOnClickListener {
-//            viewModel.getWineForType("France")
-//        }
-//        binding.mcvCountryPortugal.setOnClickListener {
-//            viewModel.getWineForType("Portugal")
-//        }
-//        binding.mcvCountryItaly.setOnClickListener {
-//            viewModel.getWineForType("Italy")
-//        }
+
+        binding.mcvCountrySpain.setOnClickListener {
+            viewModel.getWinesAndFilterByCountry("Spain")
+            navigateToWineListFragment()
+        }
+        binding.mcvCountryFrance.setOnClickListener {
+            viewModel.getWinesAndFilterByCountry("France")
+            navigateToWineListFragment()
+        }
+        binding.mcvCountryPortugal.setOnClickListener {
+            viewModel.getWinesAndFilterByCountry("Portugal")
+            navigateToWineListFragment()
+        }
+        binding.mcvCountryItaly.setOnClickListener {
+            viewModel.getWinesAndFilterByCountry("Italy")
+            navigateToWineListFragment()
+        }
 
         binding.fabCamera.setOnClickListener{
             openCamera()
