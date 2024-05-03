@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
@@ -31,7 +32,7 @@ class WineListFragment : Fragment() {
     private lateinit var _binding: FragmentWineListBinding
     private val binding: FragmentWineListBinding get() = _binding
 
-    private val viewModel: WineViewModel by viewModels()
+    private val viewModel: WineViewModel by activityViewModels()
     val adapter = WineListAdapter()
 
 
@@ -72,7 +73,7 @@ class WineListFragment : Fragment() {
                 // Verificar si la respuesta no es nula y luego actualizar el adaptador
                 uiState.response?.let { wines ->
                     adapter.submitList(wines)
-                    Log.e("WineListFragmetnt", "Enviando pidiendo datos al adapte")
+                    Log.e("WineListFragmetnt", "Enviando pidiendo datos al adapter")
                 }
             }
         })

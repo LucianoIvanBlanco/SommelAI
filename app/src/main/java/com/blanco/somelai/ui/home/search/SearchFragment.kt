@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -29,7 +30,7 @@ class SearchFragment : Fragment() {
     private lateinit var _binding: FragmentSearchBinding
     private val binding get() = _binding
 
-    private val viewModel: WineViewModel by viewModels()
+    private val viewModel: WineViewModel by activityViewModels()
 
 
 
@@ -44,37 +45,21 @@ class SearchFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.mcvWineRed.setOnClickListener {
+            viewModel.getWineForType("reds")
+            navigateToWineListFragment()
+            //navigateToWineListFragment()
+        }
+
         setClicks()
-//
-//        // Observar los cambios en los datos de los vinos
-//        viewModel.wines.observe(viewLifecycleOwner, Observer { wines ->
-//            // Actualizar la lista de vinos en el adaptador
-//            // Asegúrate de que tu adaptador esté configurado para manejar la actualización de datos
-//        })
-//
-//        // Observar el estado de carga
-//        viewModel.loading.observe(viewLifecycleOwner, Observer { isLoading ->
-//            if (isLoading) {
-//                // Mostrar un indicador de carga
-//                binding.progressBar.visibility = View.VISIBLE
-//            } else {
-//                // Ocultar el indicador de carga
-//                binding.progressBar.visibility = View.GONE
-//            }
-//        })
-//
-//        // Observar el estado de error
-//        viewModel.error.observe(viewLifecycleOwner, Observer { errorMessage ->
-//            // Mostrar un mensaje de error
-//            Toast.makeText(requireContext(), "ERROR!!!", Toast.LENGTH_SHORT).show()
-//        })
     }
 
     private fun setClicks() {
 
         binding.mcvWineRed.setOnClickListener {
-            viewModel.getWineForType("reds")
             navigateToWineListFragment()
+            viewModel.getWineForType("reds")
+            //navigateToWineListFragment()
         }
         binding.mcvWineWhite.setOnClickListener {
             viewModel.getWineForType("whites")

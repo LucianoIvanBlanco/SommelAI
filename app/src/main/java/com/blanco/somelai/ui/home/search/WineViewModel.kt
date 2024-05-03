@@ -16,45 +16,33 @@ import kotlinx.coroutines.withContext
 
 class WineViewModel : ViewModel() {
 
-//    private var _wines: MutableLiveData<List<Wine>?> = MutableLiveData(null)
-//    val wines: LiveData<List<Wine>?> get() = _wines
-
-    private var _uiState: MutableLiveData<WineUiState> = MutableLiveData(WineUiState())
+    private val _uiState: LiveData<WineUiState> = MutableLiveData(WineUiState())
     val uiState: LiveData<WineUiState> get() = _uiState
 
-
-//    private val _loading = MutableLiveData<Boolean>()
-//    val loading: LiveData<Boolean> get() = _loading
-
-//    private val _error = MutableLiveData<String>()
-//    val error: LiveData<String> get() = _error
-
-//    private val _adapter = MutableLiveData<WineListAdapter>(WineListAdapter())
-//    val adapter: LiveData<WineListAdapter> get() = _adapter
-
     fun getWineForType(typeWine: String) {
-        _uiState.postValue(WineUiState(isLoading = true))
+        (uiState as MutableLiveData).value = WineUiState(isLoading = true)
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val response = WineApi.service.getWines(typeWine)
-                if (response.isSuccessful) {
-                    val wineResponse = response.body()
-                    _uiState.postValue(WineUiState(response = response.body()))
-                    //sendWines(response.body()) // Llamar a sendWines con la lista de vinos
-                    Log.e(
-                        "ERROR VIEWMODEL",
-                        "RESPONSE recibido en el vireModel y enviado al adapter"
-                    )
-                    wineResponse?.let {
-                        Log.d("WINE_RESPONSE", it.toString())
+                viewModelScope.launch(Dispatchers.Main) {
+                    if (response.isSuccessful) {
+                        val wineResponse = response.body()
+
+                        (uiState as MutableLiveData).setValue(WineUiState(response = wineResponse))
+                        Log.e(
+                            "ERROR VIEWMODEL",
+                            "RESPONSE recibido en el ViewModel y modificado..."
+                        )
+                        wineResponse?.let {
+                            Log.d("WINE_RESPONSE", it.toString())
+                        }
+                    } else {
+                        (uiState as MutableLiveData).setValue(WineUiState(isError = true))
+                        Log.e("ERROR VIEWMODEL", "ERROR EN EL RESPONSE")
                     }
-                } else {
-                    _uiState.postValue(WineUiState(isError = true))
-                    Log.e("ERROR VIEWMODEL", "ERROR EN EL RESPONSE")
                 }
             } catch (e: Exception) {
-                _uiState.postValue(WineUiState(isError = true))
                 Log.e("ERROR VIEWMODEL", "Error al cargar los vinos")
             }
         }
