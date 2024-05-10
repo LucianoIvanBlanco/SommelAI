@@ -3,7 +3,10 @@ package com.blanco.somelai.ui.home.search
 import android.Manifest
 import android.content.ContentValues
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.icu.text.SimpleDateFormat
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
@@ -19,9 +22,6 @@ import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.camera.video.Recorder
-import androidx.camera.video.Recording
-import androidx.camera.video.VideoCapture
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -35,6 +35,8 @@ import java.util.concurrent.Executors
 
 typealias LumaListener = (luma: Double) -> Unit
 
+
+// TODO camara y visualizacion mimiatura de la foto lista, ahora falta el escanner para extraer la imagen
 class ScanerCameraFragment : Fragment() {
 
     private lateinit var _binding: FragmentScanerCameraBinding
@@ -44,9 +46,6 @@ class ScanerCameraFragment : Fragment() {
 
     // Camera X
     private var imageCapture: ImageCapture? = null
-
-    private var videoCapture: VideoCapture<Recorder>? = null
-    private var recording: Recording? = null
 
     private lateinit var cameraExecutor: ExecutorService
 
@@ -72,13 +71,9 @@ class ScanerCameraFragment : Fragment() {
 
         // Set up the listeners for take photo and video capture buttons
         binding.imageCaptureButton.setOnClickListener { takePhoto() }
-        binding.videoCaptureButton.setOnClickListener { captureVideo() }
 
         cameraExecutor = Executors.newSingleThreadExecutor()
     }
-
-
-    private fun captureVideo() {}
 
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
@@ -126,7 +121,7 @@ class ScanerCameraFragment : Fragment() {
 
     private fun takePhoto() {
         // Get a stable reference of the modifiable image capture use case
-        val imageCapture = imageCapture ?: return
+        val imageCapture = imageCapture?: return
 
         // Create time stamped name and MediaStore entry.
         val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
@@ -156,15 +151,32 @@ class ScanerCameraFragment : Fragment() {
                     Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
                 }
 
-                override fun
-                        onImageSaved(output: ImageCapture.OutputFileResults){
+                override fun onImageSaved(output: ImageCapture.OutputFileResults){
                     val msg = "Photo capture succeeded: ${output.savedUri}"
                     Toast.makeText(requireActivity(), msg, Toast.LENGTH_SHORT).show()
                     Log.d(TAG, msg)
+
+                    // Carga la foto capturada en iv_photo_preview solo si output.savedUri no es nulo
+                    output.savedUri?.let { uri ->
+                        loadPhotoPreview(uri)
+                    }
                 }
+
             }
         )
     }
+
+    private fun loadPhotoPreview(uri: Uri) {
+        val imageView = binding.ivPhotoPreview
+        val bitmap = uriToBitmap(uri)
+        imageView.setImageBitmap(bitmap)
+    }
+
+    private fun uriToBitmap(uri: Uri): Bitmap? {
+        val inputStream = requireActivity().contentResolver.openInputStream(uri)
+        return BitmapFactory.decodeStream(inputStream)
+    }
+
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(
