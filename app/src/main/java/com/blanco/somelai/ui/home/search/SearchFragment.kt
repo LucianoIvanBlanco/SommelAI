@@ -3,26 +3,25 @@ package com.blanco.somelai.ui.home.search
 
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.blanco.somelai.R
 import com.blanco.somelai.databinding.FragmentSearchBinding
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 
 
+
+// TODO los permisos de la camara estan bien, el problema es el surface. Ver algun tutorial
 class SearchFragment : Fragment() {
 
     private lateinit var _binding: FragmentSearchBinding
     private val binding get() = _binding
 
     private val viewModel: WineViewModel by activityViewModels()
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -74,36 +73,44 @@ class SearchFragment : Fragment() {
             navigateToWineListFragment()
         }
 
-        binding.fabCamera.setOnClickListener{
-            openCamera()
+        binding.fabCamera.setOnClickListener {
+            navigateToScanerCameraFragment()
         }
+    }
+
+    private fun navigateToScanerCameraFragment() {
+        findNavController().navigate(R.id.action_searchFragment_to_scanerCameraFragment)
     }
 
     private fun navigateToWineListFragment() {
         findNavController().navigate(R.id.action_searchFragment_to_wineListFragment)
     }
 
-    private fun openCamera() {
-        // TODO logica para abrir la camara, tendremos que pedir permiso
-
-        lifecycleScope.launch(Dispatchers.IO) {
-            val wine: String
-            val winery: String
-            val location: String
-            val rating: String
-            val image: String
-            val id: Int
-
-            // saveDataInDataStore(wine= "", winery="", location="", rating="", image="", id=0)
-        }
-    }
-
-    private fun showMessage(message: String) {
-        lifecycleScope.launch(Dispatchers.Main) {
-            Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
-        }
-    }
-
 }
+
+
+
+//    private fun openCamera() {
+//        // TODO logica para abrir la camara, tendremos que pedir permiso
+//
+//        lifecycleScope.launch(Dispatchers.IO) {
+//            val wine: String
+//            val winery: String
+//            val location: String
+//            val rating: String
+//            val image: String
+//            val id: Int
+//
+//            // saveDataInDataStore(wine= "", winery="", location="", rating="", image="", id=0)
+//        }
+//    }
+//
+//    private fun showMessage(message: String) {
+//        lifecycleScope.launch(Dispatchers.Main) {
+//            Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+//        }
+//    }
+//
+//}
 
 
