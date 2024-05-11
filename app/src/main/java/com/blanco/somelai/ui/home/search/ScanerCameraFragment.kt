@@ -27,9 +27,11 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import com.blanco.somelai.R
 import com.blanco.somelai.databinding.FragmentScanerCameraBinding
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.text.TextRecognition
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import java.nio.ByteBuffer
 import java.util.Locale
 import java.util.concurrent.ExecutorService
@@ -45,7 +47,6 @@ class ScanerCameraFragment : Fragment() {
     private lateinit var _binding: FragmentScanerCameraBinding
     private val binding get() = _binding
 
-    private val viewModel: WineViewModel by activityViewModels()
 
     // Camera X
     private var imageCapture: ImageCapture? = null
@@ -53,6 +54,8 @@ class ScanerCameraFragment : Fragment() {
     private lateinit var cameraExecutor: ExecutorService
 
     private var camera: Camera? = null
+
+    val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -184,7 +187,7 @@ class ScanerCameraFragment : Fragment() {
                     Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
                 }
 
-                override fun onImageSaved(output: ImageCapture.OutputFileResults){
+                override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                     val msg = "Photo capture succeeded: ${output.savedUri}"
                     Toast.makeText(requireActivity(), msg, Toast.LENGTH_SHORT).show()
                     Log.d(TAG, msg)
@@ -192,12 +195,28 @@ class ScanerCameraFragment : Fragment() {
                     // Carga la foto capturada en iv_photo_preview solo si output.savedUri no es nulo
                     output.savedUri?.let { uri ->
                         loadPhotoPreview(uri)
+                        recognizeTextFromImage(uri)
                     }
                 }
 
             }
         )
     }
+
+    private fun recognizeTextFromImage(uri: Uri) {
+        val image = InputImage.fromFilePath(requireContext(), uri)
+        recognizer.process(image)
+            .addOnSuccessListener { visionText ->
+                // Aquí manejas el texto reconocido
+                val resultText = visionText.text
+                Log.d(TAG, "Recognized text: $resultText")
+                // Opcional: Mostrar el texto en la UI o realizar alguna otra acción
+            }
+            .addOnFailureListener { e ->
+                Log.e(TAG, "Error recognizing text: ${e.localizedMessage}", e)
+            }
+    }
+
 
     private fun loadPhotoPreview(uri: Uri) {
         val imageView = binding.ivPhotoPreview
@@ -209,7 +228,6 @@ class ScanerCameraFragment : Fragment() {
         val inputStream = requireActivity().contentResolver.openInputStream(uri)
         return BitmapFactory.decodeStream(inputStream)
     }
-
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(
@@ -273,65 +291,3 @@ private class LuminosityAnalyzer(private val listener: LumaListener) : ImageAnal
         image.close()
     }
 }
-//private val requestPermissionLauncher: ActivityResultLauncher<String> =
-//    registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-//        if (isGranted) {
-//            startCamera()
-//        } else {
-//            showDeniedPermissionMessage()
-//            requireActivity().finish()
-//        }
-//    }
-//
-//private fun checkIfWeAlreadyHaveThisPermission() {
-//    val cameraPermission: String = Manifest.permission.CAMERA
-//    val permissionStatusCamera =
-//        ContextCompat.checkSelfPermission(requireActivity(), cameraPermission)
-//
-//    if (permissionStatusCamera == PackageManager.PERMISSION_GRANTED) {
-//        startCamera()
-//    } else {
-//        requestPermissionLauncher.launch(cameraPermission)
-//    }
-//}
-
-//    private fun showPermissionRationaleDialog(cameraPermission: String) {
-//        // Implementación del diálogo de razones de permiso
-//    }
-//
-//
-//    private fun showDeniedPermissionMessage() {
-//        val message = getString(R.string.new_advertisement_denied_permission)
-//        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
-//    }
-
-
-//private fun openCamera() {
-//    val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
-//
-//    cameraProviderFuture.addListener(Runnable {
-//        val cameraProvider = cameraProviderFuture.get()
-//        val preview = Preview.Builder().build().also {
-//            it.setSurfaceProvider(binding.previewView.surfaceProvider)
-//        }
-//        val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-//
-//        try {
-//            cameraProvider.unbindAll()
-//            cameraProvider.bindToLifecycle(this, cameraSelector, preview)
-//        } catch(exc: Exception) {
-//            Log.e("ERROR", "Use case binding failed", exc)
-//        }
-//    }, ContextCompat.getMainExecutor(requireContext()))
-//}
-//
-//fun processImage(bitmap: Bitmap): TensorBuffer {
-//    val imageProcessor = ImageProcessor.Builder().add(ResizeOp(224, 224, ResizeMethod.NEAREST_NEIGHBOUR)).build()
-//    val tensorImage = TensorImage(DataType.UINT8)
-//    tensorImage.load(bitmap)
-//    tensorImage = imageProcessor.process(tensorImage)
-//
-//    val tensorBuffer = TensorBuffer.createFixedSize(tensorImage.shape, DataType.UINT8)
-//    tensorBuffer.loadArray(tensorImage.buffer.array())
-//
-//    return tensorBuffer
