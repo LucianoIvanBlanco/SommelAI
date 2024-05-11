@@ -27,6 +27,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import com.blanco.somelai.R
 import com.blanco.somelai.databinding.FragmentScanerCameraBinding
 import com.google.mlkit.vision.common.InputImage
@@ -47,6 +48,7 @@ class ScanerCameraFragment : Fragment() {
     private lateinit var _binding: FragmentScanerCameraBinding
     private val binding get() = _binding
 
+    private val viewModel: WineViewModel by activityViewModels()
 
     // Camera X
     private var imageCapture: ImageCapture? = null
@@ -192,10 +194,8 @@ class ScanerCameraFragment : Fragment() {
                     Toast.makeText(requireActivity(), msg, Toast.LENGTH_SHORT).show()
                     Log.d(TAG, msg)
 
-                    // Carga la foto capturada en iv_photo_preview solo si output.savedUri no es nulo
                     output.savedUri?.let { uri ->
                         loadPhotoPreview(uri)
-                        recognizeTextFromImage(uri)
                     }
                 }
 
@@ -208,20 +208,26 @@ class ScanerCameraFragment : Fragment() {
         recognizer.process(image)
             .addOnSuccessListener { visionText ->
                 // Aquí manejas el texto reconocido
-                val resultText = visionText.text
+                val resultText = visionText.text.toString()
                 Log.d(TAG, "Recognized text: $resultText")
-                // Opcional: Mostrar el texto en la UI o realizar alguna otra acción
+                searchWine(resultText)
             }
             .addOnFailureListener { e ->
                 Log.e(TAG, "Error recognizing text: ${e.localizedMessage}", e)
             }
     }
 
+    private fun searchWine(resultText: String) {
+        viewModel.getWinesAndFilterByName(resultText,requireContext())
+    }
+
 
     private fun loadPhotoPreview(uri: Uri) {
-        val imageView = binding.ivPhotoPreview
         val bitmap = uriToBitmap(uri)
-        imageView.setImageBitmap(bitmap)
+        binding.ibPhotoPreview.setImageBitmap(bitmap)
+        binding.ibPhotoPreview.setOnClickListener {
+            recognizeTextFromImage(uri)
+        }
     }
 
     private fun uriToBitmap(uri: Uri): Bitmap? {
