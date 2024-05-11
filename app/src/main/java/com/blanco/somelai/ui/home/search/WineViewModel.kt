@@ -103,6 +103,9 @@ class WineViewModel : ViewModel() {
                     filteredWines.forEach { wine ->
                         Log.d("WineViewModel", "Found wine: ${wine.wine}")
                     }
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(context, "VINO ENCONTRADO!!!!!", Toast.LENGTH_LONG).show()
+                    }
                 } else {
                     // Mostrar un Toast en el hilo principal si no se encontraron vinos
                     withContext(Dispatchers.Main) {

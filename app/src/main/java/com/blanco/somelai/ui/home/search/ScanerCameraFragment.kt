@@ -17,10 +17,8 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
-import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.core.TorchState
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -31,15 +29,12 @@ import androidx.fragment.app.activityViewModels
 import com.blanco.somelai.R
 import com.blanco.somelai.databinding.FragmentScanerCameraBinding
 import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.text.Text
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
-import java.nio.ByteBuffer
 import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-
-
-typealias LumaListener = (luma: Double) -> Unit
 
 
 // TODO camara y visualizacion mimiatura de la foto lista, ahora falta el escanner para extraer la imagen
@@ -110,21 +105,14 @@ class ScanerCameraFragment : Fragment() {
 
             imageCapture = ImageCapture.Builder().build()
 
-            val imageAnalyzer = ImageAnalysis.Builder()
-                .build()
-                .also {
-                    it.setAnalyzer(cameraExecutor, LuminosityAnalyzer { luma ->
-                        Log.d(TAG, "Average luminosity: $luma")
-                    })
-                }
-
+            // Configuración de la cámara sin ImageAnalysis
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
             try {
                 cameraProvider.unbindAll()
                 camera = cameraProvider.bindToLifecycle(
-                    this, cameraSelector, preview, imageCapture, imageAnalyzer)
-            } catch(exc: Exception) {
+                    this, cameraSelector, preview, imageCapture)
+            } catch (exc: Exception) {
                 Log.e(TAG, "Use case binding failed", exc)
             }
 
@@ -203,12 +191,16 @@ class ScanerCameraFragment : Fragment() {
         )
     }
 
+
     private fun recognizeTextFromImage(uri: Uri) {
         val image = InputImage.fromFilePath(requireContext(), uri)
         recognizer.process(image)
             .addOnSuccessListener { visionText ->
-                // Aquí manejas el texto reconocido
-                val resultText = visionText.text.toString()
+                // Filtrar y obtener solo las palabras más grandes
+                val largestTexts = getLargestTexts(visionText)
+
+                // Convertir la lista de TextBlocks a un solo string
+                val resultText = largestTexts.joinToString(" ") { it.text }
                 Log.d(TAG, "Recognized text: $resultText")
                 searchWine(resultText)
             }
@@ -217,7 +209,45 @@ class ScanerCameraFragment : Fragment() {
             }
     }
 
+
+    // TODO FUncion que regula el tamaño de las letras escaneadas, usandolo como filtro pasa solo buscar en los titulos
+    // Igual deberia analizar todo lo que lee y comparalos con alguna coincidencia en la bbdd.
+    private fun getLargestTexts(visionText: Text): List<Text.TextBlock> {
+        val largestTextBlocks = mutableListOf<Text.TextBlock>()
+        var maxSize = 0.0  // Usar Double directamente
+
+        // Asumiendo una densidad de píxeles estándar de 160 DPI (2.54 cm/pulgada)
+        val dpi = 160.0  // DPI estándar
+        val pixelToCm = 2.54 / dpi  // Convertir píxeles a centímetros
+
+        for (block in visionText.textBlocks) {
+            val boundingBox = block.boundingBox
+            if (boundingBox != null) {
+                val width = boundingBox.width()?.toDouble() ?: 0.0  // Convertir a Double
+                val height = boundingBox.height()?.toDouble() ?: 0.0  // Convertir a Double
+                val widthInCm = width * pixelToCm
+                val heightInCm = height * pixelToCm
+                val blockSize = widthInCm * heightInCm
+
+                if (blockSize > 0.30) {  // Filtrar bloques mayores a 0.30 cm²
+                    if (blockSize > maxSize) {
+                        largestTextBlocks.clear()
+                        maxSize = blockSize
+                        largestTextBlocks.add(block)
+                    } else if (blockSize == maxSize) {
+                        largestTextBlocks.add(block)
+                    }
+                }
+            }
+        }
+
+        return largestTextBlocks
+    }
+
+
+
     private fun searchWine(resultText: String) {
+        Toast.makeText(context, resultText, Toast.LENGTH_LONG).show()
         viewModel.getWinesAndFilterByName(resultText,requireContext())
     }
 
@@ -276,24 +306,3 @@ class ScanerCameraFragment : Fragment() {
     }
 }
 
-private class LuminosityAnalyzer(private val listener: LumaListener) : ImageAnalysis.Analyzer {
-
-    private fun ByteBuffer.toByteArray(): ByteArray {
-        rewind()    // Rewind the buffer to zero
-        val data = ByteArray(remaining())
-        get(data)   // Copy the buffer into a byte array
-        return data // Return the byte array
-    }
-
-    override fun analyze(image: ImageProxy) {
-
-        val buffer = image.planes[0].buffer
-        val data = buffer.toByteArray()
-        val pixels = data.map { it.toInt() and 0xFF }
-        val luma = pixels.average()
-
-        listener(luma)
-
-        image.close()
-    }
-}
