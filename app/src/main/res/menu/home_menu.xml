@@ -4,13 +4,11 @@
 
     <item
         android:id="@+id/feedFragment"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:icon="@drawable/ic_home" />
     <item
         android:id="@+id/searchFragment"
-        android:icon="@drawable/search_24px" />
+        android:icon="@drawable/ic_search" />
     <item
         android:id="@+id/profileFragment"
-        android:icon="@drawable/ic_emoji" />
+        android:icon="@drawable/ic_account_circle" />
 </menu>

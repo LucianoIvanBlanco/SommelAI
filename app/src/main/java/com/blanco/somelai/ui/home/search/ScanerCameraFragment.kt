@@ -15,17 +15,20 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
+import androidx.camera.core.TorchState
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.blanco.somelai.R
 import com.blanco.somelai.databinding.FragmentScanerCameraBinding
 import java.nio.ByteBuffer
 import java.util.Locale
@@ -49,6 +52,7 @@ class ScanerCameraFragment : Fragment() {
 
     private lateinit var cameraExecutor: ExecutorService
 
+    private var camera: Camera? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -68,21 +72,31 @@ class ScanerCameraFragment : Fragment() {
             ActivityCompat.requestPermissions(
                 requireActivity(), REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
         }
-
-        // Set up the listeners for take photo and video capture buttons
-        binding.imageCaptureButton.setOnClickListener { takePhoto() }
-
+        initializeFlashButtonIcon()
+        setClicks()
         cameraExecutor = Executors.newSingleThreadExecutor()
+    }
+
+    private fun setClicks(){
+        // Set up the listeners for take photo and video capture buttons
+        binding.imageCaptureButton.setOnClickListener {
+            takePhoto()
+        }
+
+        binding.closeButton.setOnClickListener {
+            parentFragmentManager.popBackStack()
+        }
+        binding.flashButton.setOnClickListener {
+            toggleFlash()
+        }
     }
 
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
 
         cameraProviderFuture.addListener({
-            // Used to bind the lifecycle of cameras to the lifecycle owner
             val cameraProvider: ProcessCameraProvider = cameraProviderFuture.get()
 
-            // Preview
             val preview = Preview.Builder()
                 .build()
                 .also {
@@ -99,23 +113,42 @@ class ScanerCameraFragment : Fragment() {
                     })
                 }
 
-            // Select back camera as a default
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
             try {
-                // Unbind use cases before rebinding
                 cameraProvider.unbindAll()
-
-                // Bind use cases to camera
-                cameraProvider.bindToLifecycle(
+                camera = cameraProvider.bindToLifecycle(
                     this, cameraSelector, preview, imageCapture, imageAnalyzer)
-
             } catch(exc: Exception) {
                 Log.e(TAG, "Use case binding failed", exc)
             }
 
         }, ContextCompat.getMainExecutor(requireContext()))
+    }
 
+    private fun toggleFlash() {
+        val camera = this.camera ?: return
+
+        val torchState = camera.cameraInfo.torchState.value
+        val isTorchOn = torchState == TorchState.ON
+
+        camera.cameraControl.enableTorch(!isTorchOn).addListener({
+            updateFlashButtonIcon(!isTorchOn)
+        }, ContextCompat.getMainExecutor(requireContext()))
+    }
+
+    private fun updateFlashButtonIcon(isTorchOn: Boolean) {
+        val iconResId = if (isTorchOn) R.drawable.ic_flash_on else R.drawable.ic_flash_off
+        binding.flashButton.setIconResource(iconResId)
+    }
+
+    private fun initializeFlashButtonIcon() {
+        val camera = this.camera ?: return
+
+        camera.cameraInfo.torchState.observe(viewLifecycleOwner) { state ->
+            val isTorchOn = state == TorchState.ON
+            updateFlashButtonIcon(isTorchOn)
+        }
     }
 
 
