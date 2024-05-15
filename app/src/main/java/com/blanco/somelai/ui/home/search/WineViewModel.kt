@@ -1,8 +1,8 @@
 package com.blanco.somelai.ui.home.search
 
-
-
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
@@ -11,26 +11,24 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
-import com.blanco.somelai.R
 import com.blanco.somelai.data.network.WineApi
 import com.blanco.somelai.data.network.model.responses.Wine
-import com.google.api.gax.core.FixedCredentialsProvider
-import com.google.auth.oauth2.GoogleCredentials
-import com.google.cloud.vision.v1.AnnotateImageRequest
-import com.google.cloud.vision.v1.BatchAnnotateImagesRequest
-import com.google.cloud.vision.v1.Feature
-import com.google.cloud.vision.v1.Image
-import com.google.cloud.vision.v1.ImageAnnotatorClient
-import com.google.cloud.vision.v1.ImageAnnotatorSettings
-import com.google.protobuf.ByteString
+import com.google.ai.client.generativeai.GenerativeModel
+import com.google.ai.client.generativeai.type.BlockThreshold
+import com.google.ai.client.generativeai.type.HarmCategory
+import com.google.ai.client.generativeai.type.SafetySetting
+import com.google.ai.client.generativeai.type.asTextOrNull
+import com.google.ai.client.generativeai.type.content
+import com.google.ai.client.generativeai.type.generationConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.io.InputStream
+import java.io.IOException
 
 class WineViewModel : ViewModel() {
 
-    private var _apiKey: String ="AIzaSyCKRWn_d8zxdLFDgd1WfI4BouqzozuhfFY"
+
+    private var _apiKey: String ="AIzaSyCzEqyGwZ1a8Cz33HPm3_R8dvzMW4c-9k4"
 
     private val _uiState: LiveData<WineUiState> = MutableLiveData(WineUiState())
     val uiState: LiveData<WineUiState> get() = _uiState
@@ -102,32 +100,17 @@ class WineViewModel : ViewModel() {
         }
     }
 
-//    // FIltramos el texto a comparar
-//    private fun preprocessText(text: String): String {
-//        // Eliminar puntuación y convertir a minúsculas para una comparación uniforme
-//        val cleanedText = text.replace("[^\\w\\s]".toRegex(), "").lowercase()
-//
-//        // Lista de palabras comunes que pueden ser eliminadas (stop words)
-//        val stopWords = setOf("de", "la", "el", "y", "en", "con", "los", "del", "un", "una")
-//        return cleanedText.split("\\s+".toRegex())
-//            .filter { it.isNotEmpty() && it !in stopWords }
-//            .joinToString(" ")
-//    }
 
     fun getWinesAndFilterByName(imageUri: Uri, context: Context) {
-
-
-        val textLiveData = extractTextFromImageUri(imageUri, context)
+        val textLiveData = analyzeWineLabel(imageUri, context)
         textLiveData.observeForever { extractedText ->
             viewModelScope.launch {
                 try {
-                    val dataString = textLiveData.toString()
-                    Log.d("WineViewModel", "Extracted text: $dataString")
+                    Log.d("WineViewModel", "Extracted text: $extractedText")
                     val allWines = getAllWines()
                     val filteredWines = allWines.filter { wine ->
                         wine.wine.lowercase().contains(extractedText.lowercase(), ignoreCase = true)
                     }
-
                     if (filteredWines.isNotEmpty()) {
                         filteredWines.forEach { wine ->
                             Log.d("WineViewModel", "Found wine: ${wine.wine}")
@@ -150,58 +133,54 @@ class WineViewModel : ViewModel() {
         }
     }
 
+    // TODO Si no se puede certificado configurar la apikey correctamente
+    // TODO Limpiar Build Gradle con importaciones innecesarias
+    // TODO Conexion con IA ok. Extraccion de texto Ok. Ver bien la configuracion del ApiKey a ver si se puede pasar certificado
+    // Ver de pasar solo nombre para buscar en la bbdd.
 
-    // TODO EXTRACIION DE TEXTO OK. SALE POR CONSOLA TODAAAA LA ETIQUETE
-
-
-    fun extractTextFromImageUri(imageUri: Uri, context: Context): LiveData<String> = liveData(Dispatchers.IO) {
-        Log.d("WineViewModel", "Starting text extraction process")
+    fun analyzeWineLabel(imageUri: Uri, context: Context): LiveData<String> = liveData(Dispatchers.IO) {
         try {
-            context.contentResolver.openInputStream(imageUri)?.use { inputStream ->
-                val imageBytes = ByteString.readFrom(inputStream)
-                Log.d("WineViewModel", "Image bytes read successfully")
+            // Convert Uri to Bitmap
+            val imageBitmap: Bitmap = context.contentResolver.openInputStream(imageUri)?.use { inputStream ->
+                BitmapFactory.decodeStream(inputStream)
+            } ?: throw IOException("Failed to read image bytes")
 
-                val image = Image.newBuilder().setContent(imageBytes).build()
-                val feature = Feature.newBuilder().setType(Feature.Type.TEXT_DETECTION).build()
-                val request = AnnotateImageRequest.newBuilder()
-                    .addFeatures(feature)
-                    .setImage(image)
-                    .build()
+            // Initialize the GenerativeModel
+            val model = GenerativeModel(
+                modelName = "gemini-pro-vision",
+                apiKey = _apiKey,
+                generationConfig = generationConfig {
+                    temperature = 1f
+                    topK = 64
+                    topP = 0.95f
+                    maxOutputTokens = 8192
+                },
+                safetySettings = listOf(
+                    SafetySetting(HarmCategory.HARASSMENT, BlockThreshold.MEDIUM_AND_ABOVE),
+                    SafetySetting(HarmCategory.HATE_SPEECH, BlockThreshold.MEDIUM_AND_ABOVE),
+                    SafetySetting(HarmCategory.SEXUALLY_EXPLICIT, BlockThreshold.MEDIUM_AND_ABOVE),
+                    SafetySetting(HarmCategory.DANGEROUS_CONTENT, BlockThreshold.MEDIUM_AND_ABOVE)
+                )
+            )
 
-                val requests = listOf(request)
-                val batchAnnotateImagesRequest = BatchAnnotateImagesRequest.newBuilder()
-                    .addAllRequests(requests)
-                    .build()
-
-                // Cargar las credenciales desde el archivo JSON en res/raw
-                val credentialsStream: InputStream = context.resources.openRawResource(R.raw.cloudvisioncredentials)
-                val credentials = GoogleCredentials.fromStream(credentialsStream)
-                    .createScoped(listOf("https://www.googleapis.com/auth/cloud-platform"))
-
-                val settings = ImageAnnotatorSettings.newBuilder()
-                    .setCredentialsProvider(FixedCredentialsProvider.create(credentials))
-                    .build()
-
-                ImageAnnotatorClient.create(settings).use { client ->
-                    Log.d("WineViewModel", "Sending request to Google Cloud Vision API")
-                    val response = client.batchAnnotateImages(batchAnnotateImagesRequest)
-                    val textAnnotations = response.responsesList[0].textAnnotationsList
-                    if (textAnnotations.isNotEmpty()) {
-                        val extractedText = textAnnotations[0].description
-                        Log.d("WineViewModel", "Text extracted: $extractedText")
-                        emit(extractedText)  // Emitir el resultado a la UI
-                    } else {
-                        Log.d("WineViewModel", "No text found in the image")
-                        emit("No text found")
-                    }
-                }
-            } ?: run {
-                Log.e("WineViewModel", "Failed to open image stream")
-                emit("Failed to open image stream")
+            // Prepare the prompt and content
+            val prompt = "Extrae los siguientes datos de la etiqueta del vino: Nombre del vino, Año del vino, Bodega que lo produce, Pais/region/provincia. También un campo 'Recomendación de maridaje' donde recomiendes un tipo de comida adecuado al tipo de vino."
+            val inputContent = content {
+                text(prompt)
+                image(imageBitmap)
             }
+
+            // Generate content
+            val response = model.generateContent(inputContent)
+
+            // Process the response
+            val extractedText = response.candidates.first().content.parts.first().asTextOrNull()
+            Log.d("WineViewModel", "Extracted text: $extractedText")
+
+            emit(extractedText ?: "")
         } catch (e: Exception) {
-            Log.e("WineViewModel", "Error extracting text: ${e.localizedMessage}", e)
-            emit("Error extracting text: ${e.localizedMessage}")
+            Log.e("WineViewModel", "Error analyzing wine label with Gemini: ${e.localizedMessage}", e)
+            emit("")
         }
     }
 }
