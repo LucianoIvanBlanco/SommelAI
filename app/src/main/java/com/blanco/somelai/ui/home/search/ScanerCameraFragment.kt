@@ -28,8 +28,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.blanco.somelai.R
 import com.blanco.somelai.databinding.FragmentScanerCameraBinding
-import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.text.Text
 import com.google.mlkit.vision.text.TextRecognition
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import java.util.Locale
@@ -91,6 +89,8 @@ class ScanerCameraFragment : Fragment() {
         }
     }
 
+    // CAMARA
+
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
 
@@ -146,29 +146,26 @@ class ScanerCameraFragment : Fragment() {
 
 
     private fun takePhoto() {
-        // Get a stable reference of the modifiable image capture use case
-        val imageCapture = imageCapture?: return
+        val imageCapture = imageCapture ?: return
 
-        // Create time stamped name and MediaStore entry.
         val name = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
             .format(System.currentTimeMillis())
         val contentValues = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, name)
             put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
-            if(Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
                 put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/CameraX-Image")
             }
         }
 
-        // Create output options object which contains file + metadata
         val outputOptions = ImageCapture.OutputFileOptions
-            .Builder(requireActivity().contentResolver,
+            .Builder(
+                requireActivity().contentResolver,
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                contentValues)
+                contentValues
+            )
             .build()
 
-        // Set up image capture listener, which is triggered after photo has
-        // been taken
         imageCapture.takePicture(
             outputOptions,
             ContextCompat.getMainExecutor(requireActivity()),
@@ -186,88 +183,134 @@ class ScanerCameraFragment : Fragment() {
                         loadPhotoPreview(uri)
                     }
                 }
-
             }
         )
     }
 
-
-    private fun recognizeTextFromImage(uri: Uri) {
-        val image = InputImage.fromFilePath(requireContext(), uri)
-        recognizer.process(image)
-            .addOnSuccessListener { visionText ->
-                // Filtrar y obtener solo las palabras más grandes
-                val largestTexts = getLargestTexts(visionText)
-
-                // Convertir la lista de TextBlocks a un solo string
-                val resultText = largestTexts.joinToString(" ") { it.text }
-                Log.d(TAG, "Recognized text: $resultText")
-                searchWine(resultText)
-            }
-            .addOnFailureListener { e ->
-                Log.e(TAG, "Error recognizing text: ${e.localizedMessage}", e)
-            }
-    }
-
-
-    // TODO FUncion que regula el tamaño de las letras escaneadas, usandolo como filtro pasa solo buscar en los titulos
-    // Igual deberia analizar todo lo que lee y comparalos con alguna coincidencia en la bbdd.
-    private fun getLargestTexts(visionText: Text): List<Text.TextBlock> {
-        val largestTextBlocks = mutableListOf<Text.TextBlock>()
-        var maxSize = 0.0  // Usar Double directamente
-
-        // Asumiendo una densidad de píxeles estándar de 160 DPI (2.54 cm/pulgada)
-        val dpi = 160.0  // DPI estándar
-        val pixelToCm = 2.54 / dpi  // Convertir píxeles a centímetros
-
-        for (block in visionText.textBlocks) {
-            val boundingBox = block.boundingBox
-            if (boundingBox != null) {
-                val width = boundingBox.width()?.toDouble() ?: 0.0  // Convertir a Double
-                val height = boundingBox.height()?.toDouble() ?: 0.0  // Convertir a Double
-                val widthInCm = width * pixelToCm
-                val heightInCm = height * pixelToCm
-                val blockSize = widthInCm * heightInCm
-
-                if (blockSize > 0.30) {  // Filtrar bloques mayores a 0.30 cm²
-                    if (blockSize > maxSize) {
-                        largestTextBlocks.clear()
-                        maxSize = blockSize
-                        largestTextBlocks.add(block)
-                    } else if (blockSize == maxSize) {
-                        largestTextBlocks.add(block)
-                    }
-                }
-            }
-        }
-
-        return largestTextBlocks
-    }
-
-
-
-    private fun searchWine(resultText: String) {
-        Toast.makeText(context, resultText, Toast.LENGTH_LONG).show()
-        viewModel.getWinesAndFilterByName(resultText,requireContext())
-    }
-
-
     private fun loadPhotoPreview(uri: Uri) {
-        val bitmap = uriToBitmap(uri)
+        val bitmap = uriToBitmap(uri) // Asegúrate de que esta función convierte correctamente la URI a Bitmap
         binding.ibPhotoPreview.setImageBitmap(bitmap)
         binding.ibPhotoPreview.setOnClickListener {
-            recognizeTextFromImage(uri)
+            viewModel.getWinesAndFilterByName(uri, requireContext())
         }
     }
+
+
+
+
+//    private fun recognizeTextFromImage(uri: Uri) {
+//        val image = InputImage.fromFilePath(requireContext(), uri)
+//        recognizer.process(image)
+//            .addOnSuccessListener { visionText ->
+//                // Utilizar directamente el texto completo reconocido
+//                val fullText = visionText.text
+//
+//                // Dividir el texto en palabras individuales
+//                val words = fullText.split("\\s+".toRegex()).filter { it.isNotEmpty() }
+//
+//                // Convertir la lista de palabras a un solo string separado por comas para la búsqueda
+//                val queryText = words.joinToString(" ")
+//
+//                Log.d(TAG, "Recognized text: $queryText")
+//                searchWine(queryText)
+//            }
+//            .addOnFailureListener { e ->
+//                Log.e(TAG, "Error recognizing text: ${e.localizedMessage}", e)
+//            }
+//    }
+
+//    private fun recognizeTextFromImage(uri: Uri) {
+//        val image = InputImage.fromFilePath(requireContext(), uri)
+//        recognizer.process(image)
+//            .addOnSuccessListener { visionText ->
+//                Log.d(TAG, "Text blocks detected: ${visionText.textBlocks.size}")
+//                if (visionText.textBlocks.isEmpty()) {
+//                    Log.d(TAG, "No text blocks detected.")
+//                }
+//
+//                val largestTexts = getLargestTexts(visionText, image)
+//                val resultText = largestTexts.joinToString(" ") { it.text }
+//                Log.d(TAG, "Recognized text: $resultText")
+//                searchWine(resultText)
+//            }
+//            .addOnFailureListener { e ->
+//                Log.e(TAG, "Error recognizing text: ${e.localizedMessage}", e)
+//            }
+//    }
+//
+//    private fun getLargestTexts(visionText: Text, image: InputImage): List<Text.TextBlock> {
+//        val largestTextBlocks = mutableListOf<Text.TextBlock>()
+//        var maxSize = 0.0
+//
+//        val imageWidth = image.width.toDouble()
+//        val imageHeight = image.height.toDouble()
+//        val imageArea = imageWidth * imageHeight
+//
+//        val minProportion = 0.01  // Ajustado a 1% para capturar bloques más pequeños
+//
+//        for (block in visionText.textBlocks) {
+//            val boundingBox = block.boundingBox
+//            if (boundingBox != null) {
+//                val width = boundingBox.width()?.toDouble() ?: 0.0
+//                val height = boundingBox.height()?.toDouble() ?: 0.0
+//                val blockSize = width * height
+//                val blockProportion = blockSize / imageArea
+//
+//                Log.d(TAG, "Block size: $blockSize, Proportion: $blockProportion")
+//
+//                if (blockProportion > minProportion) {
+//                    if (blockSize > maxSize) {
+//                        largestTextBlocks.clear()
+//                        maxSize = blockSize
+//                        largestTextBlocks.add(block)
+//                    } else if (blockSize == maxSize) {
+//                        largestTextBlocks.add(block)
+//                    }
+//                }
+//            }
+//        }
+//
+//        return largestTextBlocks
+//    }
+//
+
+
+
+//    private fun getLargestTexts(visionText: Text): List<Text.TextBlock> {
+//        val largestTextBlocks = mutableListOf<Text.TextBlock>()
+//        var maxSize = 0.0  // Usar Double directamente
+//
+//        // Asumiendo una densidad de píxeles estándar de 160 DPI (2.54 cm/pulgada)
+//        val dpi = 160.0  // DPI estándar
+//        val pixelToCm = 2.54 / dpi  // Convertir píxeles a centímetros
+//
+//        for (block in visionText.textBlocks) {
+//            val boundingBox = block.boundingBox
+//            if (boundingBox != null) {
+//                val width = boundingBox.width()?.toDouble() ?: 0.0  // Convertir a Double
+//                val height = boundingBox.height()?.toDouble() ?: 0.0  // Convertir a Double
+//                val widthInCm = width * pixelToCm
+//                val heightInCm = height * pixelToCm
+//                val blockSize = widthInCm * heightInCm
+//
+//                if (blockSize > 0.30) {  // Filtrar bloques mayores a 0.30 cm²
+//                    if (blockSize > maxSize) {
+//                        largestTextBlocks.clear()
+//                        maxSize = blockSize
+//                        largestTextBlocks.add(block)
+//                    } else if (blockSize == maxSize) {
+//                        largestTextBlocks.add(block)
+//                    }
+//                }
+//            }
+//        }
+//
+//        return largestTextBlocks
+//    }
 
     private fun uriToBitmap(uri: Uri): Bitmap? {
         val inputStream = requireActivity().contentResolver.openInputStream(uri)
         return BitmapFactory.decodeStream(inputStream)
-    }
-
-    private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
-        ContextCompat.checkSelfPermission(
-            requireActivity(), it) == PackageManager.PERMISSION_GRANTED
     }
 
     override fun onDestroy() {
@@ -290,6 +333,13 @@ class ScanerCameraFragment : Fragment() {
             }.toTypedArray()
     }
 
+
+    // Permisos
+
+    private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
+        ContextCompat.checkSelfPermission(
+            requireActivity(), it) == PackageManager.PERMISSION_GRANTED
+    }
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<String>, grantResults:
         IntArray) {
