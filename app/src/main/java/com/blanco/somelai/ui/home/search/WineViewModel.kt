@@ -24,12 +24,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.IOException
+
 class WineViewModel : ViewModel() {
 
     private var _apiKey: String = "AIzaSyCzEqyGwZ1a8Cz33HPm3_R8dvzMW4c-9k4"
 
     private val _uiState: LiveData<WineUiState> = MutableLiveData(WineUiState())
     val uiState: LiveData<WineUiState> get() = _uiState
+
+    private val _navigateToWineList = MutableLiveData<Boolean>()
+    val navigateToWineList: LiveData<Boolean> get() = _navigateToWineList
 
     fun getWineForType(typeWine: String) {
         (uiState as MutableLiveData).value = WineUiState(isLoading = true)
@@ -94,6 +98,8 @@ class WineViewModel : ViewModel() {
     }
 
     fun getWinesAndFilterByName(imageUri: Uri, context: Context) {
+        (uiState as MutableLiveData).value = WineUiState(isLoading = true)
+
         val textLiveData = analyzeWineLabel(imageUri, context)
         textLiveData.observeForever { extractedText ->
             viewModelScope.launch {
@@ -108,25 +114,24 @@ class WineViewModel : ViewModel() {
                     val filteredWines = allWines.filter { wine ->
                         wine.wine.lowercase().contains(wineName.lowercase(), ignoreCase = true)
                     }
-                    if (filteredWines.isNotEmpty()) {
-                        filteredWines.forEach { wine ->
-                            Log.d("WineViewModel", "Found wine: ${wine.wine}")
-                        }
-                        withContext(Dispatchers.Main) {
-                            Toast.makeText(context, "VINO ENCONTRADO!!!!!", Toast.LENGTH_LONG)
-                                .show()
-                        }
-                    } else {
-                        withContext(Dispatchers.Main) {
-                            Toast.makeText(
-                                context,
-                                "Vino no encontrado en la BBDD",
-                                Toast.LENGTH_LONG
-                            ).show()
+
+                    viewModelScope.launch(Dispatchers.Main) {
+                        if (filteredWines.isNotEmpty()) {
+                            filteredWines.forEach { wine ->
+                                Log.d("WineViewModel", "Found wine: ${wine.wine}")
+                            }
+                            (uiState as MutableLiveData).value = WineUiState(response = filteredWines)
+                            _navigateToWineList.value = true
+                        } else {
+                            (uiState as MutableLiveData).value = WineUiState(isError = true)
+                            Toast.makeText(context, "Vino no encontrado en la BBDD", Toast.LENGTH_LONG).show()
+                            //Todo si no se encuentran los vinos hay que ir desde el scanerCamera al feedfragment llevando el vino escaneado y afregandolo a una
+                            // lista que se guardara en el perfil del usuario
                         }
                     }
                 } catch (e: Exception) {
                     Log.e("WineViewModel", "Error fetching wines: ${e.message}")
+                    (uiState as MutableLiveData).value = WineUiState(isError = true)
                     withContext(Dispatchers.Main) {
                         Toast.makeText(context, "Error al buscar vinos", Toast.LENGTH_LONG).show()
                     }
@@ -134,6 +139,7 @@ class WineViewModel : ViewModel() {
             }
         }
     }
+
 
     fun analyzeWineLabel(imageUri: Uri, context: Context): LiveData<String> =
         liveData(Dispatchers.IO) {
@@ -222,6 +228,11 @@ class WineViewModel : ViewModel() {
             "pairing" to details.getOrNull(4).orEmpty()
         )
     }
+
+    fun resetNavigateToWineList() {
+        _navigateToWineList.value = false
+    }
+
 }
 
 

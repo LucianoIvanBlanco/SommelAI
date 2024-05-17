@@ -26,12 +26,13 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import com.blanco.somelai.R
 import com.blanco.somelai.databinding.FragmentScanerCameraBinding
 import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-
 
 class ScanerCameraFragment : Fragment() {
 
@@ -46,7 +47,6 @@ class ScanerCameraFragment : Fragment() {
     private lateinit var cameraExecutor: ExecutorService
 
     private var camera: Camera? = null
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -69,6 +69,19 @@ class ScanerCameraFragment : Fragment() {
         initializeFlashButtonIcon()
         setClicks()
         cameraExecutor = Executors.newSingleThreadExecutor()
+
+        observeViewModel()
+    }
+
+    private fun observeViewModel() {
+        viewModel.navigateToWineList.observe(viewLifecycleOwner, Observer { navigate ->
+            if (navigate) {
+                // Navegar a WineListFragment
+                // Navegar a WineListFragment usando NavController
+                findNavController().navigate(R.id.action_scanerCameraFragment_to_wineListFragment)
+                viewModel.resetNavigateToWineList() // Resetear el evento
+            }
+        })
     }
 
     private fun setClicks(){
@@ -140,7 +153,6 @@ class ScanerCameraFragment : Fragment() {
         }
     }
 
-
     private fun takePhoto() {
         val imageCapture = imageCapture ?: return
 
@@ -187,7 +199,6 @@ class ScanerCameraFragment : Fragment() {
         binding.ibPhotoPreview.setOnClickListener {
             viewModel.getWinesAndFilterByName(uri, requireContext())
             Toast.makeText(context, "INICIANDO BUSQUEDA...", Toast.LENGTH_LONG).show()
-
         }
     }
 
@@ -216,16 +227,15 @@ class ScanerCameraFragment : Fragment() {
             }.toTypedArray()
     }
 
-
     // Permisos
 
     private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
         ContextCompat.checkSelfPermission(
             requireActivity(), it) == PackageManager.PERMISSION_GRANTED
     }
+
     override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<String>, grantResults:
-        IntArray) {
+        requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         if (requestCode == REQUEST_CODE_PERMISSIONS) {
             if (allPermissionsGranted()) {
                 startCamera()
@@ -238,4 +248,3 @@ class ScanerCameraFragment : Fragment() {
         }
     }
 }
-

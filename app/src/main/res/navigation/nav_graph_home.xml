@@ -48,5 +48,12 @@
         android:id="@+id/scanerCameraFragment"
         android:name="com.blanco.somelai.ui.home.search.ScanerCameraFragment"
         android:label="fragment_scaner_camera"
-        tools:layout="@layout/fragment_scaner_camera" />
+        tools:layout="@layout/fragment_scaner_camera" >
+        <action
+            android:id="@+id/action_scanerCameraFragment_to_wineListFragment"
+            app:destination="@id/wineListFragment" />
+        <action
+            android:id="@+id/action_scanerCameraFragment_to_feedFragment"
+            app:destination="@id/feedFragment" />
+    </fragment>
 </navigation>

@@ -18,7 +18,7 @@ import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface WineService {
-    // TODO Añadir los endpoints aqui
+    // TODO Mejorar el uso del service
 
     //region --- User ---
 
