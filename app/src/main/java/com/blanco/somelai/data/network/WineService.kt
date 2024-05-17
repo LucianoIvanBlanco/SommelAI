@@ -48,9 +48,6 @@ interface WineService {
     @GET("{type}")
     suspend fun getWines(@Path("type") type: String): Response<List<Wine>>
 
-@GET("wine")
-    suspend fun getAllWine(): Response<List<Wine>>
-
 
     @GET("reds")
     suspend fun getAllRedsWine(): Response<List<Wine>>
@@ -63,24 +60,6 @@ interface WineService {
 
     @GET("rose")
     suspend fun getAllRoseWine(): Response<List<Wine>>
-
-
-    @GET("reds")
-    fun getRedWines(): Call<List<Wine>>
-
-    @GET("whites")
-    fun getWhitesWines(): Call<List<Wine>>
-
-    @GET("sparkling")
-    fun getSparklingWines(): Call<List<Wine>>
-
-    @GET("rose")
-    fun getRoseWines(): Call<List<Wine>>
-
-
-
-    @GET("wine/{id}")
-    fun getWineId(@Path("id") id: String): Call<Wine>
 
 
     // Para guardar en Firebase?

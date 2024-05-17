@@ -21,8 +21,11 @@ import com.google.ai.client.generativeai.type.asTextOrNull
 import com.google.ai.client.generativeai.type.content
 import com.google.ai.client.generativeai.type.generationConfig
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import retrofit2.Response
 import java.io.IOException
 
 class WineViewModel : ViewModel() {
@@ -57,22 +60,37 @@ class WineViewModel : ViewModel() {
 
     private suspend fun getAllWines(): List<Wine> {
         return withContext(Dispatchers.IO) {
-            val typesOfWine = listOf("reds", "whites", "rose", "sparkling")
             val wineResponses = mutableListOf<Wine>()
 
-            typesOfWine.forEach { type ->
-                try {
-                    val response = WineApi.service.getWines(type)
-                    if (response.isSuccessful) {
-                        response.body()?.let { wineResponses.addAll(it) }
-                    }
-                } catch (e: Exception) {
-                    Log.e("WineViewModel", "Error fetching wines for type $type: ${e.message}")
-                }
+            val deferredResponses = listOf(
+                async { fetchWines(WineApi.service::getAllRedsWine) },
+                async { fetchWines(WineApi.service::getAllWhitesWine) },
+                async { fetchWines(WineApi.service::getAllSparklingWine) },
+                async { fetchWines(WineApi.service::getAllRoseWine) }
+            )
+
+            deferredResponses.awaitAll().forEach { wines ->
+                wineResponses.addAll(wines)
             }
+
             wineResponses  // Retornar la lista de vinos recopilada
         }
     }
+
+    private suspend fun fetchWines(fetchFunction: suspend () -> Response<List<Wine>>): List<Wine> {
+        return try {
+            val response = fetchFunction()
+            if (response.isSuccessful) {
+                response.body() ?: emptyList()
+            } else {
+                emptyList()
+            }
+        } catch (e: Exception) {
+            Log.e("WineViewModel", "Error fetching wines: ${e.message}")
+            emptyList()
+        }
+    }
+
 
     fun getWinesAndFilterByCountry(country: String) {
         (uiState as MutableLiveData).value = WineUiState(isLoading = true)
