@@ -11,7 +11,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
+import com.blanco.somelai.data.firebase.realtime_database.RealTimeDatabaseManager
 import com.blanco.somelai.data.network.WineApi
+import com.blanco.somelai.data.network.model.body.WineBody
 import com.blanco.somelai.data.network.model.responses.Wine
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.BlockThreshold
@@ -27,6 +29,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import retrofit2.Response
 import java.io.IOException
+import java.util.UUID
 
 class WineViewModel : ViewModel() {
 
@@ -37,6 +40,8 @@ class WineViewModel : ViewModel() {
 
     private val _navigateToWineList = MutableLiveData<Boolean>()
     val navigateToWineList: LiveData<Boolean> get() = _navigateToWineList
+
+    private var realTimeDatabaseManager: RealTimeDatabaseManager = RealTimeDatabaseManager()
 
     fun getWineForType(typeWine: String) {
         (uiState as MutableLiveData).value = WineUiState(isLoading = true)
@@ -143,6 +148,13 @@ class WineViewModel : ViewModel() {
                         } else {
                             (uiState as MutableLiveData).value = WineUiState(isError = true)
                             Toast.makeText(context, "Vino no encontrado en la BBDD", Toast.LENGTH_LONG).show()
+
+                            // Crear y guardar el nuevo vino
+                            createAndSaveWine(wineDetails, imageUri)
+
+                            // Hacemos que el WineFeedAdapter pinte en el feed desde esa lista de vinos guardados
+
+
                             //Todo si no se encuentran los vinos hay que ir desde el scanerCamera al feedfragment llevando el vino escaneado y afregandolo a una
                             // lista que se guardara en el perfil del usuario
                         }
@@ -158,6 +170,27 @@ class WineViewModel : ViewModel() {
         }
     }
 
+    private fun createAndSaveWine(wineDetails: Map<String, String>, imageUri: Uri) {
+        val newWine = WineBody(
+            wine = wineDetails["name"] ?: "",
+            year = wineDetails["year"] ?: "",
+            winery = wineDetails["winery"] ?: "",
+            country = wineDetails["country"] ?: "",
+            pairing = wineDetails["pairing"] ?: "",
+            image = imageUri.toString(),
+            id = UUID.randomUUID().toString(),
+            rating = ""
+        )
+
+        viewModelScope.launch {
+            try {
+                realTimeDatabaseManager.saveWine(newWine)
+                Log.d("WineViewModel", "Wine saved successfully")
+            } catch (e: Exception) {
+                Log.e("WineViewModel", "Error saving wine: ${e.message}")
+            }
+        }
+    }
 
     fun analyzeWineLabel(imageUri: Uri, context: Context): LiveData<String> =
         liveData(Dispatchers.IO) {

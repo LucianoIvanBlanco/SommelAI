@@ -9,8 +9,6 @@ import androidx.lifecycle.lifecycleScope
 import com.blanco.somelai.R
 import com.blanco.somelai.data.firebase.authentification.EmailAndPasswordAuthenticationManager
 import com.blanco.somelai.data.firebase.realtime_database.RealTimeDatabaseManager
-import com.blanco.somelai.data.firebase.realtime_database.model.UserData
-import com.blanco.somelai.data.network.model.responses.BasicResponse
 import com.blanco.somelai.data.storage.DataStoreManager
 import com.blanco.somelai.databinding.FragmentSignUpBinding
 import com.google.firebase.auth.FirebaseAuth
@@ -18,13 +16,6 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 class SignUpFragment : Fragment() {
 

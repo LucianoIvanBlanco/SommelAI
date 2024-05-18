@@ -2,6 +2,8 @@ package com.blanco.somelai.data.network.model.body
 
 import com.google.gson.annotations.SerializedName
 
+
+// No se usa
 data class UserBody(
     @SerializedName("userName")
     val userName: String,
