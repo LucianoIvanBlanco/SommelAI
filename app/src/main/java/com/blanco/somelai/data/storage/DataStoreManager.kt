@@ -7,10 +7,11 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.blanco.somelai.data.network.model.responses.UserDataResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+
+// TODO estamos usando datastore para tener acceso mas rapido?
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "SOMELAI_STORE")
 

@@ -13,8 +13,6 @@ import com.blanco.somelai.R
 import com.blanco.somelai.databinding.FragmentSearchBinding
 
 
-
-// TODO los permisos de la camara estan bien, el problema es el surface. Ver algun tutorial
 class SearchFragment : Fragment() {
 
     private lateinit var _binding: FragmentSearchBinding
@@ -37,6 +35,7 @@ class SearchFragment : Fragment() {
         setClicks()
     }
 
+    // TODO usamos las funciones de tipo especifico del service?
     private fun setClicks() {
 
         binding.mcvWineRed.setOnClickListener {
@@ -87,30 +86,5 @@ class SearchFragment : Fragment() {
     }
 
 }
-
-
-
-//    private fun openCamera() {
-//        // TODO logica para abrir la camara, tendremos que pedir permiso
-//
-//        lifecycleScope.launch(Dispatchers.IO) {
-//            val wine: String
-//            val winery: String
-//            val location: String
-//            val rating: String
-//            val image: String
-//            val id: Int
-//
-//            // saveDataInDataStore(wine= "", winery="", location="", rating="", image="", id=0)
-//        }
-//    }
-//
-//    private fun showMessage(message: String) {
-//        lifecycleScope.launch(Dispatchers.Main) {
-//            Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
-//        }
-//    }
-//
-//}
 
 

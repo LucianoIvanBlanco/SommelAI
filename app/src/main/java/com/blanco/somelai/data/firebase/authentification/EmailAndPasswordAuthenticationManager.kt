@@ -1,19 +1,18 @@
 package com.blanco.somelai.data.firebase.authentification
 
-import SignUpFragment
 import android.util.Log
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 
+// Usado para login y creacion de usuarios en firebase
 class EmailAndPasswordAuthenticationManager {
 
     private val auth = Firebase.auth
 
 
+// TODO usaremos la funcion?
     fun isUserLogged(): Boolean {
         val currentUser = auth.currentUser
         if (currentUser != null) {

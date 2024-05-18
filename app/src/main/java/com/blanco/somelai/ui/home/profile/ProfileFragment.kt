@@ -1,14 +1,13 @@
 package com.blanco.somelai.ui.home.profile
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.blanco.somelai.R
@@ -22,12 +21,8 @@ import com.blanco.somelai.ui.login.MainActivity
 import com.bumptech.glide.Glide
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
 
@@ -36,12 +31,10 @@ class ProfileFragment : Fragment() {
     private lateinit var _binding: FragmentProfileBinding
     private val binding: FragmentProfileBinding get() = _binding
 
-
     private lateinit var realTimeDatabaseManager: RealTimeDatabaseManager
     private lateinit var auth: FirebaseAuth
 
     private lateinit var dataStoreManager: DataStoreManager
-
     private lateinit var cloudStorageManager: CloudStorageManager
 
     override fun onCreateView(
@@ -69,11 +62,9 @@ class ProfileFragment : Fragment() {
         binding.btnDeleteAccount.setOnClickListener {
             showDialogDeleteAccount()
         }
-
         binding.btnLogOut.setOnClickListener {
             logOut()
         }
-
         binding.btnEditProfile.setOnClickListener {
             navigateToEditProfile()
         }
@@ -83,41 +74,40 @@ class ProfileFragment : Fragment() {
         findNavController().navigate(R.id.editProfileFragment)
     }
 
-    // leemos los datos del usuario en fireBase
+    // T
     private fun getUserData() {
-        val currentUser = auth.currentUser
-        if (currentUser != null) {
-            val uid = currentUser.uid
-            lifecycleScope.launch(Dispatchers.IO) {
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val currentUser = auth.currentUser ?: throw IllegalStateException("No hay usuario autentificado.")
+                val uid = currentUser.uid
                 val userData = realTimeDatabaseManager.readUser(uid)
                 withContext(Dispatchers.Main) {
                     if (userData != null) {
                         setUserData(userData)
                     } else {
-                        // TODO  Manejar el caso en que no se encuentren datos del usuario
-                        showMessage("No se encontraron datos del usuario.")
+                                               showMessage("No se encontraron datos del usuario.")
                     }
                 }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    showMessage("Error al obtener los datos del usuario: ${e.message}")
+                }
             }
-        } else {
-            // TODO Manejar el caso en que no haya un usuario autenticado
-            showMessage("No hay un usuario autenticado.")
         }
     }
 
     private fun setUserData(user: UserData) {
-        binding.tvMail.text = user.userEmail // Asegúrate de que UserData tenga un campo para el email
-        binding.tvUserName.text = user.userName // Asegúrate de que UserData tenga un campo para el nombre de usuario
+        binding.tvMail.text = user.userEmail
+        binding.tvUserName.text = user.userName
 
         // TODO la imagen carga lento
         Glide.with(requireContext())
-            .asBitmap() // Forzar a tratar la imagen como un bitmap
-            .load(user.userPhotoUrl?: R.drawable.default_user)
+            .asBitmap()
+            .load(user.userPhotoUrl)
             .placeholder(R.drawable.default_user)
             .fallback(R.drawable.default_user)
             .into(binding.ivProfile)
     }
-
 
 
     // Borramos la cuenta de Database
@@ -131,7 +121,7 @@ class ProfileFragment : Fragment() {
                     showMessage("Lamentamos que nos dejes. Puedes volver siempre que quieras")
                 }
                     //Retrocedemos a la pantalla anterior
-                    deleteUserStoredData()
+                    logOutStoredData()
                     goLogin()
                     deleteUserAccount()
 
@@ -147,28 +137,25 @@ class ProfileFragment : Fragment() {
 
     // Borramos de firebaseAuth
     private fun deleteUserAccount() {
-        val currentUser = FirebaseAuth.getInstance().currentUser
-        if (currentUser != null) {
+        try {
+            val currentUser = FirebaseAuth.getInstance().currentUser ?: throw IllegalStateException("No hay un usuario autenticado")
             currentUser.delete()
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        Log.d("Usuario", "Cuenta eliminada exitosamente")
-                        // Aquí puedes redirigir al usuario a la pantalla de inicio de sesión o mostrar un mensaje
+                        Log.d("ProfileFragment", "Cuenta eliminada exitosamente")
                     } else {
-                        Log.e("Usuario", "Error al eliminar la cuenta", task.exception)
-                        // Manejar el error
+                        Log.e("ProfileFragment", "Error al eliminar la cuenta", task.exception)
                     }
                 }
-        } else {
-            Log.e("Usuario", "No hay un usuario autenticado")
-            // Manejar el caso en que no haya un usuario autenticado
+        } catch (e: Exception) {
+            Log.e("ProfileFragment", "Error al intentar eliminar la cuenta: ${e.message}")
         }
     }
-
     //region --- DataStore ---
 
-    // Borramos de dataStore
-    private fun deleteUserStoredData() {
+    // LogOut de dataStore
+    //Todo falta eliminar la cuenta
+    private fun logOutStoredData() {
         lifecycleScope.launch(Dispatchers.IO) {
             dataStoreManager.logOut()
         }
@@ -211,7 +198,7 @@ class ProfileFragment : Fragment() {
     private fun logOut() {
         lifecycleScope.launch(Dispatchers.IO) {
             logoutFirebase()
-            deleteUserStoredData()
+            logOutStoredData()
             withContext(Dispatchers.Main) {
                 goLogin()
             }
@@ -224,6 +211,5 @@ class ProfileFragment : Fragment() {
         requireActivity().finish()
     }
     //endregion --- Other ---
-
 
 }

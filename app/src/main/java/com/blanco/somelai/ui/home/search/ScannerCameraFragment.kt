@@ -34,18 +34,19 @@ import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-class ScanerCameraFragment : Fragment() {
+
+// TODO incluimos funcion para entrar a la galeria??
+//si lo hacemos tenemos que modificar la forma en la que se inicia el analisis de la foto
+class ScannerCameraFragment : Fragment() {
 
     private lateinit var _binding: FragmentScanerCameraBinding
     private val binding get() = _binding
-
+    
     private val viewModel: WineViewModel by activityViewModels()
 
     // Camera X
     private var imageCapture: ImageCapture? = null
-
     private lateinit var cameraExecutor: ExecutorService
-
     private var camera: Camera? = null
 
     override fun onCreateView(
@@ -59,18 +60,22 @@ class ScanerCameraFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // Request camera permissions
-        if (allPermissionsGranted()) {
-            startCamera()
-        } else {
-            ActivityCompat.requestPermissions(
-                requireActivity(), REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS)
-        }
+        requestPermissions()
         initializeFlashButtonIcon()
         setClicks()
         cameraExecutor = Executors.newSingleThreadExecutor()
 
         observeViewModel()
+    }
+
+    private fun requestPermissions() {
+        if (allPermissionsGranted()) {
+            startCamera()
+        } else {
+            ActivityCompat.requestPermissions(
+                requireActivity(), REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
+            )
+        }
     }
 
     // Observamos cambios en los livedata para navegar
@@ -102,7 +107,6 @@ class ScanerCameraFragment : Fragment() {
         }
     }
 
-    // CAMARA
 
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
@@ -123,7 +127,7 @@ class ScanerCameraFragment : Fragment() {
                 camera = cameraProvider.bindToLifecycle(
                     this, cameraSelector, preview, imageCapture)
             } catch (exc: Exception) {
-                Log.e(TAG, "Use case binding failed", exc)
+                Log.e("ScannerCameraFragment", "Use case binding failed", exc)
             }
 
         }, ContextCompat.getMainExecutor(requireContext()))
@@ -180,12 +184,12 @@ class ScanerCameraFragment : Fragment() {
             ContextCompat.getMainExecutor(requireActivity()),
             object : ImageCapture.OnImageSavedCallback {
                 override fun onError(exc: ImageCaptureException) {
-                    Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
+                    Log.e("ScannerCameraFragment", "Photo capture failed: ${exc.message}", exc)
                 }
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
                     val msg = "Photo capture succeeded: ${output.savedUri}"
-                    Log.d(TAG, msg)
+                    Log.d("ScannerCameraFragment", msg)
                     output.savedUri?.let { uri ->
                         loadPhotoPreview(uri)
                     }
@@ -220,7 +224,7 @@ class ScanerCameraFragment : Fragment() {
         private val REQUIRED_PERMISSIONS =
             mutableListOf (
                 Manifest.permission.CAMERA,
-                Manifest.permission.RECORD_AUDIO
+                Manifest.permission.READ_EXTERNAL_STORAGE
             ).apply {
                 if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
                     add(Manifest.permission.WRITE_EXTERNAL_STORAGE)

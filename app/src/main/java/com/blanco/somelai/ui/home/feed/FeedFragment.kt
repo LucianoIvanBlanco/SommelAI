@@ -63,7 +63,7 @@ class FeedFragment : Fragment() {
 
     private fun showErrorMessage(errorBody: ResponseBody?) {
         val message = "Ha habido un error al recuperar los anuncios"
-        Log.e("WineList", errorBody.toString())
+        Log.e("FeedFragment", errorBody.toString())
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 

@@ -20,7 +20,6 @@ class HomeActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setBottomNavigationView()
-
     }
 
     private fun setBottomNavigationView() {

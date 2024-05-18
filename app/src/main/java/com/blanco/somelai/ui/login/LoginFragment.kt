@@ -86,7 +86,6 @@ class LoginFragment : BottomSheetDialogFragment() {
                 dataStoreManager.saveUser(email, password)
                 navigateToHome()
             } else {
-                // TODO Manejar que pasa cuando el useuario pone una contraseña incorrecta
                 showInvalidCredentialsMessage()
             }
         }

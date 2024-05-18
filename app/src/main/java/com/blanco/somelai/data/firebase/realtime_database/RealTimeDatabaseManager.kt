@@ -28,7 +28,8 @@ class RealTimeDatabaseManager {
             // Le asignamos un id al usuario que sera la "key"
             connection.child(key).setValue(userWithKey).await()
             //connection.child("${user.userId}").setValue(userWithKey).await()
-            //Si todo ha ido bien, retornamos el objeto con su key
+
+            // si ha ido bien, retornamos el objeto con su key
             Log.d("usuario", "guardado")
             return userWithKey
         } else {

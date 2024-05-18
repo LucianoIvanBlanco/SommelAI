@@ -32,7 +32,6 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.Calendar
 
 class EditProfileFragment : Fragment() {
 
@@ -55,7 +54,6 @@ class EditProfileFragment : Fragment() {
     private val requestPermissionLauncher: ActivityResultLauncher<String> =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) {
-                //El permiso ha sido concedido, podemos realizar la acción que lo necesitaba
                 openGallery()
             } else {
                 showDeniedPermissionMessage()
@@ -94,7 +92,6 @@ class EditProfileFragment : Fragment() {
         cloudStorageManager = CloudStorageManager()
         realTimeDatabaseManager = RealTimeDatabaseManager()
         auth = FirebaseAuth.getInstance()
-        // Inicializa tu ImageButton
         profileImageButton = view.findViewById(R.id.img_btn_profile)
 
         // Carga la foto de perfil del usuario logueado
@@ -110,14 +107,13 @@ class EditProfileFragment : Fragment() {
             if (isDataValid()) {
                 if (uploadedImageUrl != null) {
                     updateUserProfile()
-                    showMessage("Datos actualizados")
+                    showMessage("Datos actualizados.")
                 } else {
-                    // Manejar el caso en que uploadedImageUrl es null
                     showMessage("No se ha subido ninguna imagen.")
                 }
                 findNavController().popBackStack()
             } else {
-                showMessage("Error, debes completar todos los campos")
+                showMessage("Error, debes completar todos los campos.")
             }
         }
 
@@ -135,16 +131,14 @@ class EditProfileFragment : Fragment() {
             val userPhotoUrl = cloudStorageManager.getUserProfilePicture()
             if (userPhotoUrl != null) {
                 Glide.with(requireContext())
-                    .asBitmap() // Forzar a tratar la imagen como un bitmap
-                    .load(userPhotoUrl?: R.drawable.default_user)
+                    .asBitmap()
+                    .load(userPhotoUrl)
                     .placeholder(R.drawable.default_user)
                     .fallback(R.drawable.default_user)
                     .into(profileImageButton)
-
             } else {
-                // Carga una imagen por defecto si no hay foto de perfil
                 Glide.with(requireContext())
-                    .load(R.drawable.default_user) // Asegúrate de que ic_emoji exista en tus recursos de drawable
+                    .load(R.drawable.default_user)
                     .into(profileImageButton)
             }
         }
@@ -153,7 +147,7 @@ class EditProfileFragment : Fragment() {
     private fun setImagePreview(uploadedImageResponse: String) {
 
         Glide.with(requireContext())
-            .asBitmap() // Forzar a tratar la imagen como un bitmap
+            .asBitmap()
             .load(uploadedImageResponse)
             .centerCrop()
             .placeholder(R.drawable.default_user)
@@ -161,7 +155,7 @@ class EditProfileFragment : Fragment() {
             .into(profileImageButton)
     }
 
-    //endregion --- UI RElated ---
+    //endregion --- UI Related ---
 
     //region --- Firebase - CloudStorage ---
 
@@ -170,7 +164,6 @@ class EditProfileFragment : Fragment() {
             val uploadedImageResponse = cloudStorageManager.uploadProfileImage(selectedImageUri!!)
             withContext(Dispatchers.Main) {
                 if (uploadedImageResponse != null) {
-                    //Mostramos la imagen cuando recibamos el link
                     uploadedImageUrl = uploadedImageResponse
                     setImagePreview(uploadedImageResponse)
                 }
@@ -184,7 +177,7 @@ class EditProfileFragment : Fragment() {
                 //Esperamos a que nos retorne si la foto se borró a partir del enlace o no
                 val wasDeleted: Boolean = CloudStorageManager().deleteImage(uploadedImageUrl!!)
                 if (wasDeleted) {
-                    Log.i("Users", "Foto eliminada")
+                    Log.i("EditProfileFragment", "Foto eliminada")
                 }
                 openGallery()
             }
@@ -193,7 +186,6 @@ class EditProfileFragment : Fragment() {
     //endregion --- Firebase - CloudStorage ---
 
     private fun isDataValid(): Boolean {
-        // Expresiones regulares para email y password
         val userNamePattern = "^[a-zA-Z0-9]{4,}$".toRegex()
         val fullNamePattern = "^[a-zA-Z]{3,20}\\s[a-zA-Z]{4,20}$".toRegex()
         val passwordPattern = ".{6,10}".toRegex()
@@ -206,17 +198,12 @@ class EditProfileFragment : Fragment() {
                 userName.matches(userNamePattern) && userName.isNotEmpty()
     }
 
-    // TODO se puede subir la foto pero no se puede ver desde profile ni desde editProfile una vez guardada. tampoco da opcion a
-    // abrir la camara
-
+    // TODO agregamos opcion de tomar fotografia?
     fun updateUserProfile() {
-        // Recopila los datos de los campos EditText
         val userName = binding.etProfileUserName.text.toString()
         val userFullName = binding.etProfileFullName.text.toString()
         val userPassword = binding.etProfilePassword.text.toString()
-        // Asegúrate de que el usuario tenga una clave válida para actualizar su perfil
-        val userUid =
-            auth.currentUser?.uid.toString()// Aquí debes obtener la clave del usuario actual
+        val userUid = auth.currentUser?.uid.toString()
         val userEmail = auth.currentUser?.email.toString()
         val userPhotoUrl = uploadedImageUrl!!
 
@@ -250,7 +237,7 @@ class EditProfileFragment : Fragment() {
                 }
             }
         } else {
-            showMessage("No hay un usuario autenticado.")
+            showMessage("No hay usuario autentificado.")
         }
     }
 
@@ -260,19 +247,17 @@ class EditProfileFragment : Fragment() {
         binding.etProfilePassword.setText(user.userPassword)
 
         Glide.with(requireContext())
-            .asBitmap() // Forzar a tratar la imagen como un bitmap
-            .load(user.userPhotoUrl?: R.drawable.default_user)
+            .asBitmap()
+            .load(user.userPhotoUrl)
             .placeholder(R.drawable.default_user)
             .fallback(R.drawable.default_user)
             .into(profileImageButton)
-
     }
 
 
     private fun showMessage(message: String) {
         lifecycleScope.launch(Dispatchers.Main) {
             Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
-
         }
     }
 
@@ -307,6 +292,7 @@ class EditProfileFragment : Fragment() {
     }
     //endregion --- Messages ---
 
+
     //region --- Photo gallery ---
     private fun checkIfWeAlreadyHaveThisPermission() {
         val externalStoragePermission: String = Manifest.permission.READ_EXTERNAL_STORAGE
@@ -335,13 +321,12 @@ class EditProfileFragment : Fragment() {
 
     //endregion --- Photo gallery ---
 
-    //region --- Others: data validations, strings... ---
 
+    //region --- Others: data validations, strings... ---
 
     // TODO podemos usar para avisar de campos vacios al usuario
 
     private fun checkData(title: String, price: Double, description: String): Boolean {
-
         var isDataValid = true
         if (title.isNullOrEmpty()) {
             isDataValid = false
@@ -357,18 +342,6 @@ class EditProfileFragment : Fragment() {
             showMessage("Necesitas subir una foto para el anuncio")
         }
         return isDataValid
-    }
-
-    // para obtener la fecha actual no se usa
-
-    private fun getCurrentDate(): String {
-        //Obtenemos la fecha actual
-        val calendar = Calendar.getInstance()
-        // Obtener la hora, minutos y segundos actuales
-        val year = calendar.get(Calendar.YEAR)
-        val month = calendar.get(Calendar.MONTH)
-        val day = calendar.get(Calendar.DAY_OF_MONTH)
-        return "$day/$month/$year"
     }
     //endregion --- Others: data validations, strings... ---
 }

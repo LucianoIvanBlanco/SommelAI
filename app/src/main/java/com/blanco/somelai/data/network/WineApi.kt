@@ -5,13 +5,6 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-/**
- *  Necesito:
- *  - Añadir permisos de internet
- *  - Servicio
- *  Las respuestas de la api parseadas para el servicio
- */
-
 object WineApi {
     private val interceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY

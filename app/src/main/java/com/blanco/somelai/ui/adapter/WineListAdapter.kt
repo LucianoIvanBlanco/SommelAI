@@ -28,7 +28,7 @@ class WineListAdapter : ListAdapter<Wine, WineListAdapter.WineViewHolder>(ItemCa
         Glide.with(holder.binding.root)
             .load(wine.image)
             .fitCenter()
-            .error(R.drawable.ic_search) // Reemplaza con tu imagen de marcador de posición
+            .error(R.drawable.ic_search)
             .into(holder.binding.ivWineImage)
     }
 

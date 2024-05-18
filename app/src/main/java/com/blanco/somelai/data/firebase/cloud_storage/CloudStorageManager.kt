@@ -9,8 +9,10 @@ import com.google.firebase.storage.StorageReference
 import kotlinx.coroutines.tasks.await
 
 class CloudStorageManager {
+
     private val storageReference: StorageReference = FirebaseStorage.getInstance().reference
 
+    // TODO usaremos la funcion?
     suspend fun uploadProfileImage(uri: Uri): String? {
         val imageName = "$uri".replace(
             "/",
@@ -44,6 +46,8 @@ class CloudStorageManager {
         return imageUrl
     }
 
+    // TODO lo podriamos usar para guardar las fotos de los vinos ClouStorage y no en local
+    // Hace falta guardarlos en la nube?
     suspend fun getAllImages(): List<String> {
         //Accedemos al nodo de las imágenes de los anuncios
         val photoReference = storageReference.child("profileImage")

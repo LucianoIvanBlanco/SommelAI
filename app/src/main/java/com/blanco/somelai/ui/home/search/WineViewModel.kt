@@ -34,26 +34,37 @@ import java.util.UUID
 
 class WineViewModel : ViewModel() {
 
+    //TODO ver como quitar apikey, si cambiamos por certificado o algo
     private var _apiKey: String = "AIzaSyCzEqyGwZ1a8Cz33HPm3_R8dvzMW4c-9k4"
-
 
     private val _uiState: LiveData<WineUiState> = MutableLiveData(WineUiState())
     val uiState: LiveData<WineUiState> get() = _uiState
 
-
     private val _navigateToWineList = MutableLiveData<Boolean>()
     val navigateToWineList: LiveData<Boolean> get() = _navigateToWineList
-
 
     private val _navigateToWineFeed = MutableLiveData<Boolean>()
     val navigateToWineFeed: LiveData<Boolean> get() = _navigateToWineFeed
 
-
     private val _feedUiState: LiveData<WineBodyUiState> = MutableLiveData(WineBodyUiState())
     val feedUiState: LiveData<WineBodyUiState> get() = _feedUiState
 
-
     private var realTimeDatabaseManager: RealTimeDatabaseManager = RealTimeDatabaseManager()
+
+    private val prompt: String = """
+    Extrae los siguientes datos de la etiqueta del vino:
+    1. Nombre del vino
+    2. Año del vino
+    3. Bodega que lo produce
+    4. País/Región/Provincia
+    5. Recomendación de maridaje (tipo de comida adecuado al tipo de vino)
+    
+    Devuelve toda la información como una lista de valores separados por comas, en el orden solicitado. 
+    No incluyas los nombres de los campos ni corchetes, solo los datos.
+    Utiliza solo 5 comas (,) en total. Si hay más información del mismo campo, usa guiones (-) para separar los subcampos.
+    Asegúrate de que la respuesta siga exactamente este formato:
+    "Nombre del vino, Año del vino, Bodega que lo produce, País/Región/Provincia, Recomendación de maridaje"
+""".trimIndent()
 
     fun getWineForType(typeWine: String) {
         (uiState as MutableLiveData).value = WineUiState(isLoading = true)
@@ -151,7 +162,7 @@ class WineViewModel : ViewModel() {
                             Toast.makeText(context, "SIN COINCIDENCIAS EN LA BUSQUEDA", Toast.LENGTH_LONG).show()
                             Toast.makeText(context, "GUARDANDO VINO", Toast.LENGTH_LONG).show()
                             createAndSaveWine(wineDetails, imageUri)
-                           // _navigateToWineFeed.value = true
+
                         }
                     }
                 } catch (e: Exception) {
@@ -247,23 +258,8 @@ class WineViewModel : ViewModel() {
                     )
                 )
 
-                val prompt = """
-    Extrae los siguientes datos de la etiqueta del vino:
-    1. Nombre del vino
-    2. Año del vino
-    3. Bodega que lo produce
-    4. País/Región/Provincia
-    5. Recomendación de maridaje (tipo de comida adecuado al tipo de vino)
-    
-    Devuelve toda la información como una lista de valores separados por comas, en el orden solicitado. 
-    No incluyas los nombres de los campos ni corchetes, solo los datos.
-    Utiliza solo 5 comas (,) en total. Si hay más información del mismo campo, usa guiones (-) para separar los subcampos.
-    Asegúrate de que la respuesta siga exactamente este formato:
-    "Nombre del vino, Año del vino, Bodega que lo produce, País/Región/Provincia, Recomendación de maridaje"
-""".trimIndent()
-
                 val inputContent = content {
-                    text(prompt)
+                    text(prompt) // Usamos el prompt atributo, deberiamos guardarlo en values.
                     image(imageBitmap)
                 }
 
@@ -303,7 +299,6 @@ class WineViewModel : ViewModel() {
     fun resetNavigateToFeedFragment() {
         _navigateToWineFeed.value = false
     }
-
 
 }
 

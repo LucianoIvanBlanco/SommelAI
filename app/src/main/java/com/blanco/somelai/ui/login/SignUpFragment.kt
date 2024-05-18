@@ -47,8 +47,6 @@ class SignUpFragment : Fragment() {
     // TODO FUNCIONA EL SIGN UP PERO SE PUEDE MEJORAR EL RENDIMIENTO,
     //TODO AGREGAR UN SEGUNDO CAMPO DE PSSWORD
 
-    //region --- UI Related ---
-    // Limpia los capos de texto
     private fun cleanData() {
         binding.etSignUpEmail.setText("")
         binding.etSignUpPassword.setText("")
@@ -56,7 +54,6 @@ class SignUpFragment : Fragment() {
         binding.etSignUpUserName.setText("")
     }
 
-    // Maneja las funciones de los botones
     private fun setClicks() {
         binding.btnSignUp.setOnClickListener {
             val userEmail = binding.etSignUpEmail.text.toString().trim()
@@ -74,6 +71,7 @@ class SignUpFragment : Fragment() {
     //endregion --- UI Related ---
 
     //region --- Firebase ---
+    // TODO esta funcion deberia ir a alguna clase de firebase
     private fun createFirebaseUser(email: String, password: String, userName: String, fullName: String) {
         val firebaseAuth = EmailAndPasswordAuthenticationManager()
         lifecycleScope.launch(Dispatchers.IO) {
@@ -100,20 +98,13 @@ class SignUpFragment : Fragment() {
 
                     // Creamos usuario en dataStore
                     dataStoreManager.saveUserData(email, password, uid, fullName, userName)
-                    Log.i("saveUserData", "Usuario creado en DataStore")
 
-                    requireActivity().runOnUiThread {
-                        Toast.makeText(requireContext(), R.string.sign_up_saved_user_message, Toast.LENGTH_SHORT).show()
-                    }
-                    // Volvemos al login
+                    Log.i("saveUserData", "Usuario creado en DataStore")
+                    showWelcomeMessage()
                     parentFragmentManager.popBackStack()
                 } else {
                     Log.e("createFirebaseMailAndPasswordUser", "ERROR AL CREAR EL USUARIO")
-                    requireActivity().runOnUiThread {
-                        Toast.makeText(requireContext(), R.string.sign_up_failed_error, Toast.LENGTH_SHORT)
-                            .show()
-
-                    }
+                    showFailMessage()
                 }
             }
         }
@@ -159,20 +150,4 @@ class SignUpFragment : Fragment() {
             .show()
     }
     //endregion --- Messages ---
-
-    //region --- Navigation ---
-//    private fun goToSmsVerification(phoneNumber: String) {
-//        val transaction = parentFragmentManager.beginTransaction()
-//        val bundle = Bundle()
-//        bundle.putString("phoneNumber", phoneNumber)
-//        val fragment = SmsVerificationCodeFragment()
-//        fragment.arguments = bundle
-//
-//        transaction.setReorderingAllowed(true)
-//            .replace(R.id.fcv_login, fragment)
-//            .addToBackStack(null)
-//            .commit()
-//    }
-//    //endregion --- Navigation ---
-
 }

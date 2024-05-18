@@ -12,6 +12,8 @@ import androidx.core.app.NotificationCompat
 import com.blanco.somelai.R
 import com.blanco.somelai.ui.home.HomeActivity
 
+
+// Todo para notificaciones. Lo usaremos? o seran push desde firebase?
 class NotificationBroadcastReceiver : BroadcastReceiver() {
     // Nos traemos el channel ID
     private val channelId = "WALLUTAD"

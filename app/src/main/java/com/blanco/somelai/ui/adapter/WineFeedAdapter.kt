@@ -15,8 +15,6 @@ class WineFeedAdapter (val deleteWine: (wine: WineBody) -> Unit) :
         WineFeedItemCallBack
     ) {
 
-
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WineFeedViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding = ItemWineFeedBinding.inflate(inflater, parent, false)
