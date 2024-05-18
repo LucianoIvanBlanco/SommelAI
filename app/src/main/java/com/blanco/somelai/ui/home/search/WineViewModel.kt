@@ -52,7 +52,6 @@ class WineViewModel : ViewModel() {
 
     fun getWineForType(typeWine: String) {
         (uiState as MutableLiveData).value = WineUiState(isLoading = true)
-
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val response = WineApi.service.getWines(typeWine)
@@ -65,7 +64,7 @@ class WineViewModel : ViewModel() {
                     }
                 }
             } catch (e: Exception) {
-                Log.e("ERROR VIEW MODEL", "Error al cargar los vinos")
+                Log.e("WineViewModel", "Error al cargar los vinos")
             }
         }
     }
@@ -80,12 +79,10 @@ class WineViewModel : ViewModel() {
                 async { fetchWines(WineApi.service::getAllSparklingWine) },
                 async { fetchWines(WineApi.service::getAllRoseWine) }
             )
-
             deferredResponses.awaitAll().forEach { wines ->
                 wineResponses.addAll(wines)
             }
-
-            wineResponses  // Retornar la lista de vinos recopilada
+            wineResponses
         }
     }
 
@@ -106,30 +103,23 @@ class WineViewModel : ViewModel() {
 
     fun getWinesAndFilterByCountry(country: String) {
         (uiState as MutableLiveData).value = WineUiState(isLoading = true)
-
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                // Obtenemos la lista de vinos desde la API de forma asincrónica
                 val allWines = getAllWines()
-
-                // Filtrar los vinos por país
                 val filteredWines =
                     allWines.filter { it.location.contains(country, ignoreCase = true) }
-
                 viewModelScope.launch(Dispatchers.Main) {
-                    // Actualizar el estado de la UI con los vinos filtrados
                     (uiState as MutableLiveData).value = WineUiState(response = filteredWines)
                 }
             } catch (e: Exception) {
-                // Manejar cualquier error
                 (uiState as MutableLiveData).value = WineUiState(isError = true)
+                Log.e("WineViewModel", "Error: ${e.message}")
             }
         }
     }
 
     fun getWinesAndFilterByName(imageUri: Uri, context: Context) {
         (uiState as MutableLiveData).value = WineUiState(isLoading = true)
-
         val textLiveData = analyzeWineLabel(imageUri, context)
         textLiveData.observeForever { extractedText ->
             viewModelScope.launch {
@@ -144,7 +134,6 @@ class WineViewModel : ViewModel() {
                     val filteredWines = allWines.filter { wine ->
                         wine.wine.lowercase().contains(wineName.lowercase(), ignoreCase = true)
                     }
-
                     viewModelScope.launch(Dispatchers.Main) {
                         if (filteredWines.isNotEmpty()) {
                             filteredWines.forEach { wine ->
@@ -154,20 +143,13 @@ class WineViewModel : ViewModel() {
                             _navigateToWineList.value = true
                         } else {
                             (uiState as MutableLiveData).value = WineUiState(isError = true)
-                            Toast.makeText(context, "Vino no encontrado en la BBDD", Toast.LENGTH_LONG).show()
-
-                            // Crear y guardar el nuevo vino
+                            Toast.makeText(context, "SIN COINCIDENCIAS", Toast.LENGTH_LONG).show()
                             createAndSaveWine(wineDetails, imageUri)
-
-                            // Hacemos que el WineFeedAdapter pinte en el feed desde esa lista de vinos guardados
-
-
-                            //Todo si no se encuentran los vinos hay que ir desde el scanerCamera al feedfragment llevando el vino escaneado y afregandolo a una
-                            // lista que se guardara en el perfil del usuario
+                            // TODO navegar al feedFragment
                         }
                     }
                 } catch (e: Exception) {
-                    Log.e("WineViewModel", "Error fetching wines: ${e.message}")
+                    Log.e("WineViewModel", "Error al filtrar vinos: ${e.message}")
                     (uiState as MutableLiveData).value = WineUiState(isError = true)
                     withContext(Dispatchers.Main) {
                         Toast.makeText(context, "Error al buscar vinos", Toast.LENGTH_LONG).show()
@@ -188,7 +170,6 @@ class WineViewModel : ViewModel() {
             id = UUID.randomUUID().toString(),
             rating = ""
         )
-
         viewModelScope.launch {
             try {
                 realTimeDatabaseManager.saveWine(newWine)
@@ -214,7 +195,6 @@ class WineViewModel : ViewModel() {
     fun analyzeWineLabel(imageUri: Uri, context: Context): LiveData<String> =
         liveData(Dispatchers.IO) {
             try {
-                // Convert Uri to Bitmap
                 val imageBitmap: Bitmap =
                     context.contentResolver.openInputStream(imageUri)?.use { inputStream ->
                         BitmapFactory.decodeStream(inputStream)
@@ -244,7 +224,6 @@ class WineViewModel : ViewModel() {
                     )
                 )
 
-                // Prepare the prompt and content
                 val prompt = """
     Extrae los siguientes datos de la etiqueta del vino:
     1. Nombre del vino
@@ -260,19 +239,14 @@ class WineViewModel : ViewModel() {
     "Nombre del vino, Año del vino, Bodega que lo produce, País/Región/Provincia, Recomendación de maridaje"
 """.trimIndent()
 
-
                 val inputContent = content {
                     text(prompt)
                     image(imageBitmap)
                 }
 
-                // Generate content
                 val response = model.generateContent(inputContent)
-
-                // Process the response
                 val extractedText = response.candidates.first().content.parts.first().asTextOrNull()
                 Log.d("WineViewModel", "Extracted text: $extractedText")
-
                 emit(extractedText ?: "")
             } catch (e: Exception) {
                 Log.e(

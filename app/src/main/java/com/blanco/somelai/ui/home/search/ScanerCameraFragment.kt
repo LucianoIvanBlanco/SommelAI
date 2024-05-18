@@ -76,8 +76,6 @@ class ScanerCameraFragment : Fragment() {
     private fun observeViewModel() {
         viewModel.navigateToWineList.observe(viewLifecycleOwner, Observer { navigate ->
             if (navigate) {
-                // Navegar a WineListFragment
-                // Navegar a WineListFragment usando NavController
                 findNavController().navigate(R.id.action_scanerCameraFragment_to_wineListFragment)
                 viewModel.resetNavigateToWineList() // Resetear el evento
             }
@@ -85,7 +83,6 @@ class ScanerCameraFragment : Fragment() {
     }
 
     private fun setClicks(){
-        // Set up the listeners for take photo and video capture buttons
         binding.imageCaptureButton.setOnClickListener {
             takePhoto()
         }
@@ -113,10 +110,7 @@ class ScanerCameraFragment : Fragment() {
                 }
 
             imageCapture = ImageCapture.Builder().build()
-
-            // Configuración de la cámara sin ImageAnalysis
             val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
-
             try {
                 cameraProvider.unbindAll()
                 camera = cameraProvider.bindToLifecycle(
