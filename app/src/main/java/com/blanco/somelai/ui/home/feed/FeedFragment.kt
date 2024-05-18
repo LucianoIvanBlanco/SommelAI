@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.blanco.somelai.databinding.FragmentFeedBinding
@@ -21,7 +21,7 @@ class FeedFragment : Fragment() {
     private val binding get() = _binding
 
     private lateinit var adapter: WineFeedAdapter
-    private val wineViewModel: WineViewModel by viewModels()
+    private val wineViewModel: WineViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,7 +36,8 @@ class FeedFragment : Fragment() {
 
         adapter = WineFeedAdapter(
             deleteWine = { wine ->
-                // TODO implemetant logica para el boton de eliminar vino del feed
+                wineViewModel.deleteWine(wine)
+                Toast.makeText(context, "Vino eliminado", Toast.LENGTH_LONG).show()
             }
         )
         binding.rvFeed.layoutManager = LinearLayoutManager(requireContext())
@@ -48,11 +49,14 @@ class FeedFragment : Fragment() {
     private fun observeWineList() {
         wineViewModel.fetchSavedWines()
         wineViewModel.feedUiState.observe(viewLifecycleOwner, Observer { feedUiState ->
-            feedUiState.response?.let { wines ->
-                adapter.submitList(wines)
-            }
-            if (feedUiState.isError) {
-                showErrorMessage(null)
+            if (feedUiState.isLoading) {
+                // TODO agregar spinner de carga aqui
+            } else if (feedUiState.isError) {
+                showErrorMessage(errorBody = null)
+            } else {
+                feedUiState.response?.let { wines ->
+                    adapter.submitList(wines)
+                }
             }
         })
     }
@@ -62,4 +66,6 @@ class FeedFragment : Fragment() {
         Log.e("WineList", errorBody.toString())
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
+
+
 }

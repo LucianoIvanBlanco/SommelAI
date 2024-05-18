@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.blanco.somelai.R
 import com.blanco.somelai.data.network.model.body.WineBody
 import com.blanco.somelai.databinding.ItemWineFeedBinding
 import com.bumptech.glide.Glide
@@ -25,18 +26,19 @@ class WineFeedAdapter (val deleteWine: (wine: WineBody) -> Unit) :
     override fun onBindViewHolder(holder: WineFeedViewHolder, position: Int) {
         val wine = getItem(position)
         holder.binding.root.setOnClickListener { deleteWine(wine) }
-        holder.binding.tvWineTitle.text = wine.wine
+        holder.binding.tvWineTitle.text = wine.wine + " " + wine.year
         holder.binding.tvWinery.text = wine.winery
         holder.binding.tvWineLocation.text = wine.country
-        holder.binding.tvScoreItem.text = wine.rating
+        holder.binding.tvWineScoreItem.text = wine.rating
+        holder.binding.tvWinePairing.text = wine.pairing
 
         holder.binding.btnDeleteFeed.setOnClickListener { deleteWine(wine)}
 
-
-        Glide.with(holder.binding.root).load(wine.image)
-            .centerCrop()
+        Glide.with(holder.binding.root)
+            .load(wine.image)
+            .fitCenter()
+            .error(R.drawable.ic_search)
             .into(holder.binding.ivWineImage)
-
 
     }
 

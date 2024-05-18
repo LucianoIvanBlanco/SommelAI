@@ -73,6 +73,7 @@ class ScanerCameraFragment : Fragment() {
         observeViewModel()
     }
 
+    // Observamos cambios en los livedata para navegar
     private fun observeViewModel() {
         viewModel.navigateToWineList.observe(viewLifecycleOwner, Observer { navigate ->
             if (navigate) {
@@ -80,13 +81,19 @@ class ScanerCameraFragment : Fragment() {
                 viewModel.resetNavigateToWineList() // Resetear el evento
             }
         })
+        viewModel.navigateToWineFeed.observe(viewLifecycleOwner, Observer { navigate ->
+            if (navigate) {
+                findNavController().navigate(R.id.action_scanerCameraFragment_to_feedFragment)
+                viewModel.resetNavigateToFeedFragment() // Resetear el evento
+            }
+        })
+
     }
 
     private fun setClicks(){
         binding.imageCaptureButton.setOnClickListener {
             takePhoto()
         }
-
         binding.closeButton.setOnClickListener {
             parentFragmentManager.popBackStack()
         }
