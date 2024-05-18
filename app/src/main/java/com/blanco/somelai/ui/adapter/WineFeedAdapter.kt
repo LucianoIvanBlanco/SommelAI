@@ -5,14 +5,15 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.blanco.somelai.data.network.model.responses.Wine
+import com.blanco.somelai.data.network.model.body.WineBody
 import com.blanco.somelai.databinding.ItemWineFeedBinding
 import com.bumptech.glide.Glide
 
-class WineFeedAdapter (val deleteWine: (wine: Wine) -> Unit) :
-    ListAdapter< Wine, WineFeedAdapter.WineFeedViewHolder>(
+class WineFeedAdapter (val deleteWine: (wine: WineBody) -> Unit) :
+    ListAdapter<WineBody, WineFeedAdapter.WineFeedViewHolder>(
         WineFeedItemCallBack
     ) {
+
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WineFeedViewHolder {
@@ -26,8 +27,8 @@ class WineFeedAdapter (val deleteWine: (wine: Wine) -> Unit) :
         holder.binding.root.setOnClickListener { deleteWine(wine) }
         holder.binding.tvWineTitle.text = wine.wine
         holder.binding.tvWinery.text = wine.winery
-        holder.binding.tvWineLocation.text = wine.location
-        holder.binding.tvScoreItem.text = wine.rating.average
+        holder.binding.tvWineLocation.text = wine.country
+        holder.binding.tvScoreItem.text = wine.rating
 
         holder.binding.btnDeleteFeed.setOnClickListener { deleteWine(wine)}
 
@@ -43,12 +44,12 @@ class WineFeedAdapter (val deleteWine: (wine: Wine) -> Unit) :
         RecyclerView.ViewHolder(binding.root)
 }
 
-object WineFeedItemCallBack: DiffUtil.ItemCallback<Wine>() {
-    override fun areItemsTheSame(oldItem: Wine, newItem: Wine): Boolean {
+object WineFeedItemCallBack: DiffUtil.ItemCallback<WineBody>() {
+    override fun areItemsTheSame(oldItem: WineBody, newItem: WineBody): Boolean {
         return oldItem.id == newItem.id
     }
 
-    override fun areContentsTheSame(oldItem: Wine, newItem: Wine): Boolean {
+    override fun areContentsTheSame(oldItem: WineBody, newItem: WineBody): Boolean {
         return oldItem == newItem
     }
 }

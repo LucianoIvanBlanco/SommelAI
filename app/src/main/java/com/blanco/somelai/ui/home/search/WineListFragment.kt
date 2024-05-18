@@ -2,11 +2,11 @@ package com.blanco.somelai.ui.home.search
 
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -21,8 +21,6 @@ class WineListFragment : Fragment() {
     private val viewModel: WineViewModel by activityViewModels()
     val adapter = WineListAdapter()
 
-
-// TODO modificar la dimension de las imagenes
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -43,9 +41,9 @@ class WineListFragment : Fragment() {
     private fun observeViewModel() {
         viewModel.uiState.observe(viewLifecycleOwner, Observer { uiState ->
             if (uiState.isLoading) {
-              // TODO agregar spinner de carga aqui
+                // TODO agregar spinner de carga aqui
             } else if (uiState.isError) {
-                Log.e("WineListFragmetnt", "isError")
+                Log.e("WineListFragment", "isError")
                 showErrorMessage()
             } else {
                 // Verificar si la respuesta no es nula y luego actualizar el adaptador
@@ -57,13 +55,8 @@ class WineListFragment : Fragment() {
     }
 
     private fun showErrorMessage() {
-        var message = "Ha ocurrido un error al recuperar los datos"
+        val message = "Ha ocurrido un error al recuperar los datos"
         Log.e("WineListFragment", message)
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
-
 }
-
-
-
-

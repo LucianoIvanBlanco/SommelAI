@@ -2,6 +2,7 @@ package com.blanco.somelai.data.firebase.realtime_database
 
 import android.util.Log
 import com.blanco.somelai.data.firebase.realtime_database.model.UserData
+import com.blanco.somelai.data.network.model.body.WineBody
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.tasks.await
@@ -10,6 +11,8 @@ class RealTimeDatabaseManager {
 
     private val databaseReference = FirebaseDatabase.getInstance().reference
 
+
+    // TODO ver si se implementa para guardar al usuario creado, si no eliminar.
     // No la vamos a usar ya que solo almacenaremos el id de cada vino en la lista (historial)
     //Nos conectamos la nodo de "faves" mediante ".child("faves")". Si quisieramos almacenar
     // más objetos en otras funciones, deberíamos conectarnos a otro child para tener la
@@ -48,6 +51,7 @@ class RealTimeDatabaseManager {
         connection.child(user.uid!!).setValue(user)
     }
 
+
     suspend fun readUser(userId: String): UserData? {
         val connection = databaseReference.child("users")
 
@@ -64,6 +68,41 @@ class RealTimeDatabaseManager {
         return null
     }
 
+    suspend fun saveWine(wine: WineBody) {
+        val user = FirebaseAuth.getInstance().currentUser
+        if (user != null) {
+            val userId = user.uid
+            val userRef = databaseReference.child("users").child(userId)
+            val snapshot = userRef.get().await()
+            val userData = snapshot.getValue(UserData::class.java)
+
+            if (userData != null) {
+                val updatedWineList = userData.wineFavouritesList.toMutableList()
+                updatedWineList.add(wine)
+                userRef.child("wineFavouritesList").setValue(updatedWineList).await()
+                Log.d("RealTimeDatabaseManager", "Wine saved successfully")
+            } else {
+                Log.e("RealTimeDatabaseManager", "User data not found")
+            }
+        } else {
+            Log.e("RealTimeDatabaseManager", "User not logged in")
+        }
+    }
+
+    suspend fun getSavedWines(): List<WineBody> {
+        val user = FirebaseAuth.getInstance().currentUser
+        if (user != null) {
+            val userId = user.uid
+            val userRef = databaseReference.child("users").child(userId)
+            val snapshot = userRef.child("wineFavouritesList").get().await()
+            val wineList = snapshot.children.mapNotNull { it.getValue(WineBody::class.java) }
+            Log.d("RealTimeDatabaseManager", "Retrieved ${wineList.size} wines")
+            return wineList
+        } else {
+            Log.e("RealTimeDatabaseManager", "User not logged in")
+            return emptyList()
+        }
+    }
 }
 
 
