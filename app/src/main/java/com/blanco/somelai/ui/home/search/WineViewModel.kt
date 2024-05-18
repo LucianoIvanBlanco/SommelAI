@@ -36,12 +36,17 @@ class WineViewModel : ViewModel() {
 
     private var _apiKey: String = "AIzaSyCzEqyGwZ1a8Cz33HPm3_R8dvzMW4c-9k4"
 
+
     private val _uiState: LiveData<WineUiState> = MutableLiveData(WineUiState())
     val uiState: LiveData<WineUiState> get() = _uiState
 
 
     private val _navigateToWineList = MutableLiveData<Boolean>()
     val navigateToWineList: LiveData<Boolean> get() = _navigateToWineList
+
+
+    private val _navigateToWineFeed = MutableLiveData<Boolean>()
+    val navigateToWineFeed: LiveData<Boolean> get() = _navigateToWineFeed
 
 
     private val _feedUiState: LiveData<WineBodyUiState> = MutableLiveData(WineBodyUiState())
@@ -120,6 +125,7 @@ class WineViewModel : ViewModel() {
 
     fun getWinesAndFilterByName(imageUri: Uri, context: Context) {
         (uiState as MutableLiveData).value = WineUiState(isLoading = true)
+        // TODO mostrar un spinner de carga
         val textLiveData = analyzeWineLabel(imageUri, context)
         textLiveData.observeForever { extractedText ->
             viewModelScope.launch {
@@ -128,7 +134,6 @@ class WineViewModel : ViewModel() {
                     val wineName = wineDetails["name"] ?: ""
                     Log.d("WineViewModel", "Extracted wine name: $wineName")
                     withContext(Dispatchers.Main) {
-                        Toast.makeText(context, "$wineName", Toast.LENGTH_LONG).show()
                     }
                     val allWines = getAllWines()
                     val filteredWines = allWines.filter { wine ->
@@ -139,13 +144,14 @@ class WineViewModel : ViewModel() {
                             filteredWines.forEach { wine ->
                                 Log.d("WineViewModel", "Found wine: ${wine.wine}")
                             }
+                            Toast.makeText(context, "COINCIDENCIAS EN LA BUSQUEDA", Toast.LENGTH_LONG).show()
                             (uiState as MutableLiveData).value = WineUiState(response = filteredWines)
                             _navigateToWineList.value = true
                         } else {
-                            (uiState as MutableLiveData).value = WineUiState(isError = true)
-                            Toast.makeText(context, "SIN COINCIDENCIAS", Toast.LENGTH_LONG).show()
+                            Toast.makeText(context, "SIN COINCIDENCIAS EN LA BUSQUEDA", Toast.LENGTH_LONG).show()
+                            Toast.makeText(context, "GUARDANDO VINO", Toast.LENGTH_LONG).show()
                             createAndSaveWine(wineDetails, imageUri)
-                            // TODO navegar al feedFragment
+                           // _navigateToWineFeed.value = true
                         }
                     }
                 } catch (e: Exception) {
@@ -158,6 +164,8 @@ class WineViewModel : ViewModel() {
             }
         }
     }
+
+   // ----------- REGION FEED WINE---------------
 
     private fun createAndSaveWine(wineDetails: Map<String, String>, imageUri: Uri) {
         val newWine = WineBody(
@@ -173,6 +181,8 @@ class WineViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 realTimeDatabaseManager.saveWine(newWine)
+                fetchSavedWines()
+                _navigateToWineFeed.value = true
                 Log.d("WineViewModel", "Wine saved successfully")
             } catch (e: Exception) {
                 Log.e("WineViewModel", "Error saving wine: ${e.message}")
@@ -192,6 +202,19 @@ class WineViewModel : ViewModel() {
             }
         }
     }
+
+    fun deleteWine(wine: WineBody) {
+        viewModelScope.launch {
+            try {
+                RealTimeDatabaseManager().deleteUserWine(wine)
+                fetchSavedWines()
+            } catch (e: Exception) {
+                Log.e("WineViewModel", "Error deleting wine", e)
+            }
+        }
+    }
+
+    // ----------- END REGION FEED WINE---------------
     fun analyzeWineLabel(imageUri: Uri, context: Context): LiveData<String> =
         liveData(Dispatchers.IO) {
             try {
@@ -276,6 +299,11 @@ class WineViewModel : ViewModel() {
     fun resetNavigateToWineList() {
         _navigateToWineList.value = false
     }
+
+    fun resetNavigateToFeedFragment() {
+        _navigateToWineFeed.value = false
+    }
+
 
 }
 

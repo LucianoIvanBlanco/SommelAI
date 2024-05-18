@@ -1,19 +1,13 @@
 package com.blanco.somelai.ui.adapter
 
-import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.blanco.somelai.R
-import com.blanco.somelai.data.network.model.responses.Rating
 import com.blanco.somelai.data.network.model.responses.Wine
 import com.blanco.somelai.databinding.ItemWineBinding
-import com.blanco.somelai.databinding.ItemWineTypeBinding
 import com.bumptech.glide.Glide
 
 class WineListAdapter : ListAdapter<Wine, WineListAdapter.WineViewHolder>(ItemCallBack) {
@@ -26,7 +20,6 @@ class WineListAdapter : ListAdapter<Wine, WineListAdapter.WineViewHolder>(ItemCa
 
     override fun onBindViewHolder(holder: WineViewHolder, position: Int) {
         val wine = getItem(position)
-        Log.d("WineListAdapter", "Wine title: ${wine.wine}")
         holder.binding.tvWineTitle.text = wine.wine
         holder.binding.tvWinery.text = wine.winery
         holder.binding.tvWineLocation.text = wine.location

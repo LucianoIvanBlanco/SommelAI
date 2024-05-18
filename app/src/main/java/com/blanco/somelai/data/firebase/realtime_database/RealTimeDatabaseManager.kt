@@ -103,6 +103,27 @@ class RealTimeDatabaseManager {
             return emptyList()
         }
     }
+
+    suspend fun deleteUserWine(wine: WineBody) {
+        val user = FirebaseAuth.getInstance().currentUser
+        if (user != null) {
+            val userId = user.uid
+            val userRef = databaseReference.child("users").child(userId)
+            val snapshot = userRef.get().await()
+            val userData = snapshot.getValue(UserData::class.java)
+
+            if (userData != null) {
+                val updatedWineList = userData.wineFavouritesList.toMutableList()
+                updatedWineList.remove(wine)
+                userRef.child("wineFavouritesList").setValue(updatedWineList).await()
+                Log.d("RealTimeDatabaseManager", "Wine deleted successfully")
+            } else {
+                Log.e("RealTimeDatabaseManager", "User data not found")
+            }
+        } else {
+            Log.e("RealTimeDatabaseManager", "User not logged in")
+        }
+    }
 }
 
 

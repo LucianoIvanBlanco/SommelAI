@@ -1,11 +1,13 @@
 package com.blanco.somelai.ui.home
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.navigation.fragment.findNavController
+import androidx.appcompat.app.AppCompatActivity
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.blanco.somelai.R
 import com.blanco.somelai.databinding.ActivityHomeBinding
+
+// TODO cuando se pasa de un fragment que no esta en el fcv_home (uno de los hijos) a uno que si esta, se queda la seleccion del fragment anterior
 
 class HomeActivity : AppCompatActivity() {
 
@@ -22,10 +24,8 @@ class HomeActivity : AppCompatActivity() {
     }
 
     private fun setBottomNavigationView() {
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fcv_home)
-        val controller = navHostFragment?.findNavController()
-        if (controller != null) {
-            binding.bnvHome.setupWithNavController(controller)
-        }
+        val navHostFragment = supportFragmentManager.findFragmentById(R.id.fcv_home) as NavHostFragment
+        val navController = navHostFragment.navController
+        binding.bnvHome.setupWithNavController(navController)
     }
 }
