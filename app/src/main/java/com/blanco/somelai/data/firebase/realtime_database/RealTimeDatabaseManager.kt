@@ -11,6 +11,8 @@ class RealTimeDatabaseManager {
 
     private val databaseReference = FirebaseDatabase.getInstance().reference
 
+
+    // TODO ver si se implementa para guardar al usuario creado, si no eliminar.
     // No la vamos a usar ya que solo almacenaremos el id de cada vino en la lista (historial)
     //Nos conectamos la nodo de "faves" mediante ".child("faves")". Si quisieramos almacenar
     // más objetos en otras funciones, deberíamos conectarnos a otro child para tener la
@@ -49,6 +51,7 @@ class RealTimeDatabaseManager {
         connection.child(user.uid!!).setValue(user)
     }
 
+
     suspend fun readUser(userId: String): UserData? {
         val connection = databaseReference.child("users")
 
@@ -86,6 +89,20 @@ class RealTimeDatabaseManager {
         }
     }
 
+    suspend fun getSavedWines(): List<WineBody> {
+        val user = FirebaseAuth.getInstance().currentUser
+        if (user != null) {
+            val userId = user.uid
+            val userRef = databaseReference.child("users").child(userId)
+            val snapshot = userRef.child("wineFavouritesList").get().await()
+            val wineList = snapshot.children.mapNotNull { it.getValue(WineBody::class.java) }
+            Log.d("RealTimeDatabaseManager", "Retrieved ${wineList.size} wines")
+            return wineList
+        } else {
+            Log.e("RealTimeDatabaseManager", "User not logged in")
+            return emptyList()
+        }
+    }
 }
 
 

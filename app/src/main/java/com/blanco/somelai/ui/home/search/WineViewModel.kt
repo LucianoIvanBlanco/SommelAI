@@ -15,6 +15,7 @@ import com.blanco.somelai.data.firebase.realtime_database.RealTimeDatabaseManage
 import com.blanco.somelai.data.network.WineApi
 import com.blanco.somelai.data.network.model.body.WineBody
 import com.blanco.somelai.data.network.model.responses.Wine
+import com.blanco.somelai.ui.home.feed.WineBodyUiState
 import com.google.ai.client.generativeai.GenerativeModel
 import com.google.ai.client.generativeai.type.BlockThreshold
 import com.google.ai.client.generativeai.type.HarmCategory
@@ -38,8 +39,14 @@ class WineViewModel : ViewModel() {
     private val _uiState: LiveData<WineUiState> = MutableLiveData(WineUiState())
     val uiState: LiveData<WineUiState> get() = _uiState
 
+
     private val _navigateToWineList = MutableLiveData<Boolean>()
     val navigateToWineList: LiveData<Boolean> get() = _navigateToWineList
+
+
+    private val _feedUiState: LiveData<WineBodyUiState> = MutableLiveData(WineBodyUiState())
+    val feedUiState: LiveData<WineBodyUiState> get() = _feedUiState
+
 
     private var realTimeDatabaseManager: RealTimeDatabaseManager = RealTimeDatabaseManager()
 
@@ -192,6 +199,18 @@ class WineViewModel : ViewModel() {
         }
     }
 
+    fun fetchSavedWines() {
+        viewModelScope.launch {
+            try {
+                val savedWines = realTimeDatabaseManager.getSavedWines()
+                (feedUiState as MutableLiveData).value = WineBodyUiState(response = savedWines)
+                Log.d("WineViewModel", "Fetched ${savedWines.size} saved wines")
+            } catch (e: Exception) {
+                Log.e("WineViewModel", "Error fetching saved wines: ${e.message}")
+                (feedUiState as MutableLiveData).value = WineBodyUiState(isError = true)
+            }
+        }
+    }
     fun analyzeWineLabel(imageUri: Uri, context: Context): LiveData<String> =
         liveData(Dispatchers.IO) {
             try {
