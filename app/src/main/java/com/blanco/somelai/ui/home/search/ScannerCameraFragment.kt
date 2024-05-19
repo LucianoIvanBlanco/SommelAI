@@ -29,19 +29,16 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.blanco.somelai.R
-import com.blanco.somelai.databinding.FragmentScanerCameraBinding
+import com.blanco.somelai.databinding.FragmentScannerCameraBinding
 import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-
-// TODO incluimos funcion para entrar a la galeria??
-//si lo hacemos tenemos que modificar la forma en la que se inicia el analisis de la foto
 class ScannerCameraFragment : Fragment() {
 
-    private lateinit var _binding: FragmentScanerCameraBinding
+    private lateinit var _binding: FragmentScannerCameraBinding
     private val binding get() = _binding
-    
+
     private val viewModel: WineViewModel by activityViewModels()
 
     // Camera X
@@ -53,7 +50,7 @@ class ScannerCameraFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        _binding = FragmentScanerCameraBinding.inflate(inflater, container, false)
+        _binding = FragmentScannerCameraBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -82,13 +79,13 @@ class ScannerCameraFragment : Fragment() {
     private fun observeViewModel() {
         viewModel.navigateToWineList.observe(viewLifecycleOwner, Observer { navigate ->
             if (navigate) {
-                findNavController().navigate(R.id.action_scanerCameraFragment_to_wineListFragment)
+                findNavController().navigate(R.id.action_scannerCameraFragment_to_wineListFragment)
                 viewModel.resetNavigateToWineList() // Resetear el evento
             }
         })
         viewModel.navigateToWineFeed.observe(viewLifecycleOwner, Observer { navigate ->
             if (navigate) {
-                findNavController().navigate(R.id.action_scanerCameraFragment_to_feedFragment)
+                findNavController().navigate(R.id.action_scannerCameraFragment_to_feedFragment)
                 viewModel.resetNavigateToFeedFragment() // Resetear el evento
             }
         })
@@ -106,7 +103,6 @@ class ScannerCameraFragment : Fragment() {
             toggleFlash()
         }
     }
-
 
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(requireContext())
@@ -223,8 +219,7 @@ class ScannerCameraFragment : Fragment() {
         private const val REQUEST_CODE_PERMISSIONS = 10
         private val REQUIRED_PERMISSIONS =
             mutableListOf (
-                Manifest.permission.CAMERA,
-                Manifest.permission.READ_EXTERNAL_STORAGE
+                Manifest.permission.CAMERA
             ).apply {
                 if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
                     add(Manifest.permission.WRITE_EXTERNAL_STORAGE)

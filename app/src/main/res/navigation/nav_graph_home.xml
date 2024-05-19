@@ -35,8 +35,8 @@
             android:id="@+id/action_searchFragment_to_wineListFragment"
             app:destination="@id/wineListFragment" />
         <action
-            android:id="@+id/action_searchFragment_to_scanerCameraFragment"
-            app:destination="@id/scanerCameraFragment" />
+            android:id="@+id/action_searchFragment_to_scannerCameraFragment"
+            app:destination="@id/scannerCameraFragment" />
     </fragment>
 
     <fragment
@@ -45,15 +45,15 @@
         android:label="fragment_wine_list"
         tools:layout="@layout/fragment_wine_list" />
     <fragment
-        android:id="@+id/scanerCameraFragment"
-        android:name="com.blanco.somelai.ui.home.search.ScanerCameraFragment"
-        android:label="fragment_scaner_camera"
-        tools:layout="@layout/fragment_scaner_camera" >
+        android:id="@+id/scannerCameraFragment"
+        android:name="com.blanco.somelai.ui.home.search.ScannerCameraFragment"
+        android:label="fragment_scanner_camera"
+        tools:layout="@layout/fragment_scanner_camera" >
         <action
-            android:id="@+id/action_scanerCameraFragment_to_wineListFragment"
+            android:id="@+id/action_scannerCameraFragment_to_wineListFragment"
             app:destination="@id/wineListFragment" />
         <action
-            android:id="@+id/action_scanerCameraFragment_to_feedFragment"
+            android:id="@+id/action_scannerCameraFragment_to_feedFragment"
             app:destination="@id/feedFragment" />
     </fragment>
 </navigation>

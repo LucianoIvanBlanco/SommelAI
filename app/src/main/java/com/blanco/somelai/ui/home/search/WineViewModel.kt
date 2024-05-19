@@ -295,7 +295,7 @@ class WineViewModel : ViewModel() {
     fun resetNavigateToWineList() {
         _navigateToWineList.value = false
     }
-
+// TODO ver porque no esta navegando despues de guardar nuevo vino
     fun resetNavigateToFeedFragment() {
         _navigateToWineFeed.value = false
     }

@@ -73,12 +73,12 @@ class SearchFragment : Fragment() {
         }
 
         binding.fabCamera.setOnClickListener {
-            navigateToScanerCameraFragment()
+            navigateToScannerCameraFragment()
         }
     }
 
-    private fun navigateToScanerCameraFragment() {
-        findNavController().navigate(R.id.action_searchFragment_to_scanerCameraFragment)
+    private fun navigateToScannerCameraFragment() {
+        findNavController().navigate(R.id.action_searchFragment_to_scannerCameraFragment)
     }
 
     private fun navigateToWineListFragment() {
