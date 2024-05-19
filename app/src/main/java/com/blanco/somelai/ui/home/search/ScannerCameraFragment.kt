@@ -15,6 +15,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.Camera
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
@@ -22,7 +24,6 @@ import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.core.TorchState
 import androidx.camera.lifecycle.ProcessCameraProvider
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -30,6 +31,8 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.blanco.somelai.R
 import com.blanco.somelai.databinding.FragmentScannerCameraBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import java.util.Locale
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -46,6 +49,23 @@ class ScannerCameraFragment : Fragment() {
     private lateinit var cameraExecutor: ExecutorService
     private var camera: Camera? = null
 
+
+    private val requestPermissionLauncher: ActivityResultLauncher<String> =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) {
+                //El permiso ha sido concedido, podemos realizar la acción que lo necesitaba
+                startCamera()
+            } else {
+                showDeniedPermissionMessage()
+                requireActivity().finish()
+            }
+        }
+    companion object {
+        private const val TAG = "SomelAI"
+        private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
+    }
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -57,7 +77,7 @@ class ScannerCameraFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        requestPermissions()
+        checkIfWeAlreadyHaveThisPermission()
         initializeFlashButtonIcon()
         setClicks()
         cameraExecutor = Executors.newSingleThreadExecutor()
@@ -65,15 +85,7 @@ class ScannerCameraFragment : Fragment() {
         observeViewModel()
     }
 
-    private fun requestPermissions() {
-        if (allPermissionsGranted()) {
-            startCamera()
-        } else {
-            ActivityCompat.requestPermissions(
-                requireActivity(), REQUIRED_PERMISSIONS, REQUEST_CODE_PERMISSIONS
-            )
-        }
-    }
+
 
     // Observamos cambios en los livedata para navegar
     private fun observeViewModel() {
@@ -213,38 +225,46 @@ class ScannerCameraFragment : Fragment() {
         cameraExecutor.shutdown()
     }
 
-    companion object {
-        private const val TAG = "SomelAI"
-        private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
-        private const val REQUEST_CODE_PERMISSIONS = 10
-        private val REQUIRED_PERMISSIONS =
-            mutableListOf (
-                Manifest.permission.CAMERA
-            ).apply {
-                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
-                    add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                }
-            }.toTypedArray()
-    }
-
     // Permisos
 
-    private fun allPermissionsGranted() = REQUIRED_PERMISSIONS.all {
-        ContextCompat.checkSelfPermission(
-            requireActivity(), it) == PackageManager.PERMISSION_GRANTED
-    }
+    private fun checkIfWeAlreadyHaveThisPermission() {
+        val cameraPermission: String = Manifest.permission.CAMERA
+        val permissionStatus =
+            ContextCompat.checkSelfPermission(requireContext(), cameraPermission)
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
-        if (requestCode == REQUEST_CODE_PERMISSIONS) {
-            if (allPermissionsGranted()) {
-                startCamera()
+        if (permissionStatus == PackageManager.PERMISSION_GRANTED) {
+            startCamera()
+        } else {
+            val shouldRequestPermission =
+                shouldShowRequestPermissionRationale(cameraPermission)
+
+            if (shouldRequestPermission) {
+                showPermissionRationaleDialog(cameraPermission)
             } else {
-                Toast.makeText(requireActivity(),
-                    "Permissions not granted by the user.",
-                    Toast.LENGTH_SHORT).show()
-                requireActivity().finish()
+                requestPermissionLauncher.launch(cameraPermission)
             }
         }
     }
+
+    private fun showPermissionRationaleDialog(cameraPermission: String) {
+        val title = getString(R.string.new_advertisement_permission_dialog_title)
+        val message = getString(R.string.open_camera_permission_dialog_message)
+        val positiveButton = getString(R.string.new_advertisement_permission_dialog_positive_button)
+        val negativeButton = getString(R.string.new_advertisement_permission_dialog_negative_button)
+
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton(positiveButton) { dialog, which ->
+                requestPermissionLauncher.launch(cameraPermission)
+            }
+            .setNegativeButton(negativeButton) { dialog, which -> requireActivity().finish() }
+            .show()
+    }
+
+    private fun showDeniedPermissionMessage() {
+        val message = getString(R.string.new_advertisement_denied_permission)
+        Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
+    }
+
 }
