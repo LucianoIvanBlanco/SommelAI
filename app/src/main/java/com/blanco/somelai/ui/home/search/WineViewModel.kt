@@ -11,6 +11,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
+import com.blanco.somelai.data.firebase.cloud_storage.CloudStorageManager
 import com.blanco.somelai.data.firebase.realtime_database.RealTimeDatabaseManager
 import com.blanco.somelai.data.network.WineApi
 import com.blanco.somelai.data.network.model.body.WineBody
@@ -50,6 +51,8 @@ class WineViewModel : ViewModel() {
     val feedUiState: LiveData<WineBodyUiState> get() = _feedUiState
 
     private var realTimeDatabaseManager: RealTimeDatabaseManager = RealTimeDatabaseManager()
+    private var cloudStorageManager: CloudStorageManager = CloudStorageManager()
+    private var uploadedImageUrl: String? = null
 
     private val prompt: String = """
     Extrae los siguientes datos de la etiqueta del vino:
@@ -161,7 +164,10 @@ class WineViewModel : ViewModel() {
                         } else {
                             Toast.makeText(context, "SIN COINCIDENCIAS EN LA BUSQUEDA", Toast.LENGTH_LONG).show()
                             Toast.makeText(context, "GUARDANDO VINO", Toast.LENGTH_LONG).show()
-                            createAndSaveWine(wineDetails, imageUri)
+
+
+                            val imageWine = uploadImage(imageUri).toString()
+                            createAndSaveWine(wineDetails, imageWine)
 
                         }
                     }
@@ -178,25 +184,38 @@ class WineViewModel : ViewModel() {
 
    // ----------- REGION FEED WINE---------------
 
-    private fun createAndSaveWine(wineDetails: Map<String, String>, imageUri: Uri) {
+    private fun createAndSaveWine(wineDetails: Map<String, String>, imageUri: String) {
         val newWine = WineBody(
             wine = wineDetails["name"] ?: "",
             year = wineDetails["year"] ?: "",
             winery = wineDetails["winery"] ?: "",
             country = wineDetails["country"] ?: "",
             pairing = wineDetails["pairing"] ?: "",
-            image = imageUri.toString(),
+            image = imageUri,
             id = UUID.randomUUID().toString(),
             rating = ""
         )
         viewModelScope.launch {
             try {
                 realTimeDatabaseManager.saveWine(newWine)
+
                 fetchSavedWines()
                 _navigateToWineFeed.value = true
                 Log.d("WineViewModel", "Wine saved successfully")
             } catch (e: Exception) {
                 Log.e("WineViewModel", "Error saving wine: ${e.message}")
+            }
+        }
+    }
+
+
+    private suspend fun uploadImage(selectedImageUri: Uri?): String? {
+        return withContext(Dispatchers.IO) {
+            try {
+                cloudStorageManager.uploadWineImage(selectedImageUri!!)
+            } catch (e: Exception) {
+                Log.e("uploadImage", "Error uploading image: ${e.message}")
+                null // Retorna null si hay un error
             }
         }
     }

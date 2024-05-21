@@ -17,32 +17,49 @@ class CloudStorageManager {
         val imageName = "$uri".replace(
             "/",
             "_"
-        ) //Generamos un nombre para la imagen a partir de su ruta remplazando los "/" por "_"
-        //Creamos una variable para almacenar el enlace de descarga.
+        )
         var imageUrl: String? = null
-        //Creamos la referencia dentro de la carpeta de advertisement a nuestra imagen
         val photoReference = storageReference.child("profileImage/$imageName")
 
-        //Mediante el método .putFile() subimos el archivo a Firebase
         photoReference.putFile(uri).continueWithTask { task ->
-            // Si no se ha podido subir la foto lanzamos la excepción
             if (!task.isSuccessful) {
                 Log.e("CloudStorageManager", "No se ha podido subir la foto")
                 task.exception?.let { throw it }
             }
-            // Añadimos a la Task enlace de descarga a la task para poder recuperarlo en
-            // poder recuperarlo en el onCompleteListener
             photoReference.downloadUrl
         }.addOnCompleteListener { task ->
             if (task.isSuccessful) {
-                //Recuperamos el enlace donde se subió la imagen
                 imageUrl = "${task.result}"
                 Log.i("User", "Enlace de la foto: $imageUrl")
             } else {
                 Log.e("User", "No se ha podido subir la foto")
             }
         }.await()
-        //.await() hará que la función no continue hasta que termine la tarea
+        return imageUrl
+    }
+
+    suspend fun uploadWineImage(uri: Uri): String? {
+        val imageName = "$uri".replace(
+            "/",
+            "_"
+        )
+        var imageUrl: String? = null
+        val photoReference = storageReference.child("wineImage/$imageName")
+
+        photoReference.putFile(uri).continueWithTask { task ->
+            if (!task.isSuccessful) {
+                Log.e("CloudStorageManager", "No se ha podido subir la foto del vino")
+                task.exception?.let { throw it }
+            }
+            photoReference.downloadUrl
+        }.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                imageUrl = "${task.result}"
+                Log.i("User", "Enlace de la foto del vino: $imageUrl")
+            } else {
+                Log.e("User", "No se ha podido subir la foto del vino")
+            }
+        }.await()
         return imageUrl
     }
 
