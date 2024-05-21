@@ -103,9 +103,8 @@ class ProfileFragment : Fragment() {
         // TODO la imagen carga lento
         Glide.with(requireContext())
             .asBitmap()
+            .centerCrop()
             .load(user.userPhotoUrl)
-            .placeholder(R.drawable.default_user)
-            .fallback(R.drawable.default_user)
             .into(binding.ivProfile)
     }
 

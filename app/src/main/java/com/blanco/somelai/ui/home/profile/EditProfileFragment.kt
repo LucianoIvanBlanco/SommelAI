@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
@@ -50,32 +51,28 @@ class EditProfileFragment : Fragment() {
     private lateinit var profileImageButton: ImageButton
 
 
-    //region --- Launchers ---
     private val requestPermissionLauncher: ActivityResultLauncher<String> =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) {
                 openGallery()
             } else {
                 showDeniedPermissionMessage()
-                requireActivity().finish()
             }
         }
 
     private var imageGalleryLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                val data: Intent? = result.data
-                if (data != null) {
-                    selectedImageUri = data.data
-                    uploadImage(selectedImageUri)
-                } else {
+                result.data?.data?.let { uri ->
+                    selectedImageUri = uri
+                    uploadImage(uri)
+                } ?: run {
                     showErrorMessageNoImage()
                 }
             } else {
                 showErrorMessageNoImage()
             }
         }
-    //endregion --- Launchers ---
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -94,7 +91,6 @@ class EditProfileFragment : Fragment() {
         auth = FirebaseAuth.getInstance()
         profileImageButton = view.findViewById(R.id.img_btn_profile)
 
-        // Carga la foto de perfil del usuario logueado
         loadUserProfilePicture()
         setClicks()
         getUserData()
@@ -133,12 +129,6 @@ class EditProfileFragment : Fragment() {
                 Glide.with(requireContext())
                     .asBitmap()
                     .load(userPhotoUrl)
-                    .placeholder(R.drawable.default_user)
-                    .fallback(R.drawable.default_user)
-                    .into(profileImageButton)
-            } else {
-                Glide.with(requireContext())
-                    .load(R.drawable.default_user)
                     .into(profileImageButton)
             }
         }
@@ -150,8 +140,6 @@ class EditProfileFragment : Fragment() {
             .asBitmap()
             .load(uploadedImageResponse)
             .centerCrop()
-            .placeholder(R.drawable.default_user)
-            .fallback(R.drawable.default_user)
             .into(profileImageButton)
     }
 
@@ -295,30 +283,39 @@ class EditProfileFragment : Fragment() {
 
     //region --- Photo gallery ---
     private fun checkIfWeAlreadyHaveThisPermission() {
-        val externalStoragePermission: String = Manifest.permission.READ_EXTERNAL_STORAGE
-        val permissionStatus = ContextCompat.checkSelfPermission(requireActivity(), externalStoragePermission)
+        val permissionToRequest = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Manifest.permission.READ_MEDIA_IMAGES
+        } else {
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        }
+
+        val permissionStatus =
+            ContextCompat.checkSelfPermission(requireContext(), permissionToRequest)
 
         if (permissionStatus == PackageManager.PERMISSION_GRANTED) {
             openGallery()
         } else {
-            val shouldRequestPermission = shouldShowRequestPermissionRationale(externalStoragePermission)
+            val shouldRequestPermission = shouldShowRequestPermissionRationale(permissionToRequest)
             if (shouldRequestPermission) {
-                showPermissionRationaleDialog(externalStoragePermission)
+                showPermissionRationaleDialog(permissionToRequest)
             } else {
-                requestPermissionLauncher.launch(externalStoragePermission)
+                requestPermissionLauncher.launch(permissionToRequest)
             }
         }
     }
 
-    private fun openGallery() {
-        val intent = Intent(
-            Intent.ACTION_PICK,
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-        )
-        intent.type = "image/*"
-        imageGalleryLauncher.launch(intent)
-    }
 
+    private fun openGallery() {
+        Log.d("EditProfileFragment", "Attempting to open gallery")
+        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).apply {
+            type = "image/*"
+        }
+        try {
+            imageGalleryLauncher.launch(intent)
+        } catch (e: Exception) {
+            Log.e("EditProfileFragment", "Failed to open gallery", e)
+        }
+    }
     //endregion --- Photo gallery ---
 
 
