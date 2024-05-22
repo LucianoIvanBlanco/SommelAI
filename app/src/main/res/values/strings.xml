@@ -35,7 +35,7 @@
     <string name="white_wine_title">Blanco</string>
     <string name="rose_wine_title">Rose</string>
     <string name="sparkling_wine_title">Espumante</string>
-    <string name="btn_save_changes">Guardar cambios</string>
+    <string name="btn_save_changes">Guardar</string>
     <string name="btn_delete">Eliminar</string>
     <string name="sign_up_saved_user_message">Usuario creado con exito</string>
     <string name="sign_up_invalid_data_error">Los datos introducidos no son válidos</string>

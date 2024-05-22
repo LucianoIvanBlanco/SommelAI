@@ -319,6 +319,17 @@ class WineViewModel : ViewModel() {
         _navigateToWineFeed.value = false
     }
 
+    fun updateWine(wine: WineBody) {
+        viewModelScope.launch {
+            try {
+                RealTimeDatabaseManager().updateWineRating(wine)
+                fetchSavedWines()
+            } catch (e: Exception) {
+                Log.e("WineViewModel", "Error update wine", e)
+            }
+        }
+    }
+
 }
 
 

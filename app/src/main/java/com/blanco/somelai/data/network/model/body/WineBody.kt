@@ -1,6 +1,7 @@
 package com.blanco.somelai.data.network.model.body
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 // Vino que guardamos en FireBase
 data class WineBody(
@@ -19,5 +20,5 @@ data class WineBody(
     @SerializedName("id")
     val id: String = "",
     @SerializedName("rating")
-    val rating: String = ""
-)
+    var rating: String = ""
+) : Serializable

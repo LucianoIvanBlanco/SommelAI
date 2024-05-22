@@ -90,6 +90,8 @@ class RealTimeDatabaseManager {
         }
     }
 
+
+
     suspend fun getSavedWines(): List<WineBody> {
         val user = FirebaseAuth.getInstance().currentUser
         if (user != null) {
@@ -125,7 +127,36 @@ class RealTimeDatabaseManager {
             Log.e("RealTimeDatabaseManager", "User not logged in")
         }
     }
+
+    suspend fun updateWineRating(wine: WineBody) {
+        val user = FirebaseAuth.getInstance().currentUser
+        if (user != null) {
+            val userId = user.uid
+            val userRef = databaseReference.child("users").child(userId)
+            val snapshot = userRef.get().await()
+            val userData = snapshot.getValue(UserData::class.java)
+            val wineId = wine.id
+            val newRating = wine.rating
+
+            if (userData != null) {
+                val updatedWineList = userData.wineFavouritesList.map { wine ->
+                    if (wine.id == wineId) {
+                        wine.copy(rating = newRating)
+                    } else {
+                        wine
+                    }
+                }
+                userRef.child("wineFavouritesList").setValue(updatedWineList).await()
+                Log.d("RealTimeDatabaseManager", "Wine rating updated successfully")
+            } else {
+                Log.e("RealTimeDatabaseManager", "User data not found")
+            }
+        } else {
+            Log.e("RealTimeDatabaseManager", "User not logged in")
+        }
+    }
 }
+
 
 
 

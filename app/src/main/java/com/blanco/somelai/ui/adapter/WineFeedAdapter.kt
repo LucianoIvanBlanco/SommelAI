@@ -10,10 +10,10 @@ import com.blanco.somelai.data.network.model.body.WineBody
 import com.blanco.somelai.databinding.ItemWineFeedBinding
 import com.bumptech.glide.Glide
 
-class WineFeedAdapter (val deleteWine: (wine: WineBody) -> Unit) :
-    ListAdapter<WineBody, WineFeedAdapter.WineFeedViewHolder>(
-        WineFeedItemCallBack
-    ) {
+class WineFeedAdapter(
+    private val goToDetail: (wine: WineBody) -> Unit,
+    private val deleteWine: (wine: WineBody) -> Unit
+) : ListAdapter<WineBody, WineFeedAdapter.WineFeedViewHolder>(WineFeedItemCallBack) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WineFeedViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -23,21 +23,21 @@ class WineFeedAdapter (val deleteWine: (wine: WineBody) -> Unit) :
 
     override fun onBindViewHolder(holder: WineFeedViewHolder, position: Int) {
         val wine = getItem(position)
-        holder.binding.root.setOnClickListener { deleteWine(wine) }
+
         holder.binding.tvWineTitle.text = wine.wine + " " + wine.year
         holder.binding.tvWinery.text = wine.winery
         holder.binding.tvWineLocation.text = wine.country
         holder.binding.tvWineScoreItem.text = wine.rating
         holder.binding.tvWinePairing.text = wine.pairing
 
-        holder.binding.btnDeleteFeed.setOnClickListener { deleteWine(wine)}
+        holder.binding.root.setOnClickListener { goToDetail(wine) }
+        holder.binding.btnDeleteFeed.setOnClickListener { deleteWine(wine) }
 
         Glide.with(holder.binding.root)
             .load(wine.image)
             .fitCenter()
             .error(R.drawable.ic_search)
             .into(holder.binding.ivWineImage)
-
     }
 
     inner class WineFeedViewHolder(val binding: ItemWineFeedBinding) :
@@ -50,6 +50,11 @@ object WineFeedItemCallBack: DiffUtil.ItemCallback<WineBody>() {
     }
 
     override fun areContentsTheSame(oldItem: WineBody, newItem: WineBody): Boolean {
-        return oldItem == newItem
+        return oldItem.wine == newItem.wine &&
+                oldItem.year == newItem.year &&
+                oldItem.winery == newItem.winery &&
+                oldItem.country == newItem.country &&
+                oldItem.rating == newItem.rating &&
+                oldItem.pairing == newItem.pairing
     }
 }

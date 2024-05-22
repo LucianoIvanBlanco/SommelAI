@@ -9,7 +9,9 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.blanco.somelai.R
 import com.blanco.somelai.databinding.FragmentFeedBinding
 import com.blanco.somelai.ui.adapter.WineFeedAdapter
 import com.blanco.somelai.ui.home.search.WineViewModel
@@ -35,6 +37,12 @@ class FeedFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         adapter = WineFeedAdapter(
+            goToDetail = { wine ->
+                val bundle = Bundle().apply {
+                    putSerializable("wine", wine)
+                }
+                findNavController().navigate(R.id.action_feedFragment_to_wineDetailFragment,bundle)
+            },
             deleteWine = { wine ->
                 wineViewModel.deleteWine(wine)
                 Toast.makeText(context, "Vino eliminado", Toast.LENGTH_LONG).show()
@@ -66,6 +74,4 @@ class FeedFragment : Fragment() {
         Log.e("FeedFragment", errorBody.toString())
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
-
-
 }
