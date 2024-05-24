@@ -52,6 +52,16 @@ class EmailAndPasswordAuthenticationManager {
         }
     }
 
+    suspend fun isEmailRegistered(email: String): Boolean {
+        return try {
+            val signInMethods = auth.fetchSignInMethodsForEmail(email).await()
+            signInMethods.signInMethods?.isNotEmpty() == true
+        } catch (e: FirebaseException) {
+            Log.e("FirebaseAuth", "isEmailRegistered:failure", e)
+            false
+        }
+    }
+
     fun signOut() {
         auth.signOut()
     }

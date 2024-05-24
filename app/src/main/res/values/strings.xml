@@ -38,11 +38,11 @@
     <string name="btn_save_changes">Guardar</string>
     <string name="btn_delete">Eliminar</string>
     <string name="sign_up_saved_user_message">Usuario creado con exito</string>
-    <string name="sign_up_invalid_data_error">Los datos introducidos no son válidos</string>
+    <string name="sign_up_invalid_data_error">Los datos introducidos no son válidos.</string>
     <string name="sign_up_failed_error">Ha ocurrido un fallo en el registro</string>
     <string name="log_in_empty_error">Por favor, rellena todos los campos correctamente</string>
     <string name="log_in_invalid_credentials">Usuario o contraseña incorrectos</string>
-    <string name="sign_up_name_taken_error">Este nombre no se encuentra disponible</string>
+    <string name="sign_up_email_taken_error">Este email ya se encuentra registrado.</string>
 
     <string name="account_delete_dialog_title">Estás a punto de eliminar tu cuenta</string>
     <string name="account_delete_dialog_message">¿Estás seguro?</string>
@@ -67,5 +67,7 @@
     <string name="permission_rationale_message">Es necesario el acceso a la galeria para seleccionar una imagen.</string>
     <string name="ok">Acceder</string>
     <string name="cancel">Denegar</string>
+    <string name="repeat_password_hin">Repite tu contraseña</string>
+    <string name="sign_up_password_mismatch_error">Las contraseñas no coinciden</string>
 
 </resources>

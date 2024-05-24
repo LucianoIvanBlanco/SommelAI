@@ -178,12 +178,29 @@ class EditProfileFragment : Fragment() {
         val fullNamePattern = "^[a-zA-Z]{3,20}\\s[a-zA-Z]{4,20}$".toRegex()
         val passwordPattern = ".{6,10}".toRegex()
         val password = binding.etProfilePassword.text.toString().trim()
+        val repeatPassword = binding.etRepeatPassword.text.toString().trim()
         val userName = binding.etProfileUserName.text.toString().trim()
         val fullName = binding.etProfileFullName.text.toString().trim()
 
-        return fullName.matches(fullNamePattern) && fullName.isNotEmpty() &&
-                password.matches(passwordPattern) && password.isNotEmpty() &&
-                userName.matches(userNamePattern) && userName.isNotEmpty()
+        if (!userName.matches(userNamePattern) || userName.isEmpty()) {
+            return false
+        }
+
+        if (!fullName.matches(fullNamePattern) || fullName.isEmpty()) {
+            return false
+        }
+
+        if (!password.matches(passwordPattern) || password.isEmpty()) {
+            return false
+        }
+        if (!repeatPassword.matches(passwordPattern) || repeatPassword.isEmpty()) {
+            return false
+        }
+        if (password != repeatPassword) {
+            showPasswordMismatchMessage()
+            return false
+        }
+        return true
     }
 
     // TODO agregamos opcion de tomar fotografia?
@@ -278,6 +295,11 @@ class EditProfileFragment : Fragment() {
         val message = getString(R.string.new_advertisement_no_select_image_error)
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
+
+    private fun showPasswordMismatchMessage() {
+        Toast.makeText(requireContext(), R.string.sign_up_password_mismatch_error, Toast.LENGTH_SHORT).show()
+    }
+
     //endregion --- Messages ---
 
 
@@ -318,27 +340,4 @@ class EditProfileFragment : Fragment() {
     }
     //endregion --- Photo gallery ---
 
-
-    //region --- Others: data validations, strings... ---
-
-    // TODO podemos usar para avisar de campos vacios al usuario
-
-    private fun checkData(title: String, price: Double, description: String): Boolean {
-        var isDataValid = true
-        if (title.isNullOrEmpty()) {
-            isDataValid = false
-            showMessage("Debes poner un título al anuncio")
-        } else if (price <= 0.0) {
-            isDataValid = false
-            showMessage("Necesitas poner un precio al artículo")
-        } else if (description.isNullOrEmpty()) {
-            isDataValid = false
-            showMessage("Debes poner una descripción al anuncio")
-        } else if (uploadedImageUrl == null) {
-            isDataValid = false
-            showMessage("Necesitas subir una foto para el anuncio")
-        }
-        return isDataValid
-    }
-    //endregion --- Others: data validations, strings... ---
 }
