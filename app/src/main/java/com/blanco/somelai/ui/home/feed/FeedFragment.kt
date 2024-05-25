@@ -42,10 +42,6 @@ class FeedFragment : Fragment() {
                     putSerializable("wine", wine)
                 }
                 findNavController().navigate(R.id.action_feedFragment_to_wineDetailFragment,bundle)
-            },
-            deleteWine = { wine ->
-                wineViewModel.deleteWine(wine)
-                Toast.makeText(context, "Vino eliminado", Toast.LENGTH_LONG).show()
             }
         )
         binding.rvFeed.layoutManager = LinearLayoutManager(requireContext())

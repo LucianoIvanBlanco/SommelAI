@@ -7,17 +7,16 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.blanco.somelai.R
 import com.blanco.somelai.data.network.model.body.WineBody
-import com.blanco.somelai.databinding.ItemWineFeedBinding
+import com.blanco.somelai.databinding.ItemWineListBinding
 import com.bumptech.glide.Glide
 
 class WineFeedAdapter(
-    private val goToDetail: (wine: WineBody) -> Unit,
-    private val deleteWine: (wine: WineBody) -> Unit
+    private val goToDetail: (wine: WineBody) -> Unit
 ) : ListAdapter<WineBody, WineFeedAdapter.WineFeedViewHolder>(WineFeedItemCallBack) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WineFeedViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val binding = ItemWineFeedBinding.inflate(inflater, parent, false)
+        val binding = ItemWineListBinding.inflate(inflater, parent, false)
         return WineFeedViewHolder(binding)
     }
 
@@ -28,19 +27,17 @@ class WineFeedAdapter(
         holder.binding.tvWinery.text = wine.winery
         holder.binding.tvWineLocation.text = wine.country
         holder.binding.tvWineScoreItem.text = wine.rating
-        holder.binding.tvWinePairing.text = wine.pairing
 
         holder.binding.root.setOnClickListener { goToDetail(wine) }
-        holder.binding.btnDeleteFeed.setOnClickListener { deleteWine(wine) }
 
         Glide.with(holder.binding.root)
             .load(wine.image)
             .fitCenter()
             .error(R.drawable.ic_search)
-            .into(holder.binding.ivWineImage)
+            .into(holder.binding.ivWine)
     }
 
-    inner class WineFeedViewHolder(val binding: ItemWineFeedBinding) :
+    inner class WineFeedViewHolder(val binding: ItemWineListBinding) :
         RecyclerView.ViewHolder(binding.root)
 }
 

@@ -7,14 +7,14 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.blanco.somelai.R
 import com.blanco.somelai.data.network.model.responses.Wine
-import com.blanco.somelai.databinding.ItemWineBinding
+import com.blanco.somelai.databinding.ItemWineListBinding
 import com.bumptech.glide.Glide
 
 class WineListAdapter : ListAdapter<Wine, WineListAdapter.WineViewHolder>(ItemCallBack) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WineViewHolder {
         val inflater = LayoutInflater.from(parent.context)
-        val binding = ItemWineBinding.inflate(inflater, parent, false)
+        val binding = ItemWineListBinding.inflate(inflater, parent, false)
         return WineViewHolder(binding)
     }
 
@@ -29,10 +29,10 @@ class WineListAdapter : ListAdapter<Wine, WineListAdapter.WineViewHolder>(ItemCa
             .load(wine.image)
             .fitCenter()
             .error(R.drawable.ic_search)
-            .into(holder.binding.ivWineImage)
+            .into(holder.binding.ivWine)
     }
 
-    inner class WineViewHolder(val binding: ItemWineBinding) :
+    inner class WineViewHolder(val binding: ItemWineListBinding) :
         RecyclerView.ViewHolder(binding.root)
 
 }
