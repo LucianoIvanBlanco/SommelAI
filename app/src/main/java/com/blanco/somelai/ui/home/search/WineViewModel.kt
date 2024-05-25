@@ -158,11 +158,20 @@ class WineViewModel : ViewModel() {
                             filteredWines.forEach { wine ->
                                 Log.d("WineViewModel", "Found wine: ${wine.wine}")
                             }
-                            Toast.makeText(context, "COINCIDENCIAS EN LA BUSQUEDA", Toast.LENGTH_LONG).show()
-                            (uiState as MutableLiveData).value = WineUiState(response = filteredWines)
+                            Toast.makeText(
+                                context,
+                                "COINCIDENCIAS EN LA BUSQUEDA",
+                                Toast.LENGTH_LONG
+                            ).show()
+                            (uiState as MutableLiveData).value =
+                                WineUiState(response = filteredWines)
                             _navigateToWineList.value = true
                         } else {
-                            Toast.makeText(context, "SIN COINCIDENCIAS EN LA BUSQUEDA", Toast.LENGTH_LONG).show()
+                            Toast.makeText(
+                                context,
+                                "SIN COINCIDENCIAS EN LA BUSQUEDA",
+                                Toast.LENGTH_LONG
+                            ).show()
                             Toast.makeText(context, "GUARDANDO VINO", Toast.LENGTH_LONG).show()
 
 
@@ -182,7 +191,7 @@ class WineViewModel : ViewModel() {
         }
     }
 
-   // ----------- REGION FEED WINE---------------
+    // ----------- REGION FEED WINE---------------
 
     private fun createAndSaveWine(wineDetails: Map<String, String>, imageUri: String) {
         val newWine = WineBody(
@@ -244,6 +253,40 @@ class WineViewModel : ViewModel() {
         }
     }
 
+    private fun extractWineDetails(extractedText: String): Map<String, String> {
+        val details = extractedText
+            .removeSurrounding("[", "]")
+            .split(",")
+            .map { it.trim().removeSurrounding("'").trim() }
+
+        return mapOf(
+            "name" to details.getOrNull(0).orEmpty(),
+            "year" to details.getOrNull(1).orEmpty(),
+            "winery" to details.getOrNull(2).orEmpty(),
+            "country" to details.getOrNull(3).orEmpty(),
+            "pairing" to details.getOrNull(4).orEmpty()
+        )
+    }
+
+    fun resetNavigateToWineList() {
+        _navigateToWineList.value = false
+    }
+    // TODO ver porque no esta navegando despues de guardar nuevo vino
+    fun resetNavigateToFeedFragment() {
+        _navigateToWineFeed.value = false
+    }
+
+    fun updateWine(wine: WineBody) {
+        viewModelScope.launch {
+            try {
+                RealTimeDatabaseManager().updateWineRating(wine)
+                fetchSavedWines()
+            } catch (e: Exception) {
+                Log.e("WineViewModel", "Error update wine", e)
+            }
+        }
+    }
+
     // ----------- END REGION FEED WINE---------------
     fun analyzeWineLabel(imageUri: Uri, context: Context): LiveData<String> =
         liveData(Dispatchers.IO) {
@@ -296,39 +339,47 @@ class WineViewModel : ViewModel() {
             }
         }
 
-    private fun extractWineDetails(extractedText: String): Map<String, String> {
-        val details = extractedText
-            .removeSurrounding("[", "]")
-            .split(",")
-            .map { it.trim().removeSurrounding("'").trim() }
 
-        return mapOf(
-            "name" to details.getOrNull(0).orEmpty(),
-            "year" to details.getOrNull(1).orEmpty(),
-            "winery" to details.getOrNull(2).orEmpty(),
-            "country" to details.getOrNull(3).orEmpty(),
-            "pairing" to details.getOrNull(4).orEmpty()
-        )
-    }
-
-    fun resetNavigateToWineList() {
-        _navigateToWineList.value = false
-    }
-// TODO ver porque no esta navegando despues de guardar nuevo vino
-    fun resetNavigateToFeedFragment() {
-        _navigateToWineFeed.value = false
-    }
-
-    fun updateWine(wine: WineBody) {
-        viewModelScope.launch {
+    suspend fun getMoreDetails(wineName: String, winery: String): String {
+        return withContext(Dispatchers.IO) {
             try {
-                RealTimeDatabaseManager().updateWineRating(wine)
-                fetchSavedWines()
+                val model = GenerativeModel(
+                    modelName = "gemini-1.5-flash-latest",
+                    apiKey = _apiKey,
+                    generationConfig = generationConfig {
+                        temperature = 1f
+                        topK = 64
+                        topP = 0.95f
+                        maxOutputTokens = 1000
+                    },
+                    safetySettings = listOf(
+                        SafetySetting(HarmCategory.HARASSMENT, BlockThreshold.MEDIUM_AND_ABOVE),
+                        SafetySetting(HarmCategory.HATE_SPEECH, BlockThreshold.MEDIUM_AND_ABOVE),
+                        SafetySetting(HarmCategory.SEXUALLY_EXPLICIT, BlockThreshold.MEDIUM_AND_ABOVE),
+                        SafetySetting(HarmCategory.DANGEROUS_CONTENT, BlockThreshold.MEDIUM_AND_ABOVE)
+                    )
+                )
+                val prompt = """
+                Proporciona información concisa sobre el vino "$wineName" de la bodega "$winery" en un máximo de 60 palabras. 
+                Si no hay coincidencia exacta, proporciona información de un vino similar sin mencionarlo explícitamente.
+            """.trimIndent()
+                val inputContent = content {
+                    text(prompt)
+                }
+
+                val response = model.generateContent(inputContent)
+                val extractedText = response.candidates.first().content.parts.first().asTextOrNull()
+                Log.d("WineViewModel", "Extracted text: $extractedText")
+                extractedText ?: ""
             } catch (e: Exception) {
-                Log.e("WineViewModel", "Error update wine", e)
+                Log.e("WineViewModel", "Error analyzing wine label with Gemini: ${e.localizedMessage}", e)
+
+                // TODO meterlo en values para traducciones
+                "No hay más informacion disponible sobre este vino."
             }
         }
     }
+
 
 }
 

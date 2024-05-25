@@ -51,7 +51,11 @@
         android:id="@+id/wineListFragment"
         android:name="com.blanco.somelai.ui.home.search.WineListFragment"
         android:label="fragment_wine_list"
-        tools:layout="@layout/fragment_wine_list" />
+        tools:layout="@layout/fragment_wine_list" >
+        <action
+            android:id="@+id/action_wineListFragment_to_wineResponseDetailFragment"
+            app:destination="@id/wineResponseDetailFragment" />
+    </fragment>
     <fragment
         android:id="@+id/scannerCameraFragment"
         android:name="com.blanco.somelai.ui.home.search.ScannerCameraFragment"
@@ -73,4 +77,9 @@
             android:name="wineId"
             app:argType="string" />
     </fragment>
+    <fragment
+        android:id="@+id/wineResponseDetailFragment"
+        android:name="com.blanco.somelai.ui.home.search.WineResponseDetailFragment"
+        android:label="fragment_wine_response_detail"
+        tools:layout="@layout/fragment_wine_response_detail" />
 </navigation>

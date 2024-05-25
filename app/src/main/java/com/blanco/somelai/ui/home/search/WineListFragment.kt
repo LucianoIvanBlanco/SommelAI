@@ -9,7 +9,9 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.blanco.somelai.R
 import com.blanco.somelai.databinding.FragmentWineListBinding
 import com.blanco.somelai.ui.adapter.WineListAdapter
 
@@ -19,7 +21,7 @@ class WineListFragment : Fragment() {
     private val binding: FragmentWineListBinding get() = _binding
 
     private val viewModel: WineViewModel by activityViewModels()
-    val adapter = WineListAdapter()
+    private lateinit var adapter: WineListAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -31,6 +33,15 @@ class WineListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        adapter = WineListAdapter(
+            goToDetail = { wine ->
+                val bundle = Bundle().apply {
+                    putSerializable("wine", wine)
+                }
+                findNavController().navigate(R.id.action_wineListFragment_to_wineResponseDetailFragment,bundle)
+            }
+        )
 
         binding.rveWineListType.layoutManager = LinearLayoutManager(requireContext())
         binding.rveWineListType.adapter = adapter

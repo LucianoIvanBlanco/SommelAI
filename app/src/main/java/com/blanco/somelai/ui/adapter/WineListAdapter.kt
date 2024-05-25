@@ -10,7 +10,9 @@ import com.blanco.somelai.data.network.model.responses.Wine
 import com.blanco.somelai.databinding.ItemWineListBinding
 import com.bumptech.glide.Glide
 
-class WineListAdapter : ListAdapter<Wine, WineListAdapter.WineViewHolder>(ItemCallBack) {
+class WineListAdapter(
+    private val goToDetail: (wine: Wine) -> Unit
+) : ListAdapter<Wine, WineListAdapter.WineViewHolder>(ItemCallBack) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): WineViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -20,10 +22,12 @@ class WineListAdapter : ListAdapter<Wine, WineListAdapter.WineViewHolder>(ItemCa
 
     override fun onBindViewHolder(holder: WineViewHolder, position: Int) {
         val wine = getItem(position)
-        holder.binding.tvWineTitle.text = wine.wine
-        holder.binding.tvWinery.text = wine.winery
+        holder.binding.tvWineTitle.text = wine.winery // winery es el title
+        holder.binding.tvWinery.text = wine.wine      // wine es la bodega
         holder.binding.tvWineLocation.text = wine.location
         holder.binding.tvWineScoreItem.text = wine.rating.average
+
+        holder.binding.root.setOnClickListener { goToDetail(wine) }
 
         Glide.with(holder.binding.root)
             .load(wine.image)
@@ -43,6 +47,10 @@ object ItemCallBack: DiffUtil.ItemCallback<Wine>() {
     }
 
     override fun areContentsTheSame(oldItem: Wine, newItem: Wine): Boolean {
-        return oldItem == newItem
+        return oldItem.wine == newItem.wine &&
+                oldItem.winery == newItem.winery &&
+                oldItem.rating == newItem.rating &&
+                oldItem.location == newItem.location
+
     }
 }

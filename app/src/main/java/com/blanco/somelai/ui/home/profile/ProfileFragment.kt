@@ -105,6 +105,8 @@ class ProfileFragment : Fragment() {
             .asBitmap()
             .centerCrop()
             .load(user.userPhotoUrl)
+            .placeholder(R.drawable.default_user) // Imagen por defecto mientras se carga
+            .error(R.drawable.default_user)  // Imagen por defecto si hay un error
             .into(binding.ivProfile)
     }
 
