@@ -52,7 +52,6 @@ class WineViewModel : ViewModel() {
 
     private var realTimeDatabaseManager: RealTimeDatabaseManager = RealTimeDatabaseManager()
     private var cloudStorageManager: CloudStorageManager = CloudStorageManager()
-    private var uploadedImageUrl: String? = null
 
     private val prompt: String = """
     Extrae los siguientes datos de la etiqueta del vino:
@@ -226,7 +225,7 @@ class WineViewModel : ViewModel() {
                 cloudStorageManager.uploadWineImage(selectedImageUri!!)
             } catch (e: Exception) {
                 Log.e("uploadImage", "Error uploading image: ${e.message}")
-                null // Retorna null si hay un error
+                null
             }
         }
     }

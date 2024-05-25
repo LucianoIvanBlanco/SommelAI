@@ -16,6 +16,7 @@ import com.blanco.somelai.ui.home.HomeActivity
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class LoginFragment : BottomSheetDialogFragment() {
 
@@ -37,6 +38,18 @@ class LoginFragment : BottomSheetDialogFragment() {
 
         dataStoreManager = DataStoreManager(requireContext())
         setClicks()
+        checkUserLogged()
+    }
+
+    // Chekeamos login en datastore para no tener que iniciar sesion nuevamente
+    private fun checkUserLogged() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            if (dataStoreManager.isUserLogged()) {
+                withContext(Dispatchers.IO) {
+                    navigateToHome()
+                }
+            }
+        }
     }
 
     private fun cleanData(){

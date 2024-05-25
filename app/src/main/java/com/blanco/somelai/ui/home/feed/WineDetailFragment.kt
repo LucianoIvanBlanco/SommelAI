@@ -72,7 +72,7 @@ class WineDetailFragment : Fragment() {
                 wine.rating = binding.ratingBar.rating.toString()
                 binding.tvWineScoreItem.text = wine.rating
                 lifecycleScope.launch {
-                    realTimeDatabaseManager.updateWineRating(wine)
+                    wineViewModel.updateWine(wine)
                     Toast.makeText(context, "Vino actualizado", Toast.LENGTH_LONG).show()
                     requireActivity().onBackPressed()
                 }
