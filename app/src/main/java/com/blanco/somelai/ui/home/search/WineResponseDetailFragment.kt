@@ -15,8 +15,6 @@ import com.bumptech.glide.Glide
 import kotlinx.coroutines.launch
 
 
-// TODO aqui tendremos que pintar la vista del detalel del vino de la API, agregando info
-
 class WineResponseDetailFragment : Fragment() {
 
     private lateinit var _binding: FragmentWineResponseDetailBinding

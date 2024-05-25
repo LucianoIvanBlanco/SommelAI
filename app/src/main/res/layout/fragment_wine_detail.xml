@@ -12,14 +12,11 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="12dp"
-        android:layout_marginBottom="1dp"
         app:cardBackgroundColor="@color/md_theme_light_background"
         app:cardElevation="2dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0">
+        app:layout_constraintTop_toTopOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -32,6 +29,7 @@
                 android:orientation="vertical"
                 android:paddingBottom="12dp"
                 app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
@@ -90,57 +88,65 @@
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/linearLayout2"
                     android:layout_width="match_parent"
-                    android:layout_height="235dp">
+                    android:layout_height="match_parent">
 
                     <!-- Title, secondary and supporting text -->
 
                     <TextView
                         android:id="@+id/tv_wine_title"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         android:layout_marginTop="12dp"
+                        android:layout_marginEnd="12dp"
                         android:text="@string/default_text"
                         android:textColor="@color/md_theme_light_onBackground"
                         android:textSize="20sp"
                         android:textStyle="bold"
+                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
                     <TextView
                         android:id="@+id/tv_winery"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         android:layout_marginTop="12dp"
+                        android:layout_marginEnd="12dp"
                         android:text="@string/loading"
                         android:textColor="?android:attr/textColorSecondary"
                         android:textSize="16sp"
                         android:textStyle="italic"
+                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/tv_wine_title" />
 
                     <TextView
                         android:id="@+id/tv_wine_location"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         android:layout_marginTop="12dp"
+                        android:layout_marginEnd="12dp"
                         android:layout_weight="1"
                         android:maxLines="3"
                         android:text="@string/loading"
                         android:textColor="?android:attr/textColorSecondary"
                         android:textSize="14sp"
+                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/tv_winery" />
 
                     <TextView
                         android:id="@+id/tv_wine_pairing"
-                        android:layout_width="wrap_content"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="12dp"
                         android:layout_marginTop="12dp"
+                        android:layout_marginEnd="12dp"
                         android:text="@string/loading"
+                        app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@+id/tv_wine_location" />
 
@@ -148,10 +154,12 @@
                         android:id="@+id/ratingBar"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginBottom="15dp"
+                        android:layout_marginTop="12dp"
+                        android:layout_marginBottom="12dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintStart_toStartOf="parent" />
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/tv_wine_pairing" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -177,8 +185,6 @@
         android:layout_marginStart="30dp"
         android:layout_marginTop="32dp"
         android:text="@string/btn_save_changes"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/mcv_wine" />
 

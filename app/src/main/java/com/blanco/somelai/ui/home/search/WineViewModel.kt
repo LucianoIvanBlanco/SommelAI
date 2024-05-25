@@ -145,6 +145,8 @@ class WineViewModel : ViewModel() {
             viewModelScope.launch {
                 try {
                     val wineDetails = extractWineDetails(extractedText)
+                    val nameAndYear = wineDetails["name"] + wineDetails["year"]
+                    val moreDetails = getMoreDetails(nameAndYear, wineDetails["winery"] ?: "")
                     val wineName = wineDetails["name"] ?: ""
                     Log.d("WineViewModel", "Extracted wine name: $wineName")
                     withContext(Dispatchers.Main) {
@@ -176,7 +178,7 @@ class WineViewModel : ViewModel() {
 
 
                             val imageWine = uploadImage(imageUri).toString()
-                            createAndSaveWine(wineDetails, imageWine)
+                            createAndSaveWine(wineDetails, moreDetails, imageWine)
 
                         }
                     }
@@ -193,13 +195,13 @@ class WineViewModel : ViewModel() {
 
     // ----------- REGION FEED WINE---------------
 
-    private fun createAndSaveWine(wineDetails: Map<String, String>, imageUri: String) {
+    private fun createAndSaveWine(wineDetails: Map<String, String>, moreDetails: String, imageUri: String) {
         val newWine = WineBody(
             wine = wineDetails["name"] ?: "",
             year = wineDetails["year"] ?: "",
             winery = wineDetails["winery"] ?: "",
             country = wineDetails["country"] ?: "",
-            pairing = wineDetails["pairing"] ?: "",
+            pairing = moreDetails,
             image = imageUri,
             id = UUID.randomUUID().toString(),
             rating = ""
@@ -271,11 +273,13 @@ class WineViewModel : ViewModel() {
     fun resetNavigateToWineList() {
         _navigateToWineList.value = false
     }
+
     // TODO ver porque no esta navegando despues de guardar nuevo vino
     fun resetNavigateToFeedFragment() {
         _navigateToWineFeed.value = false
     }
 
+    // Ver porque no se usa
     fun updateWine(wine: WineBody) {
         viewModelScope.launch {
             try {
