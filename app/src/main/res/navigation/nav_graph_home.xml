@@ -45,6 +45,9 @@
         <action
             android:id="@+id/action_searchFragment_to_scannerCameraFragment"
             app:destination="@id/scannerCameraFragment" />
+        <action
+            android:id="@+id/action_searchFragment_to_searchNameFragment"
+            app:destination="@id/searchNameFragment" />
     </fragment>
 
     <fragment
@@ -82,4 +85,8 @@
         android:name="com.blanco.somelai.ui.home.search.WineResponseDetailFragment"
         android:label="fragment_wine_response_detail"
         tools:layout="@layout/fragment_wine_response_detail" />
+    <fragment
+        android:id="@+id/searchNameFragment"
+        android:name="com.blanco.somelai.ui.home.search.SearchNameFragment"
+        android:label="SearchNameFragment" />
 </navigation>

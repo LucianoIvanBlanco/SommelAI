@@ -53,6 +53,8 @@ class WineViewModel : ViewModel() {
     private var realTimeDatabaseManager: RealTimeDatabaseManager = RealTimeDatabaseManager()
     private var cloudStorageManager: CloudStorageManager = CloudStorageManager()
 
+    private var allWinesCache: List<Wine> = emptyList()
+
     private val prompt: String = """
     Extrae los siguientes datos de la etiqueta del vino:
     1. Nombre del vino
@@ -68,22 +70,18 @@ class WineViewModel : ViewModel() {
     "Nombre del vino, Año del vino, Bodega que lo produce, País/Región/Provincia, Recomendación de maridaje"
 """.trimIndent()
 
-    fun getWineForType(typeWine: String) {
-        (uiState as MutableLiveData).value = WineUiState(isLoading = true)
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val response = WineApi.service.getWines(typeWine)
-                viewModelScope.launch(Dispatchers.Main) {
-                    if (response.isSuccessful) {
-                        val wineResponse = response.body()
-                        (uiState as MutableLiveData).setValue(WineUiState(response = wineResponse))
-                    } else {
-                        (uiState as MutableLiveData).setValue(WineUiState(isError = true))
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e("WineViewModel", "Error al cargar los vinos")
-            }
+    init {
+        // Cargar todos los vinos al iniciar la aplicación
+        viewModelScope.launch {
+            loadAllWines()
+        }
+    }
+    private suspend fun loadAllWines() {
+        try {
+            val wines = getAllWines()
+            allWinesCache = wines
+        } catch (e: Exception) {
+            Log.e("WineViewModel", "Error loading all wines: ${e.message}")
         }
     }
 
@@ -101,6 +99,32 @@ class WineViewModel : ViewModel() {
                 wineResponses.addAll(wines)
             }
             wineResponses
+        }
+    }
+
+    fun searchWinesByName(query: String) {
+        val filteredWines = allWinesCache.filter { wine ->
+            wine.wine.lowercase().contains(query.lowercase(), ignoreCase = true)
+        }
+        (uiState as MutableLiveData).value = WineUiState(response = filteredWines)
+    }
+
+    fun getWineForType(typeWine: String) {
+        (uiState as MutableLiveData).value = WineUiState(isLoading = true)
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val response = WineApi.service.getWines(typeWine)
+                viewModelScope.launch(Dispatchers.Main) {
+                    if (response.isSuccessful) {
+                        val wineResponse = response.body()
+                        (uiState as MutableLiveData).setValue(WineUiState(response = wineResponse))
+                    } else {
+                        (uiState as MutableLiveData).setValue(WineUiState(isError = true))
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("WineViewModel", "Error al cargar los vinos")
+            }
         }
     }
 
@@ -123,9 +147,8 @@ class WineViewModel : ViewModel() {
         (uiState as MutableLiveData).value = WineUiState(isLoading = true)
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val allWines = getAllWines()
                 val filteredWines =
-                    allWines.filter { it.location.contains(country, ignoreCase = true) }
+                    allWinesCache.filter { it.location.contains(country, ignoreCase = true) }
                 viewModelScope.launch(Dispatchers.Main) {
                     (uiState as MutableLiveData).value = WineUiState(response = filteredWines)
                 }
@@ -150,8 +173,7 @@ class WineViewModel : ViewModel() {
                     Log.d("WineViewModel", "Extracted wine name: $wineName")
                     withContext(Dispatchers.Main) {
                     }
-                    val allWines = getAllWines()
-                    val filteredWines = allWines.filter { wine ->
+                    val filteredWines = allWinesCache.filter { wine ->
                         wine.wine.lowercase().contains(wineName.lowercase(), ignoreCase = true)
                     }
                     viewModelScope.launch(Dispatchers.Main) {

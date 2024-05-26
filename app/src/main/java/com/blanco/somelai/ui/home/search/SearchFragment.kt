@@ -1,7 +1,5 @@
 package com.blanco.somelai.ui.home.search
 
-
-
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -12,14 +10,12 @@ import androidx.navigation.fragment.findNavController
 import com.blanco.somelai.R
 import com.blanco.somelai.databinding.FragmentSearchBinding
 
-
 class SearchFragment : Fragment() {
 
     private lateinit var _binding: FragmentSearchBinding
     private val binding get() = _binding
 
     private val viewModel: WineViewModel by activityViewModels()
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,6 +29,7 @@ class SearchFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setClicks()
+        setupSearch()
     }
 
     // TODO usamos las funciones de tipo especifico del service?
@@ -77,6 +74,19 @@ class SearchFragment : Fragment() {
         }
     }
 
+    private fun setupSearch() {
+        binding.tfSearchName.setOnClickListener {
+            navigateToSearchNameFragment()
+        }
+        binding.etSearch.setOnClickListener{
+            navigateToSearchNameFragment()
+        }
+    }
+
+    private fun navigateToSearchNameFragment() {
+        findNavController().navigate(R.id.action_searchFragment_to_searchNameFragment)
+    }
+
     private fun navigateToScannerCameraFragment() {
         findNavController().navigate(R.id.action_searchFragment_to_scannerCameraFragment)
     }
@@ -84,7 +94,4 @@ class SearchFragment : Fragment() {
     private fun navigateToWineListFragment() {
         findNavController().navigate(R.id.action_searchFragment_to_wineListFragment)
     }
-
 }
-
-
