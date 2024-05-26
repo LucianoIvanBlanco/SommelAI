@@ -18,7 +18,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         Firebase.appCheck.installAppCheckProviderFactory(
-            DebugAppCheckProviderFactory.getInstance())
+            DebugAppCheckProviderFactory.getInstance()
+        )
         checkLogin()
     }
 
@@ -27,10 +28,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkLogin() {
-        if(isUserLogged()){
+        if (isUserLogged()) {
 
         }
     }
-
-
 }

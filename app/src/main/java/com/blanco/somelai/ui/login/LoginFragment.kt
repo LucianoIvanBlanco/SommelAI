@@ -52,7 +52,7 @@ class LoginFragment : BottomSheetDialogFragment() {
         }
     }
 
-    private fun cleanData(){
+    private fun cleanData() {
         binding.etLoginEmail.setText("")
         binding.etLoginPassword.setText("")
     }
@@ -90,7 +90,6 @@ class LoginFragment : BottomSheetDialogFragment() {
             .commit()
     }
 
-
     private fun sendLogin(email: String, password: String) {
         lifecycleScope.launch(Dispatchers.IO) {
             val resultIsSuccessful =
@@ -104,7 +103,7 @@ class LoginFragment : BottomSheetDialogFragment() {
         }
     }
 
-   private fun navigateToHome() {
+    private fun navigateToHome() {
         val intent = Intent(requireContext(), HomeActivity::class.java)
         startActivity(intent)
         requireActivity().finish()
@@ -125,5 +124,4 @@ class LoginFragment : BottomSheetDialogFragment() {
             ).show()
         }
     }
-
 }

@@ -52,11 +52,9 @@ class ProfileFragment : Fragment() {
         dataStoreManager = DataStoreManager(requireContext())
         realTimeDatabaseManager = RealTimeDatabaseManager()
         auth = FirebaseAuth.getInstance()
-
         setClicks()
         getUserData()
     }
-
 
     private fun setClicks() {
         binding.btnDeleteAccount.setOnClickListener {
@@ -74,18 +72,18 @@ class ProfileFragment : Fragment() {
         findNavController().navigate(R.id.editProfileFragment)
     }
 
-    // T
     private fun getUserData() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                val currentUser = auth.currentUser ?: throw IllegalStateException("No hay usuario autentificado.")
+                val currentUser =
+                    auth.currentUser ?: throw IllegalStateException("No hay usuario autentificado.")
                 val uid = currentUser.uid
                 val userData = realTimeDatabaseManager.readUser(uid)
                 withContext(Dispatchers.Main) {
                     if (userData != null) {
                         setUserData(userData)
                     } else {
-                                               showMessage("No se encontraron datos del usuario.")
+                        showMessage("No se encontraron datos del usuario.")
                     }
                 }
             } catch (e: Exception) {
@@ -110,10 +108,9 @@ class ProfileFragment : Fragment() {
             .into(binding.ivProfile)
     }
 
-
     // Borramos la cuenta de Database
     private fun deleteAccount() {
-        try{
+        try {
             val currentUser = auth.currentUser
             if (currentUser != null) {
                 val uid = currentUser.uid
@@ -121,10 +118,9 @@ class ProfileFragment : Fragment() {
                     realTimeDatabaseManager.deleteUser(uid)
                     showMessage("Lamentamos que nos dejes. Puedes volver siempre que quieras")
                 }
-                    //Retrocedemos a la pantalla anterior
-                    logOutStoredData()
-                    goLogin()
-                    deleteUserAccount()
+                logOutStoredData()
+                goLogin()
+                deleteUserAccount()
 
             } else {
                 showMessage("Error al eliminar tu cuenta")
@@ -132,14 +128,15 @@ class ProfileFragment : Fragment() {
         } catch (e: Exception) {
             Log.e("deleteAccount", "$e")
             showMessage(e.localizedMessage)
-
         }
     }
 
     // Borramos de firebaseAuth
     private fun deleteUserAccount() {
         try {
-            val currentUser = FirebaseAuth.getInstance().currentUser ?: throw IllegalStateException("No hay un usuario autenticado")
+            val currentUser = FirebaseAuth.getInstance().currentUser ?: throw IllegalStateException(
+                "No hay un usuario autenticado"
+            )
             currentUser.delete()
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
@@ -152,7 +149,6 @@ class ProfileFragment : Fragment() {
             Log.e("ProfileFragment", "Error al intentar eliminar la cuenta: ${e.message}")
         }
     }
-    //region --- DataStore ---
 
     // LogOut de dataStore
     //Todo falta eliminar la cuenta
@@ -161,17 +157,12 @@ class ProfileFragment : Fragment() {
             dataStoreManager.logOut()
         }
     }
-    //endregion --- DataStore ---
-
-    //region --- Firebase Auth ---
 
     private fun logoutFirebase() {
         val manager = EmailAndPasswordAuthenticationManager()
         manager.signOut()
     }
-    //endregion --- Firebase Auth ---
 
-    //region --- Messages ---
     private fun showDialogDeleteAccount() {
         val title = getString(R.string.account_delete_dialog_title)
         val message = getString(R.string.account_delete_dialog_message)
@@ -193,9 +184,7 @@ class ProfileFragment : Fragment() {
             Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
         }
     }
-    //region --- Messages ---
 
-    //region --- Other ---
     private fun logOut() {
         lifecycleScope.launch(Dispatchers.IO) {
             logoutFirebase()
@@ -211,6 +200,4 @@ class ProfileFragment : Fragment() {
         startActivity(intent)
         requireActivity().finish()
     }
-    //endregion --- Other ---
-
 }

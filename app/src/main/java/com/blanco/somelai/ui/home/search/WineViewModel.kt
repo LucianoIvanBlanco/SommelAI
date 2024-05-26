@@ -194,7 +194,11 @@ class WineViewModel : ViewModel() {
 
     // ----------- REGION FEED WINE---------------
 
-    private fun createAndSaveWine(wineDetails: Map<String, String>, moreDetails: String, imageUri: String) {
+    private fun createAndSaveWine(
+        wineDetails: Map<String, String>,
+        moreDetails: String,
+        imageUri: String
+    ) {
         val newWine = WineBody(
             wine = wineDetails["name"] ?: "",
             year = wineDetails["year"] ?: "",
@@ -276,9 +280,9 @@ class WineViewModel : ViewModel() {
     // TODO ver porque no esta navegando despues de guardar nuevo vino
     fun resetNavigateToFeedFragment() {
         _navigateToWineFeed.value = false
+        Log.d("WineViewModel", "navigateToWineFeed")
     }
 
-    // Ver porque no se usa
     fun updateWine(wine: WineBody) {
         viewModelScope.launch {
             try {
@@ -358,8 +362,14 @@ class WineViewModel : ViewModel() {
                     safetySettings = listOf(
                         SafetySetting(HarmCategory.HARASSMENT, BlockThreshold.MEDIUM_AND_ABOVE),
                         SafetySetting(HarmCategory.HATE_SPEECH, BlockThreshold.MEDIUM_AND_ABOVE),
-                        SafetySetting(HarmCategory.SEXUALLY_EXPLICIT, BlockThreshold.MEDIUM_AND_ABOVE),
-                        SafetySetting(HarmCategory.DANGEROUS_CONTENT, BlockThreshold.MEDIUM_AND_ABOVE)
+                        SafetySetting(
+                            HarmCategory.SEXUALLY_EXPLICIT,
+                            BlockThreshold.MEDIUM_AND_ABOVE
+                        ),
+                        SafetySetting(
+                            HarmCategory.DANGEROUS_CONTENT,
+                            BlockThreshold.MEDIUM_AND_ABOVE
+                        )
                     )
                 )
                 val prompt = """
@@ -375,15 +385,17 @@ class WineViewModel : ViewModel() {
                 Log.d("WineViewModel", "Extracted text: $extractedText")
                 extractedText ?: ""
             } catch (e: Exception) {
-                Log.e("WineViewModel", "Error analyzing wine label with Gemini: ${e.localizedMessage}", e)
+                Log.e(
+                    "WineViewModel",
+                    "Error analyzing wine label with Gemini: ${e.localizedMessage}",
+                    e
+                )
 
                 // TODO meterlo en values para traducciones
                 "No hay más informacion disponible sobre este vino."
             }
         }
     }
-
-
 }
 
 

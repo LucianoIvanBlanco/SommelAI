@@ -12,7 +12,7 @@ class EmailAndPasswordAuthenticationManager {
     private val auth = Firebase.auth
 
 
-// TODO usaremos la funcion?
+    // TODO usaremos la funcion?
     fun isUserLogged(): Boolean {
         val currentUser = auth.currentUser
         if (currentUser != null) {

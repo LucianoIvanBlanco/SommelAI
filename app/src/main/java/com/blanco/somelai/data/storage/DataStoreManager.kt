@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.map
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "SOMELAI_STORE")
 
-class DataStoreManager (val context: Context) {
+class DataStoreManager(val context: Context) {
 
     private val emailKey = "EMAIL"
     private val passwordKey = "PASSWORD"
@@ -35,7 +35,7 @@ class DataStoreManager (val context: Context) {
 
     val sampleKey = stringPreferencesKey("SAMPLE_KEY")
 
-    suspend fun saveData (context: Context, sampleData: String) {
+    suspend fun saveData(context: Context, sampleData: String) {
         context.dataStore.edit { editor ->
             editor[sampleKey] = sampleData
         }
@@ -78,7 +78,13 @@ class DataStoreManager (val context: Context) {
         putBoolean(isLoggedKey, true)
     }
 
-    suspend fun saveUserData(email: String, password: String, id: String, fullName: String, userName: String) {
+    suspend fun saveUserData(
+        email: String,
+        password: String,
+        id: String,
+        fullName: String,
+        userName: String
+    ) {
         putString(emailKey, email)
         putString(passwordKey, password)
         putString(userIdKey, id)
@@ -91,7 +97,7 @@ class DataStoreManager (val context: Context) {
         return preferences[stringPreferencesKey(jwtKey)]
     }
 
-    suspend fun getUserData(){
+    suspend fun getUserData() {
         val preferences = context.dataStore.data.first()
         val userName = preferences[stringPreferencesKey(userNameKey)] ?: ""
         val fullName = preferences[stringPreferencesKey(fullNameKey)] ?: ""
