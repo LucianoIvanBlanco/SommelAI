@@ -88,5 +88,9 @@
     <fragment
         android:id="@+id/searchNameFragment"
         android:name="com.blanco.somelai.ui.home.search.SearchNameFragment"
-        android:label="SearchNameFragment" />
+        android:label="SearchNameFragment" >
+        <action
+            android:id="@+id/action_searchNameFragment_to_wineResponseDetailFragment"
+            app:destination="@id/wineResponseDetailFragment" />
+    </fragment>
 </navigation>

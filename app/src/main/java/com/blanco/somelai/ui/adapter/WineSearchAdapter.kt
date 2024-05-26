@@ -10,7 +10,9 @@ import com.blanco.somelai.R
 import com.blanco.somelai.data.network.model.responses.Wine
 import com.bumptech.glide.Glide
 
-class WineSearchAdapter : RecyclerView.Adapter<WineSearchAdapter.WineViewHolder>() {
+class WineSearchAdapter(
+    private val goToDetail: (wine: Wine) -> Unit
+) : RecyclerView.Adapter<WineSearchAdapter.WineViewHolder>() {
 
     private var wines: List<Wine> = emptyList()
 
@@ -25,7 +27,7 @@ class WineSearchAdapter : RecyclerView.Adapter<WineSearchAdapter.WineViewHolder>
     }
 
     override fun onBindViewHolder(holder: WineViewHolder, position: Int) {
-        holder.bind(wines[position])
+        holder.bind(wines[position], goToDetail)
     }
 
     override fun getItemCount(): Int = wines.size
@@ -37,9 +39,9 @@ class WineSearchAdapter : RecyclerView.Adapter<WineSearchAdapter.WineViewHolder>
         private val wineLocationTextView: TextView = itemView.findViewById(R.id.tv_wine_location)
         private val wineScoreTextView: TextView = itemView.findViewById(R.id.tv_wine_score_item)
 
-        fun bind(wine: Wine) {
-            wineNameTextView.text = wine.wine
-            wineWineryTextView.text = wine.winery
+        fun bind(wine: Wine, goToDetail: (wine: Wine) -> Unit) {
+            wineNameTextView.text = wine.winery
+            wineWineryTextView.text = wine.wine
             wineLocationTextView.text = wine.location
             wineScoreTextView.text = wine.rating.average.toString() // Asegúrate de que sea una cadena
 
@@ -48,6 +50,10 @@ class WineSearchAdapter : RecyclerView.Adapter<WineSearchAdapter.WineViewHolder>
                 .fitCenter()
                 .error(R.drawable.ic_search)
                 .into(wineImage)
+
+            itemView.setOnClickListener {
+                goToDetail(wine)
+            }
         }
     }
 }
