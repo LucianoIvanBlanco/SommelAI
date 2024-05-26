@@ -104,7 +104,7 @@ class WineViewModel : ViewModel() {
 
     fun searchWinesByName(query: String) {
         val filteredWines = allWinesCache.filter { wine ->
-            wine.wine.lowercase().contains(query.lowercase(), ignoreCase = true)
+            wine.winery.lowercase().contains(query.lowercase(), ignoreCase = true)
         }
         (uiState as MutableLiveData).value = WineUiState(response = filteredWines)
     }

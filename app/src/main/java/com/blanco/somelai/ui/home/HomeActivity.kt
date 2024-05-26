@@ -7,16 +7,20 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.blanco.somelai.R
 import com.blanco.somelai.databinding.ActivityHomeBinding
+import com.blanco.somelai.ui.custom.CustomSpinner
 
 class HomeActivity : AppCompatActivity() {
 
     private lateinit var _binding: ActivityHomeBinding
     private val binding: ActivityHomeBinding get() = _binding
+    private lateinit var customSpinner: CustomSpinner
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         _binding = ActivityHomeBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        customSpinner = CustomSpinner(this)
 
         setBottomNavigationView()
     }
@@ -36,5 +40,12 @@ class HomeActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+    fun showSpinner() {
+        customSpinner.show()
+    }
+
+    fun hideSpinner() {
+        customSpinner.dismiss()
     }
 }

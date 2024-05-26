@@ -31,6 +31,8 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.blanco.somelai.R
 import com.blanco.somelai.databinding.FragmentScannerCameraBinding
+import com.blanco.somelai.ui.custom.CustomSpinner
+import com.blanco.somelai.ui.home.HomeActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import java.util.Locale
@@ -43,6 +45,7 @@ class ScannerCameraFragment : Fragment() {
     private val binding get() = _binding
 
     private val viewModel: WineViewModel by activityViewModels()
+    private lateinit var customSpinner: CustomSpinner
 
     // Camera X
     private var imageCapture: ImageCapture? = null
@@ -91,12 +94,14 @@ class ScannerCameraFragment : Fragment() {
     private fun observeViewModel() {
         viewModel.navigateToWineList.observe(viewLifecycleOwner, Observer { navigate ->
             if (navigate) {
+                (activity as HomeActivity).hideSpinner()
                 findNavController().navigate(R.id.action_scannerCameraFragment_to_wineListFragment)
                 viewModel.resetNavigateToWineList() // Resetear el evento
             }
         })
         viewModel.navigateToWineFeed.observe(viewLifecycleOwner, Observer { navigate ->
             if (navigate) {
+                (activity as HomeActivity).hideSpinner()
                 findNavController().navigate(R.id.action_scannerCameraFragment_to_feedFragment)
                 viewModel.resetNavigateToFeedFragment() // Resetear el evento
             }
@@ -212,6 +217,7 @@ class ScannerCameraFragment : Fragment() {
         binding.ibPhotoPreview.setOnClickListener {
             viewModel.getWinesAndFilterByName(uri, requireContext())
             Toast.makeText(context, "INICIANDO BUSQUEDA...", Toast.LENGTH_LONG).show()
+            (activity as HomeActivity).showSpinner()
         }
     }
 
