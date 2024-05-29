@@ -5,10 +5,12 @@
     android:id="@+id/linearLayout3"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/md_theme_dark_onSurface"
     android:orientation="vertical">
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textFieldBottom"
+        style="@style/TextField"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
@@ -24,7 +26,6 @@
             android:id="@+id/et_search_bottom"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/search_wine_hint"
             android:paddingStart="40dp"
             tools:ignore="TextContrastCheck,VisualLintTextFieldSize" />
     </com.google.android.material.textfield.TextInputLayout>

@@ -4,14 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.home.profile.EditProfileFragment" >
+    android:background="@color/md_theme_dark_onSurface"
+    tools:context=".ui.home.profile.EditProfileFragment">
 
     <ImageButton
         android:id="@+id/img_btn_profile"
         android:layout_width="201dp"
         android:layout_height="174dp"
         android:layout_marginTop="50dp"
-        android:backgroundTint="@android:color/transparent"
+        android:background="@android:color/transparent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -19,6 +20,7 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textInputLayout2"
+        style="@style/TextField"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
@@ -38,14 +40,10 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/til_sign_up_name"
+        style="@style/TextField"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        app:boxBackgroundMode="outline"
-        app:boxCornerRadiusBottomEnd="8dp"
-        app:boxCornerRadiusBottomStart="8dp"
-        app:boxCornerRadiusTopEnd="8dp"
-        app:boxCornerRadiusTopStart="8dp"
         app:layout_constraintEnd_toEndOf="@+id/textInputLayout2"
         app:layout_constraintStart_toStartOf="@+id/textInputLayout2"
         app:layout_constraintTop_toBottomOf="@+id/textInputLayout2">
@@ -61,13 +59,10 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/til_login_password"
+        style="@style/TextField"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        app:boxCornerRadiusBottomEnd="8dp"
-        app:boxCornerRadiusBottomStart="8dp"
-        app:boxCornerRadiusTopEnd="8dp"
-        app:boxCornerRadiusTopStart="8dp"
         app:layout_constraintEnd_toEndOf="@+id/til_sign_up_name"
         app:layout_constraintStart_toStartOf="@+id/til_sign_up_name"
         app:layout_constraintTop_toBottomOf="@+id/til_sign_up_name"
@@ -85,13 +80,10 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/til_repeat_password"
+        style="@style/TextField"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        app:boxCornerRadiusBottomEnd="8dp"
-        app:boxCornerRadiusBottomStart="8dp"
-        app:boxCornerRadiusTopEnd="8dp"
-        app:boxCornerRadiusTopStart="8dp"
         app:layout_constraintEnd_toEndOf="@+id/til_login_password"
         app:layout_constraintStart_toStartOf="@+id/til_login_password"
         app:layout_constraintTop_toBottomOf="@+id/til_login_password"
@@ -112,10 +104,12 @@
         style="@style/CustomButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="60dp"
+        android:layout_marginStart="64dp"
+        android:layout_marginEnd="64dp"
+        android:layout_marginBottom="64dp"
         android:text="@string/profile_save_changes_button"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/til_login_password"
-        app:layout_constraintStart_toStartOf="@+id/til_login_password" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

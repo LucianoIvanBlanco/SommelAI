@@ -7,7 +7,7 @@
     <string name="login_password_hint">Contraseña</string>
     <string name="login_button_description">Acceder</string>
     <string name="signup_button_description">Todavia no tengo cuenta</string>
-    <string name="sign_up_title">Súmate a SomelAI</string>
+    <string name="sign_up_title">Regístrate</string>
     <string name="sign_up_user_name_hint">Nombre de usuario</string>
     <string name="sign_up_name_hint"> Nombre y apellidos </string>
     <string name="sign_up_mail_hint">Dirección de e-mail</string>
@@ -28,8 +28,8 @@
     <string name="conuntry_title">Pais del vino</string>
     <string name="secondary_title">Descripcion</string>
     <string name="img_description">Imagen</string>
-    <string name="title_wine_country">Por pais:</string>
-    <string name="title_category_wine_type">Por tipo:</string>
+    <string name="title_wine_country">Origen de vino:</string>
+    <string name="title_category_wine_type">Tipos de vino:</string>
     <string name="default_score">5.5</string>
     <string name="red_wine_title">Tinto</string>
     <string name="white_wine_title">Blanco</string>

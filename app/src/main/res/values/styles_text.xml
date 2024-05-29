@@ -25,4 +25,16 @@
         <item name="android:textColor">@color/md_theme_light_outline</item>
     </style>
 
+    <style name="TextField" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay.MyApp.TextInputLayout.Rounded</item>
+        <item name="android:fontFamily">@font/poppins</item>
+        <item name="boxBackgroundColor">#E5C3D3</item>
+    </style>
+
+    <style name="ShapeAppearanceOverlay.MyApp.TextInputLayout.Rounded" parent="">
+        <item name="cornerSize">16dp</item>
+    </style>
+
+
+
 </resources>

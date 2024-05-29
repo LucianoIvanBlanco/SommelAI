@@ -4,11 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.home.search.SearchFragment" >
+    android:background="@color/md_theme_dark_onSurface"
+    tools:context=".ui.home.search.SearchFragment">
 
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/tf_search_name"
+        style="@style/TextField"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"
@@ -27,7 +29,6 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="18dp"
             android:focusableInTouchMode="false"
-            android:hint="@string/search_wine_hint"
             android:paddingStart="40dp"
             android:selectAllOnFocus="false"
             app:layout_constraintEnd_toEndOf="parent"
@@ -44,9 +45,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:paddingStart="12dp"
+        android:fontFamily="@font/poppins_semibold"
+        android:paddingStart="24dp"
         android:text="@string/title_category_wine_type"
         android:textAppearance="?attr/textAppearanceTitleMedium"
+        android:textSize="20sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="@+id/tf_search_name"
         app:layout_constraintStart_toStartOf="@+id/tf_search_name"
         app:layout_constraintTop_toBottomOf="@+id/tf_search_name" />
@@ -85,6 +89,7 @@
                 android:layout_height="wrap_content"
                 android:clickable="true"
                 android:focusable="true"
+                app:cardBackgroundColor="@color/md_theme_light_background"
                 app:cardElevation="4dp"
                 tools:layout_editor_absoluteX="8dp">
 
@@ -122,6 +127,7 @@
                 android:layout_marginTop="16dp"
                 android:clickable="true"
                 android:focusable="true"
+                app:cardBackgroundColor="@color/md_theme_light_background"
                 app:cardElevation="4dp"
                 tools:layout_editor_absoluteX="8dp">
 
@@ -175,6 +181,7 @@
                 android:layout_height="wrap_content"
                 android:clickable="true"
                 android:focusable="true"
+                app:cardBackgroundColor="@color/md_theme_light_background"
                 app:cardElevation="4dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -215,6 +222,7 @@
                 android:layout_marginTop="16dp"
                 android:clickable="true"
                 android:focusable="true"
+                app:cardBackgroundColor="@color/md_theme_light_background"
                 app:cardElevation="4dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -256,10 +264,12 @@
         android:id="@+id/fab_camera"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="35dp"
-        android:layout_marginBottom="30dp"
+        android:layout_marginEnd="25dp"
+        android:layout_marginBottom="25dp"
+        android:background="@color/md_theme_light_background"
         android:clickable="true"
         android:src="@drawable/photo_camera_24px"
+        app:backgroundTint="@color/md_theme_light_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -267,10 +277,13 @@
         android:id="@+id/tv_wine_country_type"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:paddingStart="12dp"
+        android:layout_marginTop="24dp"
+        android:fontFamily="@font/poppins_semibold"
+        android:paddingStart="24dp"
         android:text="@string/title_wine_country"
         android:textAppearance="?attr/textAppearanceTitleMedium"
+        android:textSize="20sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="@+id/tv_wine_type_title"
         app:layout_constraintStart_toStartOf="@+id/tv_wine_type_title"
         app:layout_constraintTop_toBottomOf="@+id/linearLayoutH1" />
@@ -307,6 +320,7 @@
                 android:layout_margin="8dp"
                 android:clickable="true"
                 android:focusable="true"
+                app:cardBackgroundColor="@color/md_theme_light_background"
                 app:cardElevation="4dp"
                 tools:ignore="MissingConstraints"
                 tools:layout_editor_absoluteX="8dp">
@@ -357,6 +371,7 @@
                 android:layout_margin="8dp"
                 android:clickable="true"
                 android:focusable="true"
+                app:cardBackgroundColor="@color/md_theme_light_background"
                 app:cardElevation="4dp"
                 tools:ignore="MissingConstraints"
                 tools:layout_editor_absoluteX="8dp">
@@ -423,6 +438,7 @@
                 android:layout_margin="8dp"
                 android:clickable="true"
                 android:focusable="true"
+                app:cardBackgroundColor="@color/md_theme_light_background"
                 app:cardElevation="4dp"
                 tools:ignore="MissingConstraints"
                 tools:layout_editor_absoluteX="8dp">
@@ -473,6 +489,7 @@
                 android:layout_margin="8dp"
                 android:clickable="true"
                 android:focusable="true"
+                app:cardBackgroundColor="@color/md_theme_light_background"
                 app:cardElevation="4dp"
                 tools:ignore="MissingConstraints"
                 tools:layout_editor_absoluteX="8dp">
