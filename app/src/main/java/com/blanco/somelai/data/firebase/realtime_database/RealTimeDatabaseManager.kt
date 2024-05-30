@@ -17,11 +17,18 @@ class RealTimeDatabaseManager {
         Log.i("Usuario", "Borrado")
     }
 
-    fun updateUser(user: UserData) {
-        //Nos conectamos la nodo de "users" mediante ".child("users")
-        val connection = databaseReference.child("users")
-        connection.child(user.uid!!).setValue(user)
+    fun updateUser(userData: UserData) {
+        val userUpdates = mapOf(
+            "userEmail" to userData.userEmail,
+            "userFullName" to userData.userFullName,
+            "userName" to userData.userName,
+            "userPassword" to userData.userPassword,
+            "userPhotoUrl" to userData.userPhotoUrl
+        )
+
+        databaseReference.child("users").child(userData.uid).updateChildren(userUpdates)
     }
+
 
     suspend fun readUser(userId: String): UserData? {
         val connection = databaseReference.child("users")

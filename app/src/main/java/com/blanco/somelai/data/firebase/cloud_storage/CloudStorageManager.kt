@@ -11,8 +11,6 @@ import kotlinx.coroutines.tasks.await
 class CloudStorageManager {
 
     private val storageReference: StorageReference = FirebaseStorage.getInstance().reference
-
-    // TODO usaremos la funcion?
     suspend fun uploadProfileImage(uri: Uri): String? {
         val imageName = "$uri".replace(
             "/",

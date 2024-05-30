@@ -70,5 +70,6 @@
     <string name="repeat_password_hin">Repite tu contraseña</string>
     <string name="sign_up_password_mismatch_error">Las contraseñas no coinciden</string>
     <string name="spinner_text_loading">BUSCANDO...</string>
+    <string name="tv_user_wines">Tus vinos:</string>
 
 </resources>

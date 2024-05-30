@@ -11,16 +11,6 @@ class EmailAndPasswordAuthenticationManager {
 
     private val auth = Firebase.auth
 
-
-    // TODO usaremos la funcion?
-    fun isUserLogged(): Boolean {
-        val currentUser = auth.currentUser
-        if (currentUser != null) {
-            Log.d("FirebaseEmailAndPassAuth", "usuario logeado")
-        }
-        return currentUser != null
-    }
-
     suspend fun createUserFirebaseEmailAndPassword(email: String, password: String): Boolean {
         val result = auth.createUserWithEmailAndPassword(email, password)
         //Esperamos el resultado del registro
