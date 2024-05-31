@@ -31,9 +31,8 @@ import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.blanco.somelai.R
 import com.blanco.somelai.databinding.FragmentScannerCameraBinding
-import com.blanco.somelai.ui.custom.CustomSpinner
-import com.blanco.somelai.ui.home.HomeActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.snackbar.Snackbar
 import java.util.Locale
 import java.util.concurrent.ExecutorService
@@ -45,13 +44,12 @@ class ScannerCameraFragment : Fragment() {
     private val binding get() = _binding
 
     private val viewModel: WineViewModel by activityViewModels()
-    private lateinit var customSpinner: CustomSpinner
+    private lateinit var progressIndicator: CircularProgressIndicator
 
     // Camera X
     private var imageCapture: ImageCapture? = null
     private lateinit var cameraExecutor: ExecutorService
     private var camera: Camera? = null
-
 
     private val requestPermissionLauncher: ActivityResultLauncher<String> =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
@@ -63,11 +61,11 @@ class ScannerCameraFragment : Fragment() {
                 requireActivity().finish()
             }
         }
+
     companion object {
         private const val TAG = "SomelAI"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
     }
-
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -85,28 +83,32 @@ class ScannerCameraFragment : Fragment() {
         setClicks()
         cameraExecutor = Executors.newSingleThreadExecutor()
 
+        progressIndicator = view.findViewById(R.id.progress_circular)
+
         observeViewModel()
     }
 
-
+    override fun onResume() {
+        super.onResume()
+        hideLoadingSpinner()
+    }
 
     // Observamos cambios en los livedata para navegar
     private fun observeViewModel() {
         viewModel.navigateToWineList.observe(viewLifecycleOwner, Observer { navigate ->
             if (navigate) {
-                (activity as HomeActivity).hideSpinner()
+                hideLoadingSpinner()
                 findNavController().navigate(R.id.action_scannerCameraFragment_to_wineListFragment)
                 viewModel.resetNavigateToWineList() // Resetear el evento
             }
         })
         viewModel.navigateToWineFeed.observe(viewLifecycleOwner, Observer { navigate ->
             if (navigate) {
-                (activity as HomeActivity).hideSpinner()
+                hideLoadingSpinner()
                 findNavController().navigate(R.id.action_scannerCameraFragment_to_feedFragment)
                 viewModel.resetNavigateToFeedFragment() // Resetear el evento
             }
         })
-
     }
 
     private fun setClicks(){
@@ -215,10 +217,18 @@ class ScannerCameraFragment : Fragment() {
         val bitmap = uriToBitmap(uri)
         binding.ibPhotoPreview.setImageBitmap(bitmap)
         binding.ibPhotoPreview.setOnClickListener {
+            showLoadingSpinner()
             viewModel.getWinesAndFilterByName(uri, requireContext())
             Toast.makeText(context, "INICIANDO BUSQUEDA...", Toast.LENGTH_LONG).show()
-            (activity as HomeActivity).showSpinner()
         }
+    }
+
+    private fun showLoadingSpinner() {
+        progressIndicator.visibility = View.VISIBLE
+    }
+
+    private fun hideLoadingSpinner() {
+        progressIndicator.visibility = View.GONE
     }
 
     private fun uriToBitmap(uri: Uri): Bitmap? {
@@ -230,7 +240,6 @@ class ScannerCameraFragment : Fragment() {
         super.onDestroy()
         cameraExecutor.shutdown()
     }
-
     // Permisos
 
     private fun checkIfWeAlreadyHaveThisPermission() {

@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.blanco.somelai.R
 import com.blanco.somelai.databinding.FragmentSearchNameBinding
 import com.blanco.somelai.ui.adapter.WineSearchAdapter
-import com.blanco.somelai.ui.home.HomeActivity
 
 class SearchNameFragment : Fragment() {
 
@@ -54,7 +53,6 @@ class SearchNameFragment : Fragment() {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                (activity as HomeActivity).showSpinner()
                 viewModel.searchWinesByName(s.toString())
             }
 
@@ -66,7 +64,6 @@ class SearchNameFragment : Fragment() {
         viewModel.uiState.observe(viewLifecycleOwner) { uiState ->
             uiState.response?.let { wines ->
                 adapter.setWines(wines)
-                (activity as HomeActivity).hideSpinner()
             }
         }
     }

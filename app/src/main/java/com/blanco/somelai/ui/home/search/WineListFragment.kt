@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.blanco.somelai.R
 import com.blanco.somelai.databinding.FragmentWineListBinding
 import com.blanco.somelai.ui.adapter.WineListAdapter
+import com.google.android.material.progressindicator.CircularProgressIndicator
 
 class WineListFragment : Fragment() {
 
@@ -22,6 +23,9 @@ class WineListFragment : Fragment() {
 
     private val viewModel: WineViewModel by activityViewModels()
     private lateinit var adapter: WineListAdapter
+
+    private lateinit var progressIndicator: CircularProgressIndicator
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,21 +50,35 @@ class WineListFragment : Fragment() {
         binding.rveWineListType.layoutManager = LinearLayoutManager(requireContext())
         binding.rveWineListType.adapter = adapter
 
+        progressIndicator = view.findViewById(R.id.progress_circular)
+
         observeViewModel()
+    }
+
+
+
+    private fun showLoadingSpinner() {
+        progressIndicator.visibility = View.VISIBLE
+    }
+
+    private fun hideLoadingSpinner() {
+        progressIndicator.visibility = View.GONE
     }
 
     private fun observeViewModel() {
         viewModel.uiState.observe(viewLifecycleOwner, Observer { uiState ->
             if (uiState.isLoading) {
-                // TODO agregar spinner de carga aqui
+                showLoadingSpinner()
             } else if (uiState.isError) {
                 Log.e("WineListFragment", "isError")
                 showErrorMessage()
+                hideLoadingSpinner()
             } else {
                 // Verificar si la respuesta no es nula y luego actualizar el adaptador
                 uiState.response?.let { wines ->
                     adapter.submitList(wines)
                 }
+                hideLoadingSpinner()
             }
         })
     }

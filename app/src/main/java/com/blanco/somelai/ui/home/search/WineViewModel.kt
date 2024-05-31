@@ -111,6 +111,7 @@ class WineViewModel : ViewModel() {
 
     fun getWineForType(typeWine: String) {
         (uiState as MutableLiveData).value = WineUiState(isLoading = true)
+        // TODO mostrar un spinner de carga
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val response = WineApi.service.getWines(typeWine)
@@ -145,6 +146,7 @@ class WineViewModel : ViewModel() {
 
     fun getWinesAndFilterByCountry(country: String) {
         (uiState as MutableLiveData).value = WineUiState(isLoading = true)
+        // TODO mostrar un spinner de carga
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val filteredWines =
