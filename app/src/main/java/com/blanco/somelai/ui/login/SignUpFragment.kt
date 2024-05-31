@@ -41,7 +41,7 @@ class SignUpFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         dataStoreManager = DataStoreManager(requireContext())
-        realTimeDatabaseManager = RealTimeDatabaseManager() // Inicializa tu RealTimeDatabaseManager
+        realTimeDatabaseManager = RealTimeDatabaseManager()
         auth = FirebaseAuth.getInstance()
         setClicks()
     }
@@ -58,8 +58,8 @@ class SignUpFragment : Fragment() {
         binding.btnSignUp.setOnClickListener {
             val userEmail = binding.etSignUpEmail.text.toString().trim()
             val userPassword = binding.etSignUpPassword.text.toString().trim()
-            val h_userName: String = binding.etSignUpUserName.text.toString().trim()
-            val h_fullName: String = binding.etSignUpName.text.toString().trim()
+            val userName: String = binding.etSignUpUserName.text.toString().trim()
+            val fullName: String = binding.etSignUpName.text.toString().trim()
             if (isDataValid()) {
                 lifecycleScope.launch {
                     if (isEmailRegistered(userEmail)) {
@@ -67,7 +67,7 @@ class SignUpFragment : Fragment() {
                             showEmailAlreadyRegisteredMessage()
                         }
                     } else {
-                        createFirebaseUser(userEmail, userPassword, h_userName, h_fullName)
+                        createFirebaseUser(userEmail, userPassword, userName, fullName)
                     }
                 }
             } else {
@@ -91,6 +91,9 @@ class SignUpFragment : Fragment() {
                         val uid = auth.currentUser!!.uid
                         reference = FirebaseDatabase.getInstance().reference.child("users").child(uid)
 
+                        // Creamos usuario en dataStore
+                        saveUserToDataStore(email, password, uid, fullName, userName)
+
                         val hashMap = HashMap<String, Any>()
                         hashMap["uid"] = uid
                         hashMap["userName"] = userName
@@ -102,10 +105,6 @@ class SignUpFragment : Fragment() {
                             .addOnFailureListener {}
                         Log.i("createFirebaseMailAndPasswordUser", "Usuario creado en Firebase")
 
-                        // Creamos usuario en dataStore
-                        dataStoreManager.saveUserData(email, password, uid, fullName, userName)
-
-                        Log.i("saveUserData", "Usuario creado en DataStore")
                         withContext(Dispatchers.Main) {
                             showWelcomeMessage()
                             parentFragmentManager.popBackStack()
@@ -124,6 +123,12 @@ class SignUpFragment : Fragment() {
             }
         }
         cleanData()
+    }
+
+    private suspend fun saveUserToDataStore(email: String, password: String, uid: String, fullName: String, userName: String) {
+        Log.d("saveUserToDataStore", "Guardando datos: email=$email, password=$password, uid=$uid, fullName=$fullName, userName=$userName")
+        dataStoreManager.saveUserData(email, password, uid, fullName, userName)
+        Log.i("saveUserData", "Usuario creado en DataStore")
     }
 
     private fun isDataValid(): Boolean {

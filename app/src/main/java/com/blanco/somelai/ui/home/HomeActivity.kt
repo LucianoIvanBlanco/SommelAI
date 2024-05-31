@@ -41,6 +41,7 @@ class HomeActivity : AppCompatActivity() {
             }
         }
     }
+
     fun showSpinner() {
         customSpinner.show()
     }

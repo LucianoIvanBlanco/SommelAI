@@ -2,12 +2,16 @@ package com.blanco.somelai.ui.home.profile
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -33,6 +37,8 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
+import java.io.InputStream
 
 class EditProfileFragment : Fragment() {
 
@@ -45,6 +51,7 @@ class EditProfileFragment : Fragment() {
 
     private var selectedImageUri: Uri? = null
     private var uploadedImageUrl: String? = null
+    private var tempBase64Image: String? = null
 
 
     private lateinit var cloudStorageManager: CloudStorageManager
@@ -66,6 +73,7 @@ class EditProfileFragment : Fragment() {
                 result.data?.data?.let { uri ->
                     selectedImageUri = uri
                     uploadImage(uri)
+                    handleImageUri(uri)
                 } ?: run {
                     showErrorMessageNoImage()
                 }
@@ -96,8 +104,6 @@ class EditProfileFragment : Fragment() {
         getUserData()
     }
 
-    //region --- UI Related ---
-
     private fun setClicks() {
         binding.btnSaveChanges.setOnClickListener {
             if (isDataValid()) {
@@ -122,30 +128,31 @@ class EditProfileFragment : Fragment() {
         }
     }
 
+    private fun navigateToPreviousFragment() {
+        findNavController().navigateUp()
+    }
+
     private fun loadUserProfilePicture() {
-        lifecycleScope.launch {
+        lifecycleScope.launch(Dispatchers.IO) {
             val userPhotoUrl = cloudStorageManager.getUserProfilePicture()
-            if (userPhotoUrl != null) {
-                Glide.with(requireContext())
-                    .asBitmap()
-                    .load(userPhotoUrl)
-                    .into(profileImageButton)
+            withContext(Dispatchers.Main) {
+                if (userPhotoUrl != null) {
+                    Glide.with(requireContext())
+                        .asBitmap()
+                        .load(userPhotoUrl)
+                        .into(profileImageButton)
+                }
             }
         }
     }
 
     private fun setImagePreview(uploadedImageResponse: String) {
-
         Glide.with(requireContext())
             .asBitmap()
             .load(uploadedImageResponse)
             .centerCrop()
             .into(profileImageButton)
     }
-
-    //endregion --- UI Related ---
-
-    //region --- Firebase - CloudStorage ---
 
     private fun uploadImage(selectedImageUri: Uri?) {
         lifecycleScope.launch(Dispatchers.IO) {
@@ -162,7 +169,6 @@ class EditProfileFragment : Fragment() {
     private fun deleteImageAndOpenGallery() {
         lifecycleScope.launch(Dispatchers.IO) {
             if (uploadedImageUrl != null) {
-                //Esperamos a que nos retorne si la foto se borró a partir del enlace o no
                 val wasDeleted: Boolean = CloudStorageManager().deleteImage(uploadedImageUrl!!)
                 if (wasDeleted) {
                     Log.i("EditProfileFragment", "Foto eliminada")
@@ -171,7 +177,6 @@ class EditProfileFragment : Fragment() {
             }
         }
     }
-    //endregion --- Firebase - CloudStorage ---
 
     private fun isDataValid(): Boolean {
         val userNamePattern = "^[a-zA-Z0-9]{4,}$".toRegex()
@@ -204,7 +209,7 @@ class EditProfileFragment : Fragment() {
     }
 
     // TODO agregamos opcion de tomar fotografia?
-    fun updateUserProfile() {
+    private fun updateUserProfile() {
         val userName = binding.etProfileUserName.text.toString()
         val userFullName = binding.etProfileFullName.text.toString()
         val userPassword = binding.etProfilePassword.text.toString()
@@ -212,7 +217,6 @@ class EditProfileFragment : Fragment() {
         val userEmail = auth.currentUser?.email.toString()
         val userPhotoUrl = uploadedImageUrl!!
 
-        // Crea un objeto UserData con los datos recopilados
         val userData = UserData(
             uid = userUid,
             userEmail = userEmail,
@@ -221,8 +225,58 @@ class EditProfileFragment : Fragment() {
             userPassword = userPassword,
             userPhotoUrl = userPhotoUrl
         )
-        // Llama a la función updateUser del RealTimeDatabaseManager para actualizar los datos del usuario
-        realTimeDatabaseManager.updateUser(userData)
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                realTimeDatabaseManager.updateUser(userData)
+                updateUserDataInDataStore(userEmail, userPassword, userUid, userFullName,userName)
+
+                withContext(Dispatchers.Main) {
+                    showMessage("Datos actualizados en Firebase y DataStore.")
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    showMessage("Error al actualizar los datos: ${e.message}")
+                }
+            }
+        }
+    }
+
+    private suspend fun updateUserDataInDataStore(email: String, password: String, id: String, fullName: String, userName: String) {
+        dataStoreManager.saveUserData(email, password, id, fullName, userName)
+        tempBase64Image?.let {
+            dataStoreManager.savedUserPhoto(it)
+        }
+    }
+
+    private fun handleImageUri(imageUri: Uri?) {
+        val base64Image = convertImageToBase64(requireContext(), imageUri)
+        if (base64Image != null) {
+            tempBase64Image = base64Image
+        } else {
+            Log.e("EditProfileFragment", "La imagen en Base64 es nula, no se puede convertir.")
+        }
+    }
+
+    private fun convertImageToBase64(context: Context, imageUri: Uri?): String? {
+        return try {
+            val inputStream: InputStream? = imageUri?.let {
+                context.contentResolver.openInputStream(it)
+            }
+            if (inputStream != null) {
+                val bitmap = BitmapFactory.decodeStream(inputStream)
+                val byteArrayOutputStream = ByteArrayOutputStream()
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+                val byteArray = byteArrayOutputStream.toByteArray()
+                Base64.encodeToString(byteArray, Base64.DEFAULT)
+            } else {
+                Log.e("EditProfileFragment", "Error al abrir el InputStream de la imagen: No se pudo abrir el archivo de imagen desde el URI proporcionado.")
+                null
+            }
+        } catch (e: Exception) {
+            Log.e("EditProfileFragment", "Error al convertir la imagen a Base64: ${e.message}")
+            null
+        }
     }
 
     private fun getUserData() {
@@ -249,7 +303,6 @@ class EditProfileFragment : Fragment() {
     private fun setOldUserData(user: UserData) {
         binding.etProfileUserName.setText(user.userName)
         binding.etProfileFullName.setText(user.userFullName)
-        binding.etProfilePassword.setText(user.userPassword)
 
         Glide.with(requireContext())
             .asBitmap()
@@ -259,15 +312,11 @@ class EditProfileFragment : Fragment() {
             .into(profileImageButton)
     }
 
-
     private fun showMessage(message: String) {
         lifecycleScope.launch(Dispatchers.Main) {
             Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
         }
     }
-
-
-    //region --- Messages ---
 
     private fun showPermissionRationaleDialog(externalStoragePermission: String) {
 
@@ -300,10 +349,6 @@ class EditProfileFragment : Fragment() {
         Toast.makeText(requireContext(), R.string.sign_up_password_mismatch_error, Toast.LENGTH_SHORT).show()
     }
 
-    //endregion --- Messages ---
-
-
-    //region --- Photo gallery ---
     private fun checkIfWeAlreadyHaveThisPermission() {
         val permissionToRequest = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             Manifest.permission.READ_MEDIA_IMAGES
@@ -326,9 +371,7 @@ class EditProfileFragment : Fragment() {
         }
     }
 
-
     private fun openGallery() {
-        Log.d("EditProfileFragment", "Attempting to open gallery")
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).apply {
             type = "image/*"
         }
@@ -338,6 +381,4 @@ class EditProfileFragment : Fragment() {
             Log.e("EditProfileFragment", "Failed to open gallery", e)
         }
     }
-    //endregion --- Photo gallery ---
-
 }

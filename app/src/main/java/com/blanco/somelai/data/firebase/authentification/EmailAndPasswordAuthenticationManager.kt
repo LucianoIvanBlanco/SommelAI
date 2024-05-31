@@ -6,14 +6,13 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.tasks.await
 
-// Usado para login y creacion de usuarios en firebase
+
 class EmailAndPasswordAuthenticationManager {
 
     private val auth = Firebase.auth
 
     suspend fun createUserFirebaseEmailAndPassword(email: String, password: String): Boolean {
         val result = auth.createUserWithEmailAndPassword(email, password)
-        //Esperamos el resultado del registro
         result.await()
         if (result.isSuccessful) {
             Log.d("FirebaseAuth", "createUserFirebaseEmailAndPassword:success")
@@ -55,5 +54,18 @@ class EmailAndPasswordAuthenticationManager {
     fun signOut() {
         auth.signOut()
     }
+
+    suspend fun deleteUserAccount(): Boolean {
+        return try {
+            val currentUser = auth.currentUser
+            currentUser?.delete()?.await()
+            Log.d("FirebaseAuth", "deleteUserAccount:success")
+            true
+        } catch (e: FirebaseException) {
+            Log.e("FirebaseAuth", "deleteUserAccount:failure", e)
+            false
+        }
+    }
 }
+
 

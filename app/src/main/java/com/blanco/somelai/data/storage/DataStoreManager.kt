@@ -7,11 +7,8 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 
-// TODO estamos usando datastore para tener acceso mas rapido?
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "SOMELAI_STORE")
 
@@ -26,39 +23,6 @@ class DataStoreManager(val context: Context) {
     private val userIdKey = "USER_ID"
     private val isLoggedKey = "IS_LOGGED"
 
-    private val wine = "WINE"
-    private val winery = "WINERY"
-    private val location = "LOCATION"
-    private val rating = "RATING"
-    private val image = "IMAGE"
-    private val id = "ID"
-
-    val sampleKey = stringPreferencesKey("SAMPLE_KEY")
-
-    suspend fun saveData(context: Context, sampleData: String) {
-        context.dataStore.edit { editor ->
-            editor[sampleKey] = sampleData
-        }
-    }
-
-    suspend fun getSampleData(context: Context): Flow<String> {
-        return context.dataStore.data.map { editor ->
-            editor[sampleKey] ?: "No hay datos"
-        }
-    }
-
-    suspend fun deleteAll(context: Context) {
-        context.dataStore.edit { editor ->
-            editor.clear() // Borrar todos
-        }
-    }
-
-    suspend fun deleteSample(context: Context) {
-        context.dataStore.edit { editor ->
-            editor.remove(sampleKey) // borrar solo un dato
-        }
-
-    }
 
     private suspend fun putString(key: String, value: String) {
         context.dataStore.edit { editor ->
@@ -78,13 +42,7 @@ class DataStoreManager(val context: Context) {
         putBoolean(isLoggedKey, true)
     }
 
-    suspend fun saveUserData(
-        email: String,
-        password: String,
-        id: String,
-        fullName: String,
-        userName: String
-    ) {
+    suspend fun saveUserData(email: String, password: String, id: String, fullName: String, userName: String) {
         putString(emailKey, email)
         putString(passwordKey, password)
         putString(userIdKey, id)
@@ -92,18 +50,31 @@ class DataStoreManager(val context: Context) {
         putString(userNameKey, userName)
     }
 
+    suspend fun savedUserPhoto(photo: String) {
+        putString(userPhotoUrl, photo)
+    }
     suspend fun getToken(): String? {
         val preferences = context.dataStore.data.first()
         return preferences[stringPreferencesKey(jwtKey)]
     }
 
-    suspend fun getUserData() {
+    suspend fun getUserData(): Map<String, String> {
         val preferences = context.dataStore.data.first()
         val userName = preferences[stringPreferencesKey(userNameKey)] ?: ""
         val fullName = preferences[stringPreferencesKey(fullNameKey)] ?: ""
         val email = preferences[stringPreferencesKey(emailKey)] ?: ""
         val id = preferences[stringPreferencesKey(userIdKey)] ?: ""
         val photo = preferences[stringPreferencesKey(userPhotoUrl)] ?: ""
+        val password = preferences[stringPreferencesKey(passwordKey)] ?: ""
+
+        return mapOf(
+            "userName" to userName,
+            "fullName" to fullName,
+            "email" to email,
+            "id" to id,
+            "photo" to photo,
+            "password" to password
+        )
     }
 
     suspend fun isUserLogged(): Boolean {
@@ -115,5 +86,21 @@ class DataStoreManager(val context: Context) {
         context.dataStore.edit { editor -> editor.clear() }
     }
 
+    suspend fun deleteUserData() {
+        context.dataStore.edit { editor ->
+            editor.remove(stringPreferencesKey(emailKey))
+            editor.remove(stringPreferencesKey(passwordKey))
+            editor.remove(stringPreferencesKey(userIdKey))
+            editor.remove(stringPreferencesKey(fullNameKey))
+            editor.remove(stringPreferencesKey(userNameKey))
+            editor.remove(stringPreferencesKey(userPhotoUrl))
+            editor.remove(booleanPreferencesKey(isLoggedKey))
+        }
+    }
 
+    suspend fun clearAllData() {
+        context.dataStore.edit { editor ->
+            editor.clear()
+        }
+    }
 }

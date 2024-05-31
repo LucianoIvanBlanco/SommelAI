@@ -1,7 +1,10 @@
 package com.blanco.somelai.ui.home.profile
 
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -14,7 +17,6 @@ import com.blanco.somelai.R
 import com.blanco.somelai.data.firebase.authentification.EmailAndPasswordAuthenticationManager
 import com.blanco.somelai.data.firebase.cloud_storage.CloudStorageManager
 import com.blanco.somelai.data.firebase.realtime_database.RealTimeDatabaseManager
-import com.blanco.somelai.data.firebase.realtime_database.model.UserData
 import com.blanco.somelai.data.storage.DataStoreManager
 import com.blanco.somelai.databinding.FragmentProfileBinding
 import com.blanco.somelai.ui.login.MainActivity
@@ -53,7 +55,8 @@ class ProfileFragment : Fragment() {
         realTimeDatabaseManager = RealTimeDatabaseManager()
         auth = FirebaseAuth.getInstance()
         setClicks()
-        getUserData()
+        //getUserData()              // Para cargar desde Firebase
+        loadUserDataFromDataStore() // Cargar datos del usuario desde DataStore
     }
 
     private fun setClicks() {
@@ -72,43 +75,52 @@ class ProfileFragment : Fragment() {
         findNavController().navigate(R.id.editProfileFragment)
     }
 
-    private fun getUserData() {
+
+    // TODO la imagen se carga de costado y carga despues de editar en EditProfile, hay que moverse de fragment para que lo haga.
+    private fun loadUserDataFromDataStore() {
         lifecycleScope.launch(Dispatchers.IO) {
-            try {
-                val currentUser =
-                    auth.currentUser ?: throw IllegalStateException("No hay usuario autentificado.")
-                val uid = currentUser.uid
-                val userData = realTimeDatabaseManager.readUser(uid)
-                withContext(Dispatchers.Main) {
-                    if (userData != null) {
-                        setUserData(userData)
+            val userData = dataStoreManager.getUserData()
+            withContext(Dispatchers.Main) {
+                if (userData.isNotEmpty()) {
+                    Log.d("ProfileFragment", "Datos del usuario: ${userData["email"]}, ${userData["userName"]}")
+                    binding.tvMail.text = userData["email"]
+                    binding.tvUserName.text = userData["userName"]
+
+                    val photoBase64 = userData["photo"] ?: ""
+
+                    val bitmap = convertBase64ToBitmap(photoBase64)
+                    if (bitmap != null) {
+                        Glide.with(requireContext())
+                            .load(bitmap)
+                            .centerCrop()
+                            .placeholder(R.drawable.default_user)
+                            .error(R.drawable.default_user)
+                            .into(binding.ivProfile)
                     } else {
-                        showMessage("No se encontraron datos del usuario.")
+                        Log.e("ProfileFragment", "Bitmap es nulo, cargando imagen por defecto")
+                        Glide.with(requireContext())
+                            .load(R.drawable.default_user)
+                            .into(binding.ivProfile)
                     }
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    showMessage("Error al obtener los datos del usuario: ${e.message}")
+                } else {
+                    showMessage("No se encontraron datos del usuario en DataStore.")
                 }
             }
         }
     }
 
-    private fun setUserData(user: UserData) {
-        binding.tvMail.text = user.userEmail
-        binding.tvUserName.text = user.userName
 
-        // TODO la imagen carga lento
-        Glide.with(requireContext())
-            .asBitmap()
-            .centerCrop()
-            .load(user.userPhotoUrl)
-            .placeholder(R.drawable.default_user) // Imagen por defecto mientras se carga
-            .error(R.drawable.default_user)  // Imagen por defecto si hay un error
-            .into(binding.ivProfile)
+    fun convertBase64ToBitmap(base64: String): Bitmap? {
+        return try {
+            val decodedString = Base64.decode(base64, Base64.DEFAULT)
+            BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+        } catch (e: IllegalArgumentException) {
+            Log.e("ProfileFragment", "Error al convertir Base64 a Bitmap: ${e.message}")
+            null
+        }
     }
 
-    // Borramos la cuenta de Database
+
     private fun deleteAccount() {
         try {
             val currentUser = auth.currentUser
@@ -116,12 +128,23 @@ class ProfileFragment : Fragment() {
                 val uid = currentUser.uid
                 lifecycleScope.launch(Dispatchers.IO) {
                     realTimeDatabaseManager.deleteUser(uid)
-                    showMessage("Lamentamos que nos dejes. Puedes volver siempre que quieras")
-                }
-                logOutStoredData()
-                goLogin()
-                deleteUserAccount()
+                    dataStoreManager.clearAllData() // Eliminar todos los datos de DataStore
 
+                    val authManager = EmailAndPasswordAuthenticationManager()
+                    val result = authManager.deleteUserAccount()
+                    if (result) {
+                        Log.d("ProfileFragment", "Cuenta eliminada exitosamente")
+                        withContext(Dispatchers.Main) {
+                            showMessage("Cuenta eliminada exitosamente")
+                            goLogin()
+                        }
+                    } else {
+                        Log.e("ProfileFragment", "Error al eliminar la cuenta")
+                        withContext(Dispatchers.Main) {
+                            showMessage("Error al eliminar la cuenta")
+                        }
+                    }
+                }
             } else {
                 showMessage("Error al eliminar tu cuenta")
             }
@@ -131,27 +154,6 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    // Borramos de firebaseAuth
-    private fun deleteUserAccount() {
-        try {
-            val currentUser = FirebaseAuth.getInstance().currentUser ?: throw IllegalStateException(
-                "No hay un usuario autenticado"
-            )
-            currentUser.delete()
-                .addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        Log.d("ProfileFragment", "Cuenta eliminada exitosamente")
-                    } else {
-                        Log.e("ProfileFragment", "Error al eliminar la cuenta", task.exception)
-                    }
-                }
-        } catch (e: Exception) {
-            Log.e("ProfileFragment", "Error al intentar eliminar la cuenta: ${e.message}")
-        }
-    }
-
-    // LogOut de dataStore
-    //Todo falta eliminar la cuenta
     private fun logOutStoredData() {
         lifecycleScope.launch(Dispatchers.IO) {
             dataStoreManager.logOut()
@@ -161,6 +163,22 @@ class ProfileFragment : Fragment() {
     private fun logoutFirebase() {
         val manager = EmailAndPasswordAuthenticationManager()
         manager.signOut()
+    }
+
+    private fun logOut() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            logoutFirebase()
+            logOutStoredData()
+            withContext(Dispatchers.Main) {
+                goLogin()
+            }
+        }
+    }
+
+    private fun goLogin() {
+        val intent = Intent(requireContext(), MainActivity::class.java)
+        startActivity(intent)
+        requireActivity().finish()
     }
 
     private fun showDialogDeleteAccount() {
@@ -184,20 +202,43 @@ class ProfileFragment : Fragment() {
             Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
         }
     }
-
-    private fun logOut() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            logoutFirebase()
-            logOutStoredData()
-            withContext(Dispatchers.Main) {
-                goLogin()
-            }
-        }
-    }
-
-    private fun goLogin() {
-        val intent = Intent(requireContext(), MainActivity::class.java)
-        startActivity(intent)
-        requireActivity().finish()
-    }
 }
+
+//--------------------- CARGA DE DATOS DESDE FIREBASE ---------------------------------
+
+//    private fun setUserData(user: UserData) {
+//        binding.tvMail.text = user.userEmail
+//        binding.tvUserName.text = user.userName
+//
+//        Glide.with(requireContext())
+//            .asBitmap()
+//            .centerCrop()
+//            .load(user.userPhotoUrl)
+//            .placeholder(R.drawable.default_user)
+//            .error(R.drawable.default_user)
+//            .diskCacheStrategy(DiskCacheStrategy.ALL)
+//            .into(binding.ivProfile)
+//    }
+
+//    private fun getUserData() {
+//        lifecycleScope.launch(Dispatchers.IO) {
+//            try {
+//                val currentUser =
+//                    auth.currentUser ?: throw IllegalStateException("No hay usuario autentificado.")
+//                val uid = currentUser.uid
+//                val userData = realTimeDatabaseManager.readUser(uid)
+//                withContext(Dispatchers.Main) {
+//                    if (userData != null) {
+//                        setUserData(userData)
+//                    } else {
+//                        showMessage("No se encontraron datos del usuario.")
+//                    }
+//                }
+//            } catch (e: Exception) {
+//                withContext(Dispatchers.Main) {
+//                    showMessage("Error al obtener los datos del usuario: ${e.message}")
+//                }
+//            }
+//        }
+//    }
+//-------------------------------------------------------------------------------------------------
