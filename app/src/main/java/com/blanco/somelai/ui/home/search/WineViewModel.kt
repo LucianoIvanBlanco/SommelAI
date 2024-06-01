@@ -255,6 +255,7 @@ class WineViewModel : ViewModel() {
     fun fetchSavedWines() {
         viewModelScope.launch {
             try {
+                (feedUiState as MutableLiveData).value = WineBodyUiState(isLoading = true )
                 val savedWines = realTimeDatabaseManager.getSavedWines()
                 (feedUiState as MutableLiveData).value = WineBodyUiState(response = savedWines)
                 Log.d("WineViewModel", "Fetched ${savedWines.size} saved wines")

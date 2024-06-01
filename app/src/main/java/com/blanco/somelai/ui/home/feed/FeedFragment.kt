@@ -15,6 +15,7 @@ import com.blanco.somelai.R
 import com.blanco.somelai.databinding.FragmentFeedBinding
 import com.blanco.somelai.ui.adapter.WineFeedAdapter
 import com.blanco.somelai.ui.home.search.WineViewModel
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import okhttp3.ResponseBody
 
 class FeedFragment : Fragment() {
@@ -24,6 +25,7 @@ class FeedFragment : Fragment() {
 
     private lateinit var adapter: WineFeedAdapter
     private val wineViewModel: WineViewModel by activityViewModels()
+    private lateinit var progressIndicator: CircularProgressIndicator
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,11 +43,12 @@ class FeedFragment : Fragment() {
                 val bundle = Bundle().apply {
                     putSerializable("wine", wine)
                 }
-                findNavController().navigate(R.id.action_feedFragment_to_wineDetailFragment,bundle)
+                findNavController().navigate(R.id.action_feedFragment_to_wineDetailFragment, bundle)
             }
         )
         binding.rvFeed.layoutManager = LinearLayoutManager(requireContext())
         binding.rvFeed.adapter = adapter
+        progressIndicator = binding.progressCircular
 
         observeWineList()
     }
@@ -54,15 +57,25 @@ class FeedFragment : Fragment() {
         wineViewModel.fetchSavedWines()
         wineViewModel.feedUiState.observe(viewLifecycleOwner, Observer { feedUiState ->
             if (feedUiState.isLoading) {
-                // TODO agregar spinner de carga aqui
+                showLoadingSpinner()
             } else if (feedUiState.isError) {
+                hideLoadingSpinner()
                 showErrorMessage(errorBody = null)
             } else {
+                hideLoadingSpinner()
                 feedUiState.response?.let { wines ->
                     adapter.submitList(wines)
                 }
             }
         })
+    }
+
+    private fun showLoadingSpinner() {
+        progressIndicator.visibility = View.VISIBLE
+    }
+
+    private fun hideLoadingSpinner() {
+        progressIndicator.visibility = View.GONE
     }
 
     private fun showErrorMessage(errorBody: ResponseBody?) {

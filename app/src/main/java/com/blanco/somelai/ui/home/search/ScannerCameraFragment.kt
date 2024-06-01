@@ -26,6 +26,7 @@ import androidx.camera.core.Preview
 import androidx.camera.core.TorchState
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
+import androidx.exifinterface.media.ExifInterface
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
@@ -166,8 +167,9 @@ class ScannerCameraFragment : Fragment() {
 
     private fun showImageConfirmationDialog(uri: Uri) {
         val bitmap = uriToBitmap(uri)
+        val rotatedBitmap = rotateBitmapIfNeeded(bitmap)
         val imageView = ImageView(requireContext()).apply {
-            setImageBitmap(bitmap)
+            setImageBitmap(rotatedBitmap)
             adjustViewBounds = true
         }
 
@@ -185,6 +187,16 @@ class ScannerCameraFragment : Fragment() {
                 pickImageFromGallery()
             }
             .show()
+    }
+
+    private fun rotateBitmapIfNeeded(bitmap: Bitmap?): Bitmap? {
+        return bitmap?.let {
+            if (it.width > it.height) {
+                rotateBitmap(it, 90f)
+            } else {
+                it
+            }
+        }
     }
 
     private fun pickImageFromGallery() {
@@ -294,7 +306,26 @@ class ScannerCameraFragment : Fragment() {
 
     private fun uriToBitmap(uri: Uri): Bitmap? {
         val inputStream = requireActivity().contentResolver.openInputStream(uri)
-        return BitmapFactory.decodeStream(inputStream)
+        val bitmap = BitmapFactory.decodeStream(inputStream)
+        inputStream?.close()
+
+        // Obtener la orientación de la imagen
+        val exif = requireActivity().contentResolver.openInputStream(uri)?.let { ExifInterface(it) }
+        val orientation = exif?.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+        Log.d("ScannerCameraFragment", "Image orientation: $orientation")
+
+        return when (orientation) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> rotateBitmap(bitmap, 90f)
+            ExifInterface.ORIENTATION_ROTATE_180 -> rotateBitmap(bitmap, 180f)
+            ExifInterface.ORIENTATION_ROTATE_270 -> rotateBitmap(bitmap, 270f)
+            else -> bitmap
+        }
+    }
+
+    private fun rotateBitmap(bitmap: Bitmap?, degrees: Float): Bitmap? {
+        if (bitmap == null) return null
+        val matrix = android.graphics.Matrix().apply { postRotate(degrees) }
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
     }
 
     override fun onDestroy() {
@@ -303,7 +334,6 @@ class ScannerCameraFragment : Fragment() {
             cameraExecutor.shutdown()
         }
     }
-    // Permisos
 
     private fun checkIfWeAlreadyHaveThisPermission() {
         val cameraPermission: String = Manifest.permission.CAMERA
