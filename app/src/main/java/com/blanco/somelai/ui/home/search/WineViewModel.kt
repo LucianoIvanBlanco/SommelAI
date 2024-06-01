@@ -88,7 +88,6 @@ class WineViewModel : ViewModel() {
     private suspend fun getAllWines(): List<Wine> {
         return withContext(Dispatchers.IO) {
             val wineResponses = mutableListOf<Wine>()
-
             val deferredResponses = listOf(
                 async { fetchWines(WineApi.service::getAllRedsWine) },
                 async { fetchWines(WineApi.service::getAllWhitesWine) },
@@ -111,7 +110,6 @@ class WineViewModel : ViewModel() {
 
     fun getWineForType(typeWine: String) {
         (uiState as MutableLiveData).value = WineUiState(isLoading = true)
-        // TODO mostrar un spinner de carga
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val response = WineApi.service.getWines(typeWine)
@@ -146,7 +144,6 @@ class WineViewModel : ViewModel() {
 
     fun getWinesAndFilterByCountry(country: String) {
         (uiState as MutableLiveData).value = WineUiState(isLoading = true)
-        // TODO mostrar un spinner de carga
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val filteredWines =
@@ -163,7 +160,6 @@ class WineViewModel : ViewModel() {
 
     fun getWinesAndFilterByName(imageUri: Uri, context: Context) {
         (uiState as MutableLiveData).value = WineUiState(isLoading = true)
-        // TODO mostrar un spinner de carga
         val textLiveData = analyzeWineLabel(imageUri, context)
         textLiveData.observeForever { extractedText ->
             viewModelScope.launch {
@@ -215,8 +211,6 @@ class WineViewModel : ViewModel() {
             }
         }
     }
-
-    // ----------- REGION FEED WINE---------------
 
     private fun createAndSaveWine(
         wineDetails: Map<String, String>,

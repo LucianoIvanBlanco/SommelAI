@@ -1,10 +1,14 @@
 package com.blanco.somelai.ui.login
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.blanco.somelai.R
 import com.blanco.somelai.databinding.ActivityMainBinding
+import com.blanco.somelai.ui.home.HomeActivity
 import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory
 import com.google.firebase.appcheck.ktx.appCheck
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
 
 class MainActivity : AppCompatActivity() {
@@ -24,12 +28,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun isUserLogged(): Boolean {
-        return true
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        return currentUser != null
     }
 
     private fun checkLogin() {
         if (isUserLogged()) {
-
+            startActivity(Intent(this, HomeActivity::class.java))
+            finish()
+        } else {
+            // Cargar LoginFragment en MainActivity
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fcv_login, LoginFragment())
+                .commit()
         }
     }
 }

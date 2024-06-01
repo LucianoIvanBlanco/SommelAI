@@ -93,7 +93,6 @@ class ScannerCameraFragment : Fragment() {
         hideLoadingSpinner()
     }
 
-    // Observamos cambios en los livedata para navegar
     private fun observeViewModel() {
         viewModel.navigateToWineList.observe(viewLifecycleOwner, Observer { navigate ->
             if (navigate) {
@@ -105,11 +104,12 @@ class ScannerCameraFragment : Fragment() {
         viewModel.navigateToWineFeed.observe(viewLifecycleOwner, Observer { navigate ->
             if (navigate) {
                 hideLoadingSpinner()
+                viewModel.resetNavigateToFeedFragment()
                 findNavController().navigate(R.id.action_scannerCameraFragment_to_feedFragment)
-                viewModel.resetNavigateToFeedFragment() // Resetear el evento
             }
         })
     }
+
 
     private fun setClicks(){
         binding.imageCaptureButton.setOnClickListener {
@@ -238,7 +238,9 @@ class ScannerCameraFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        cameraExecutor.shutdown()
+        if (::cameraExecutor.isInitialized) {
+            cameraExecutor.shutdown()
+        }
     }
     // Permisos
 
