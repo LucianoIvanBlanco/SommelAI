@@ -109,13 +109,13 @@ class EditProfileFragment : Fragment() {
             if (isDataValid()) {
                 if (uploadedImageUrl != null) {
                     updateUserProfile()
-                    showMessage("Datos actualizados.")
+                    showMessage(getString(R.string.show_message_update_image))
                 } else {
-                    showMessage("No se ha subido ninguna imagen.")
+                    showMessage(getString(R.string.show_message_dont_have_image))
                 }
                 findNavController().popBackStack()
             } else {
-                showMessage("Error, debes completar todos los campos.")
+                showMessage(getString(R.string.show_message_error_complete_all))
             }
         }
 
@@ -128,6 +128,8 @@ class EditProfileFragment : Fragment() {
         }
     }
 
+
+    // TODO ver si no navega coorectamente por esto
     private fun navigateToPreviousFragment() {
         findNavController().navigateUp()
     }
@@ -232,11 +234,11 @@ class EditProfileFragment : Fragment() {
                 updateUserDataInDataStore(userEmail, userPassword, userUid, userFullName,userName)
 
                 withContext(Dispatchers.Main) {
-                    showMessage("Datos actualizados en Firebase y DataStore.")
+                    showMessage(getString(R.string.show_message_data_updated))
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    showMessage("Error al actualizar los datos: ${e.message}")
+                    showMessage(getString(R.string.show_message_error_update_data))
                 }
             }
         }
@@ -291,12 +293,12 @@ class EditProfileFragment : Fragment() {
                     if (userData != null) {
                         setOldUserData(userData)
                     } else {
-                        showMessage("No se encontraron datos del usuario.")
+                        showMessage(getString(R.string.show_message_error_not_found_data))
                     }
                 }
             }
         } else {
-            showMessage("No hay usuario autentificado.")
+            showMessage(getString(R.string.show_message_error_not_found_user_login))
         }
     }
 
@@ -320,10 +322,10 @@ class EditProfileFragment : Fragment() {
 
     private fun showPermissionRationaleDialog(externalStoragePermission: String) {
 
-        val title = getString(R.string.new_advertisement_permission_dialog_title)
-        val message = getString(R.string.new_advertisement_permission_dialog_message)
-        val positiveButton = getString(R.string.new_advertisement_permission_dialog_positive_button)
-        val negativeButton = getString(R.string.new_advertisement_permission_dialog_negative_button)
+        val title = getString(R.string.show_permission_necessary)
+        val message = getString(R.string.show_permission_necessary_photo)
+        val positiveButton = getString(R.string.show_permission_dialog_positive_button)
+        val negativeButton = getString(R.string.show_permission_dialog_negative_button)
 
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(title)
@@ -336,12 +338,12 @@ class EditProfileFragment : Fragment() {
     }
 
     private fun showDeniedPermissionMessage() {
-        val message = getString(R.string.new_advertisement_denied_permission)
+        val message = getString(R.string.show_message_denied_permission)
         Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
     }
 
     private fun showErrorMessageNoImage() {
-        val message = getString(R.string.new_advertisement_no_select_image_error)
+        val message = getString(R.string.show_message_no_select_image_error)
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
 

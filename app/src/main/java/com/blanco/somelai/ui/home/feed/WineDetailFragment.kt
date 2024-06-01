@@ -62,7 +62,7 @@ class WineDetailFragment : Fragment() {
         binding.btnDelete.setOnClickListener {
             currentWine?.let { wine ->
                 wineViewModel.deleteWine(wine)
-                Toast.makeText(context, "Vino eliminado", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, getString(R.string.toast_message_delete_wine), Toast.LENGTH_LONG).show()
                 requireActivity().onBackPressed()
             }
         }
@@ -73,7 +73,7 @@ class WineDetailFragment : Fragment() {
                 binding.tvWineScoreItem.text = wine.rating
                 lifecycleScope.launch {
                     wineViewModel.updateWine(wine)
-                    Toast.makeText(context, "Vino actualizado", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, getString(R.string.toast_message_update_wine), Toast.LENGTH_LONG).show()
                     requireActivity().onBackPressed()
                 }
             }

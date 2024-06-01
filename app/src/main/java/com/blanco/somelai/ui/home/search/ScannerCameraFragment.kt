@@ -175,15 +175,15 @@ class ScannerCameraFragment : Fragment() {
 
         // TODO meter en strings
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle("¿Quieres usar esta foto?")
-            .setMessage("Asegúrate de que puedes ver toda la etiqueta del vino:")
+            .setTitle(getString(R.string.show_select_photo))
+            .setMessage(getString(R.string.show_select_photo_advertisement))
             .setView(imageView)
-            .setPositiveButton("Aceptar") { dialog, which ->
+            .setPositiveButton(getString(R.string.show_permission_dialog_positive_button)) { dialog, which ->
                 showLoadingSpinner()
                 viewModel.getWinesAndFilterByName(uri, requireContext())
-                Toast.makeText(context, "INICIANDO BUSQUEDA...", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, getString(R.string.show_start_search_wine), Toast.LENGTH_LONG).show()
             }
-            .setNegativeButton("Usar otra foto") { dialog, which ->
+            .setNegativeButton(getString(R.string.show_message_button_other_photo)) { dialog, which ->
                 pickImageFromGallery()
             }
             .show()
@@ -288,7 +288,7 @@ class ScannerCameraFragment : Fragment() {
                     output.savedUri?.let { uri ->
                         showLoadingSpinner()
                         viewModel.getWinesAndFilterByName(uri, requireContext())
-                        Toast.makeText(context, "INICIANDO BUSQUEDA...", Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, getString(R.string.show_start_search_wine), Toast.LENGTH_LONG).show()
 
                     }
                 }
@@ -355,10 +355,10 @@ class ScannerCameraFragment : Fragment() {
     }
 
     private fun showPermissionRationaleDialog(cameraPermission: String) {
-        val title = getString(R.string.new_advertisement_permission_dialog_title)
-        val message = getString(R.string.open_camera_permission_dialog_message)
-        val positiveButton = getString(R.string.new_advertisement_permission_dialog_positive_button)
-        val negativeButton = getString(R.string.new_advertisement_permission_dialog_negative_button)
+        val title = getString(R.string.show_permission_necessary)
+        val message = getString(R.string.show_permission_necessary_camera)
+        val positiveButton = getString(R.string.show_permission_dialog_positive_button)
+        val negativeButton = getString(R.string.show_permission_dialog_negative_button)
 
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(title)
@@ -371,7 +371,7 @@ class ScannerCameraFragment : Fragment() {
     }
 
     private fun showDeniedPermissionMessage() {
-        val message = getString(R.string.new_advertisement_denied_permission)
+        val message = getString(R.string.show_message_denied_permission)
         Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
     }
 

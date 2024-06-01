@@ -6,9 +6,11 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object WineApi {
+
     private val interceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
     }
+
     private val client = OkHttpClient.Builder()
         .addInterceptor(interceptor)
         .build()

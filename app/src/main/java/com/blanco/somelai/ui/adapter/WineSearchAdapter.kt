@@ -43,7 +43,7 @@ class WineSearchAdapter(
             wineNameTextView.text = wine.winery
             wineWineryTextView.text = wine.wine
             wineLocationTextView.text = wine.location
-            wineScoreTextView.text = wine.rating.average.toString() // Asegúrate de que sea una cadena
+            wineScoreTextView.text = wine.rating.average
 
             Glide.with(itemView.context)
                 .load(wine.image)

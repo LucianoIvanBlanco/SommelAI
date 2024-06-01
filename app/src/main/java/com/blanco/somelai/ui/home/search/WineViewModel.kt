@@ -179,9 +179,10 @@ class WineViewModel : ViewModel() {
                             filteredWines.forEach { wine ->
                                 Log.d("WineViewModel", "Found wine: ${wine.wine}")
                             }
+                            //TODO no se pueden sacar strings. lo dejamos?
                             Toast.makeText(
                                 context,
-                                "COINCIDENCIAS EN LA BUSQUEDA",
+                                "SE ENCONTRARON COINCIDENCIAS EN LA BUSQUEDA",
                                 Toast.LENGTH_LONG
                             ).show()
                             (uiState as MutableLiveData).value =
@@ -190,10 +191,10 @@ class WineViewModel : ViewModel() {
                         } else {
                             Toast.makeText(
                                 context,
-                                "SIN COINCIDENCIAS EN LA BUSQUEDA",
+                                "SIN COINCIDENCIAS EN LA BUSQUEDA, GUARDANDO VINO",
                                 Toast.LENGTH_LONG
                             ).show()
-                            Toast.makeText(context, "GUARDANDO VINO", Toast.LENGTH_LONG).show()
+                            //Toast.makeText(context, "GUARDANDO VINO", Toast.LENGTH_LONG).show()
 
 
                             val imageWine = uploadImage(imageUri).toString()
@@ -205,7 +206,7 @@ class WineViewModel : ViewModel() {
                     Log.e("WineViewModel", "Error al filtrar vinos: ${e.message}")
                     (uiState as MutableLiveData).value = WineUiState(isError = true)
                     withContext(Dispatchers.Main) {
-                        Toast.makeText(context, "Error al buscar vinos", Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, "ERROR", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -313,7 +314,6 @@ class WineViewModel : ViewModel() {
         }
     }
 
-    // ----------- END REGION FEED WINE---------------
     fun analyzeWineLabel(imageUri: Uri, context: Context): LiveData<String> =
         liveData(Dispatchers.IO) {
             try {
@@ -347,7 +347,7 @@ class WineViewModel : ViewModel() {
                 )
 
                 val inputContent = content {
-                    text(prompt) // Usamos el prompt atributo, deberiamos guardarlo en values.
+                    text(prompt)
                     image(imageBitmap)
                 }
 
@@ -409,8 +409,6 @@ class WineViewModel : ViewModel() {
                     "Error analyzing wine label with Gemini: ${e.localizedMessage}",
                     e
                 )
-
-                // TODO meterlo en values para traducciones
                 "No hay más informacion disponible sobre este vino."
             }
         }

@@ -37,7 +37,6 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, HomeActivity::class.java))
             finish()
         } else {
-            // Cargar LoginFragment en MainActivity
             supportFragmentManager.beginTransaction()
                 .replace(R.id.fcv_login, LoginFragment())
                 .commit()

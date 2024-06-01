@@ -16,7 +16,7 @@ import com.blanco.somelai.ui.home.HomeActivity
 // Todo para notificaciones. Lo usaremos? o seran push desde firebase?
 class NotificationBroadcastReceiver : BroadcastReceiver() {
     // Nos traemos el channel ID
-    private val channelId = "WALLUTAD"
+    private val channelId = "SOMMELAI"
 
     override fun onReceive(context: Context?, intent: Intent?) {
         if (context != null) {

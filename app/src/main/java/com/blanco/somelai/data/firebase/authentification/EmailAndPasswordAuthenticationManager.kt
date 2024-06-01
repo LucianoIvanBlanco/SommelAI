@@ -26,7 +26,6 @@ class EmailAndPasswordAuthenticationManager {
     suspend fun signInFirebaseEmailAndPassword(email: String, password: String): Boolean {
         try {
             val result = auth.signInWithEmailAndPassword(email, password)
-            //Esperamos el resulta del login
             result.await()
             if (result.isSuccessful) {
                 Log.d("FirebaseAuth", "signInFirebaseEmailAndPassword:success")

@@ -353,7 +353,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="center_horizontal"
-                            android:text="España"
+                            android:text="@string/tv_wine_spain"
                             android:textAppearance="?attr/textAppearanceTitleMedium" />
 
                     </LinearLayout>
@@ -404,7 +404,7 @@
                             android:id="@+id/tv_wine_country_france"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Francia"
+                            android:text="@string/tv_wine_france"
                             android:textAppearance="?attr/textAppearanceTitleMedium" />
 
                     </LinearLayout>
@@ -471,7 +471,7 @@
                             android:id="@+id/tv_wine_country_portugal"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Portugal"
+                            android:text="@string/tv_wine_portugal"
                             android:textAppearance="?attr/textAppearanceTitleMedium" />
 
                     </LinearLayout>
@@ -521,7 +521,7 @@
                             android:id="@+id/tv_wine_country_italy"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Italia"
+                            android:text="@string/tv_wine_italy"
                             android:textAppearance="?attr/textAppearanceTitleMedium" />
 
                     </LinearLayout>

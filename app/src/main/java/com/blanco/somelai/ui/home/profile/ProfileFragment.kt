@@ -104,7 +104,7 @@ class ProfileFragment : Fragment() {
                             .into(binding.ivProfile)
                     }
                 } else {
-                    showMessage("No se encontraron datos del usuario en DataStore.")
+                    showMessage(getString(R.string.show_message_error_not_found_data))
                 }
             }
         }
@@ -152,18 +152,18 @@ class ProfileFragment : Fragment() {
                     if (result) {
                         Log.d("ProfileFragment", "Cuenta eliminada exitosamente")
                         withContext(Dispatchers.Main) {
-                            showMessage("Cuenta eliminada exitosamente")
+                            showMessage(getString(R.string.account_deleted_message))
                             goLogin()
                         }
                     } else {
                         Log.e("ProfileFragment", "Error al eliminar la cuenta")
                         withContext(Dispatchers.Main) {
-                            showMessage("Error al eliminar la cuenta")
+                            showMessage(getString(R.string.account_delete_failed_message))
                         }
                     }
                 }
             } else {
-                showMessage("Error al eliminar tu cuenta")
+                showMessage(getString(R.string.account_delete_failed_message))
             }
         } catch (e: Exception) {
             Log.e("deleteAccount", "$e")

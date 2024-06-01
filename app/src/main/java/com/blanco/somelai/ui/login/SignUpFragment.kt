@@ -126,7 +126,6 @@ class SignUpFragment : Fragment() {
     }
 
     private suspend fun saveUserToDataStore(email: String, password: String, uid: String, fullName: String, userName: String) {
-        Log.d("saveUserToDataStore", "Guardando datos: email=$email, password=$password, uid=$uid, fullName=$fullName, userName=$userName")
         dataStoreManager.saveUserData(email, password, uid, fullName, userName)
         Log.i("saveUserData", "Usuario creado en DataStore")
     }

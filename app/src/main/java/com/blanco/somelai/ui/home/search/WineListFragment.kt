@@ -84,7 +84,7 @@ class WineListFragment : Fragment() {
     }
 
     private fun showErrorMessage() {
-        val message = "Ha ocurrido un error al recuperar los datos"
+        val message = getString(R.string.error_wine_message)
         Log.e("WineListFragment", message)
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
