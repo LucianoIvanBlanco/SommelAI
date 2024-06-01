@@ -128,7 +128,7 @@ class ProfileFragment : Fragment() {
                 val uid = currentUser.uid
                 lifecycleScope.launch(Dispatchers.IO) {
                     realTimeDatabaseManager.deleteUser(uid)
-                    dataStoreManager.clearAllData() // Eliminar todos los datos de DataStore
+                    dataStoreManager.deleteUserData()
 
                     val authManager = EmailAndPasswordAuthenticationManager()
                     val result = authManager.deleteUserAccount()

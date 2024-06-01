@@ -8,4 +8,13 @@
         <item name="android:backgroundTint">@color/md_theme_dark_primaryContainer</item>
     </style>
 
+    <style name="RoundButton" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="shapeAppearanceOverlay">@style/RoundShapeAppearance</item>
+    </style>
+
+    <style name="RoundShapeAppearance">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">100%</item>
+    </style>
+
 </resources>

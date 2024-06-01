@@ -14,6 +14,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -51,10 +52,9 @@ class ScannerCameraFragment : Fragment() {
     private lateinit var cameraExecutor: ExecutorService
     private var camera: Camera? = null
 
-    private val requestPermissionLauncher: ActivityResultLauncher<String> =
+    private val requestPermissionCameraLauncher: ActivityResultLauncher<String> =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) {
-                //El permiso ha sido concedido, podemos realizar la acción que lo necesitaba
                 startCamera()
             } else {
                 showDeniedPermissionMessage()
@@ -62,8 +62,17 @@ class ScannerCameraFragment : Fragment() {
             }
         }
 
+    private val requestPermissionGaleryLauncher: ActivityResultLauncher<String> =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) {
+                pickImageFromGallery()
+            } else {
+                showDeniedPermissionMessage()
+            }
+        }
+
     companion object {
-        private const val TAG = "SomelAI"
+        private const val TAG = "SommelAI"
         private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
     }
 
@@ -98,7 +107,7 @@ class ScannerCameraFragment : Fragment() {
             if (navigate) {
                 hideLoadingSpinner()
                 findNavController().navigate(R.id.action_scannerCameraFragment_to_wineListFragment)
-                viewModel.resetNavigateToWineList() // Resetear el evento
+                viewModel.resetNavigateToWineList()
             }
         })
         viewModel.navigateToWineFeed.observe(viewLifecycleOwner, Observer { navigate ->
@@ -121,6 +130,65 @@ class ScannerCameraFragment : Fragment() {
         binding.flashButton.setOnClickListener {
             toggleFlash()
         }
+
+        binding.addPhotoButton.setOnClickListener {
+            checkGalleryPermissionAndPickImage()
+        }
+    }
+
+    private fun checkGalleryPermissionAndPickImage() {
+        val permissionToRequest = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Manifest.permission.READ_MEDIA_IMAGES
+        } else {
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        }
+
+        val permissionStatus = ContextCompat.checkSelfPermission(requireContext(), permissionToRequest)
+
+        if (permissionStatus == PackageManager.PERMISSION_GRANTED) {
+            pickImageFromGallery()
+        } else {
+            val shouldRequestPermission = shouldShowRequestPermissionRationale(permissionToRequest)
+            if (shouldRequestPermission) {
+                showPermissionRationaleDialog(permissionToRequest)
+            } else {
+                requestPermissionGaleryLauncher.launch(permissionToRequest)
+            }
+        }
+    }
+
+    private val pickImageLauncher: ActivityResultLauncher<String> =
+        registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+            uri?.let {
+                showImageConfirmationDialog(it)
+            }
+        }
+
+    private fun showImageConfirmationDialog(uri: Uri) {
+        val bitmap = uriToBitmap(uri)
+        val imageView = ImageView(requireContext()).apply {
+            setImageBitmap(bitmap)
+            adjustViewBounds = true
+        }
+
+        // TODO meter en strings
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("¿Quieres usar esta foto?")
+            .setMessage("Asegúrate de que puedes ver toda la etiqueta del vino:")
+            .setView(imageView)
+            .setPositiveButton("Aceptar") { dialog, which ->
+                showLoadingSpinner()
+                viewModel.getWinesAndFilterByName(uri, requireContext())
+                Toast.makeText(context, "INICIANDO BUSQUEDA...", Toast.LENGTH_LONG).show()
+            }
+            .setNegativeButton("Usar otra foto") { dialog, which ->
+                pickImageFromGallery()
+            }
+            .show()
+    }
+
+    private fun pickImageFromGallery() {
+        pickImageLauncher.launch("image/*")
     }
 
     private fun startCamera() {
@@ -206,21 +274,14 @@ class ScannerCameraFragment : Fragment() {
                     val msg = "Photo capture succeeded: ${output.savedUri}"
                     Log.d("ScannerCameraFragment", msg)
                     output.savedUri?.let { uri ->
-                        loadPhotoPreview(uri)
+                        showLoadingSpinner()
+                        viewModel.getWinesAndFilterByName(uri, requireContext())
+                        Toast.makeText(context, "INICIANDO BUSQUEDA...", Toast.LENGTH_LONG).show()
+
                     }
                 }
             }
         )
-    }
-
-    private fun loadPhotoPreview(uri: Uri) {
-        val bitmap = uriToBitmap(uri)
-        binding.ibPhotoPreview.setImageBitmap(bitmap)
-        binding.ibPhotoPreview.setOnClickListener {
-            showLoadingSpinner()
-            viewModel.getWinesAndFilterByName(uri, requireContext())
-            Toast.makeText(context, "INICIANDO BUSQUEDA...", Toast.LENGTH_LONG).show()
-        }
     }
 
     private fun showLoadingSpinner() {
@@ -258,7 +319,7 @@ class ScannerCameraFragment : Fragment() {
             if (shouldRequestPermission) {
                 showPermissionRationaleDialog(cameraPermission)
             } else {
-                requestPermissionLauncher.launch(cameraPermission)
+                requestPermissionCameraLauncher.launch(cameraPermission)
             }
         }
     }
@@ -273,7 +334,7 @@ class ScannerCameraFragment : Fragment() {
             .setTitle(title)
             .setMessage(message)
             .setPositiveButton(positiveButton) { dialog, which ->
-                requestPermissionLauncher.launch(cameraPermission)
+                requestPermissionCameraLauncher.launch(cameraPermission)
             }
             .setNegativeButton(negativeButton) { dialog, which -> requireActivity().finish() }
             .show()

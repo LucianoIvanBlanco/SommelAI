@@ -13,7 +13,9 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+    </androidx.camera.view.PreviewView>
 
     <!--TODO falta lograr que se difumine alrededor del recuadro-->
 
@@ -47,18 +49,6 @@
         app:iconSize="@android:dimen/app_icon_size"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
-
-    <ImageButton
-        android:id="@+id/ib_photo_preview"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginStart="30dp"
-        android:layout_marginBottom="50dp"
-        android:rotation="90"
-        android:scaleType="centerCrop"
-        android:background="?attr/selectableItemBackground"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
 
@@ -97,5 +87,23 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:trackThickness="4dp" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/add_photo_button"
+        style="@style/RoundButton"
+        android:layout_width="70dp"
+        android:layout_height="80dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginBottom="95dp"
+        android:gravity="center"
+        app:cornerRadius="35dp"
+        app:icon="@drawable/ic_add_photo_24px"
+        app:iconSize="40dp"
+        app:iconTint="@color/background_text_field"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:strokeColor="@color/background_text_field"
+        app:strokeWidth="3dp" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

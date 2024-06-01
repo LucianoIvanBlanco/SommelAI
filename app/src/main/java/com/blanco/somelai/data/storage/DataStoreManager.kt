@@ -82,8 +82,9 @@ class DataStoreManager(val context: Context) {
         return preferences[booleanPreferencesKey(isLoggedKey)] ?: false
     }
 
+    // TODO ver si lo usaremos, no hace logout, elimina todo
     suspend fun logOut() {
-        context.dataStore.edit { editor -> editor.clear() }
+        putBoolean(isLoggedKey, false)
     }
 
     suspend fun deleteUserData() {
