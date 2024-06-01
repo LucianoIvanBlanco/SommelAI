@@ -76,7 +76,7 @@ class ProfileFragment : Fragment() {
     }
 
 
-    // TODO la imagen se carga de costado y carga despues de editar en EditProfile, hay que moverse de fragment para que lo haga.
+    // TODO despues de cambiar la imagen, hay que moverse por el nabvar para que cargue aqui.
     private fun loadUserDataFromDataStore() {
         lifecycleScope.launch(Dispatchers.IO) {
             val userData = dataStoreManager.getUserData()
@@ -89,9 +89,10 @@ class ProfileFragment : Fragment() {
                     val photoBase64 = userData["photo"] ?: ""
 
                     val bitmap = convertBase64ToBitmap(photoBase64)
-                    if (bitmap != null) {
+                    val rotatedBitmap = rotateBitmapIfNeeded(bitmap)
+                    if (rotatedBitmap != null) {
                         Glide.with(requireContext())
-                            .load(bitmap)
+                            .load(rotatedBitmap)
                             .centerCrop()
                             .placeholder(R.drawable.default_user)
                             .error(R.drawable.default_user)
@@ -107,6 +108,22 @@ class ProfileFragment : Fragment() {
                 }
             }
         }
+    }
+
+    private fun rotateBitmapIfNeeded(bitmap: Bitmap?): Bitmap? {
+        return bitmap?.let {
+            if (it.width > it.height) {
+                rotateBitmap(it, 90f)
+            } else {
+                it
+            }
+        }
+    }
+
+    private fun rotateBitmap(bitmap: Bitmap?, degrees: Float): Bitmap? {
+        if (bitmap == null) return null
+        val matrix = android.graphics.Matrix().apply { postRotate(degrees) }
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
     }
 
 
