@@ -18,7 +18,15 @@
         android:id="@+id/feedFragment"
         android:name="com.blanco.somelai.ui.home.feed.FeedFragment"
         android:label="fragment_feed"
-        tools:layout="@layout/fragment_feed" />
+        tools:layout="@layout/fragment_feed" >
+        <action
+            android:id="@+id/action_feedFragment_to_wineDetailFragment"
+            app:destination="@id/wineDetailFragment">
+        <argument
+            android:name="wineId"
+            app:argType="string" />
+        </action>
+    </fragment>
 
     <fragment
         android:id="@+id/editProfileFragment"
@@ -35,25 +43,54 @@
             android:id="@+id/action_searchFragment_to_wineListFragment"
             app:destination="@id/wineListFragment" />
         <action
-            android:id="@+id/action_searchFragment_to_scanerCameraFragment"
-            app:destination="@id/scanerCameraFragment" />
+            android:id="@+id/action_searchFragment_to_scannerCameraFragment"
+            app:destination="@id/scannerCameraFragment" />
+        <action
+            android:id="@+id/action_searchFragment_to_searchNameFragment"
+            app:destination="@id/searchNameFragment" />
     </fragment>
 
     <fragment
         android:id="@+id/wineListFragment"
         android:name="com.blanco.somelai.ui.home.search.WineListFragment"
         android:label="fragment_wine_list"
-        tools:layout="@layout/fragment_wine_list" />
-    <fragment
-        android:id="@+id/scanerCameraFragment"
-        android:name="com.blanco.somelai.ui.home.search.ScanerCameraFragment"
-        android:label="fragment_scaner_camera"
-        tools:layout="@layout/fragment_scaner_camera" >
+        tools:layout="@layout/fragment_wine_list" >
         <action
-            android:id="@+id/action_scanerCameraFragment_to_wineListFragment"
+            android:id="@+id/action_wineListFragment_to_wineResponseDetailFragment"
+            app:destination="@id/wineResponseDetailFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/scannerCameraFragment"
+        android:name="com.blanco.somelai.ui.home.search.ScannerCameraFragment"
+        android:label="fragment_scanner_camera"
+        tools:layout="@layout/fragment_scanner_camera" >
+        <action
+            android:id="@+id/action_scannerCameraFragment_to_wineListFragment"
             app:destination="@id/wineListFragment" />
         <action
-            android:id="@+id/action_scanerCameraFragment_to_feedFragment"
+            android:id="@+id/action_scannerCameraFragment_to_feedFragment"
             app:destination="@id/feedFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/wineDetailFragment"
+        android:name="com.blanco.somelai.ui.home.feed.WineDetailFragment"
+        android:label="fragment_wine_detail"
+        tools:layout="@layout/fragment_wine_detail" >
+        <argument
+            android:name="wineId"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/wineResponseDetailFragment"
+        android:name="com.blanco.somelai.ui.home.search.WineResponseDetailFragment"
+        android:label="fragment_wine_response_detail"
+        tools:layout="@layout/fragment_wine_response_detail" />
+    <fragment
+        android:id="@+id/searchNameFragment"
+        android:name="com.blanco.somelai.ui.home.search.SearchNameFragment"
+        android:label="SearchNameFragment" >
+        <action
+            android:id="@+id/action_searchNameFragment_to_wineResponseDetailFragment"
+            app:destination="@id/wineResponseDetailFragment" />
     </fragment>
 </navigation>

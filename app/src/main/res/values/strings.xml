@@ -1,48 +1,50 @@
 <resources>
-    <string name="app_name">SomelAI</string>
+    <string name="app_name" translatable="false">SommelAI</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+
+    <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
     <string name="login_title">Bienvenidos a SomelAI!</string>
     <string name="login_mail_hint">Dirección de e-mail</string>
     <string name="login_password_hint">Contraseña</string>
     <string name="login_button_description">Acceder</string>
     <string name="signup_button_description">Todavia no tengo cuenta</string>
-    <string name="sign_up_title">Súmate a SomelAI</string>
+    <string name="sign_up_title">Regístrate</string>
     <string name="sign_up_user_name_hint">Nombre de usuario</string>
-    <string name="sign_up_name_hint"> Nombre y apellidos </string>
+    <string name="sign_up_name_hint">"Nombre y apellidos "</string>
     <string name="sign_up_mail_hint">Dirección de e-mail</string>
     <string name="sign_up_password_hint">Contraseña</string>
     <string name="sign_up_button_description">Crear cuenta</string>
 
-    <string name="error_message_empty_fields">Por favor, rellena todos los campos.</string>
+    <string name="error_message_empty_fields">Por favor, rellena todos los campos</string>
     <string name="profile_log_out_button">Cerrar sesión</string>
     <string name="btn_delete_account">Borrar cuenta</string>
     <string name="feed_botton">Historial</string>
     <string name="search_bottom">Buscar</string>
     <string name="profile_bottom">Perfil</string>
     <string name="default_username">Nombre de usuario</string>
-    <string name="default_text">defaul_text</string>
+    <string name="default_text" translatable="false">defaul_text</string>
     <string name="loading">Cargando</string>
     <string name="title_wine_type">Tipo de vino</string>
     <string name="search_wine_hint">Busca cualquier vino</string>
     <string name="conuntry_title">Pais del vino</string>
     <string name="secondary_title">Descripcion</string>
     <string name="img_description">Imagen</string>
-    <string name="title_wine_country">Por pais:</string>
-    <string name="title_category_wine_type">Por tipo:</string>
-    <string name="default_score">5.5</string>
-    <string name="red_wine_title">Tinto</string>
-    <string name="white_wine_title">Blanco</string>
+    <string name="title_wine_country">Origen de vino:</string>
+    <string name="title_category_wine_type">Tipos de vino:</string>
+    <string name="default_score" translatable="false">5.5</string>
+    <string name="red_wine_title">Tintos</string>
+    <string name="white_wine_title">Blancos</string>
     <string name="rose_wine_title">Rose</string>
-    <string name="sparkling_wine_title">Espumante</string>
-    <string name="btn_save_changes">Guardar cambios</string>
+    <string name="sparkling_wine_title">Espumantes</string>
+    <string name="btn_save_changes">Guardar</string>
     <string name="btn_delete">Eliminar</string>
     <string name="sign_up_saved_user_message">Usuario creado con exito</string>
     <string name="sign_up_invalid_data_error">Los datos introducidos no son válidos</string>
     <string name="sign_up_failed_error">Ha ocurrido un fallo en el registro</string>
     <string name="log_in_empty_error">Por favor, rellena todos los campos correctamente</string>
     <string name="log_in_invalid_credentials">Usuario o contraseña incorrectos</string>
-    <string name="sign_up_name_taken_error">Este nombre no se encuentra disponible</string>
+    <string name="sign_up_email_taken_error">Este email ya se encuentra registrado</string>
 
     <string name="account_delete_dialog_title">Estás a punto de eliminar tu cuenta</string>
     <string name="account_delete_dialog_message">¿Estás seguro?</string>
@@ -51,17 +53,57 @@
     <string name="profile_edit_bouton">Editar perfil</string>
     <string name="profile_save_changes_button">Guardar cambios</string>
     <string name="go_back_button">Volver atrás</string>
+    <string name="account_deleted_message">Cuenta eliminada</string>
+    <string name="account_delete_failed_message">Error al eliminar la cuenta</string>
 
-    <string name="new_advertisement_permission_dialog_title">El permiso es necesario</string>
-    <string name="new_advertisement_permission_dialog_message">Es necesario para poder cargar tu imagen de tu proyecto.</string>
-    <string name="open_camera_permission_dialog_message">Es necesario para poder abrir la camara y escanear el producto.</string>
-    <string name="new_advertisement_permission_dialog_positive_button">Okay</string>
-    <string name="new_advertisement_permission_dialog_negative_button">Denegar</string>
-    <string name="new_advertisement_denied_permission">El permiso ha sido denegado</string>
-    <string name="new_advertisement_no_select_image_error">No has seleccionado ninguna imagen</string>
 
-    <string name="take_photo">Take Photo</string>
-    <string name="start_capture">Start Capture</string>
-    <string name="stop_capture">Stop Capture</string>
 
-    </resources>
+
+
+
+
+
+    <string name="take_photo">Tomar foto</string>
+    <string name="start_capture">Comenzar captura</string>
+    <string name="stop_capture">Detener captura</string>
+    <string name="permission_rationale_title">Permiso necesario</string>
+    <string name="permission_rationale_message">Es necesario el acceso a la galeria para seleccionar una imagen</string>
+    <string name="ok">Acceder</string>
+    <string name="cancel">Denegar</string>
+    <string name="repeat_password_hin">Repite tu contraseña</string>
+    <string name="sign_up_password_mismatch_error">Las contraseñas no coinciden</string>
+    <string name="spinner_text_loading">BUSCANDO</string>
+    <string name="tv_user_wines">Tus vinos:</string>
+
+    <string name="error_wine_message">Error al recuperar los vinos</string>
+
+    <string name="toast_message_delete_wine">Vino eliminado</string>
+    <string name="toast_message_update_wine">Vino actualizado</string>
+
+    <string name="show_message_update_image">Imagen actualizada</string>
+    <string name="show_message_dont_have_image">No se ha subido ninguna imagen</string>
+    <string name="show_message_error_complete_all">"Error, debes completar todos los campos"</string>
+    <string name="show_message_data_updated">Datos actualizados</string>
+    <string name="show_message_error_update_data">Error al actualizar los datos</string>
+    <string name="show_message_error_not_found_data">No se encontraron datos del usuario</string>
+    <string name="show_message_error_not_found_user_login">Error, no estas correctamente logeado</string>
+
+    <string name="show_permission_necessary">El permiso es necesario</string>
+    <string name="show_permission_necessary_camera">Es necesario para poder escanear el vino</string>
+    <string name="show_permission_necessary_photo">Es necesario para poder cargar una imagen</string>
+    <string name="show_permission_dialog_positive_button">Aceptar</string>
+    <string name="show_permission_dialog_negative_button">Denegar</string>
+    <string name="show_message_denied_permission">El permiso ha sido denegado</string>
+    <string name="show_message_no_select_image_error">No has seleccionado ninguna imagen</string>
+
+    <string name="show_select_photo">¿Quieres escanear esta foto?</string>
+    <string name="show_select_photo_advertisement">Asegúrate de que puedes ver toda la etiqueta del vino:</string>
+    <string name="show_start_search_wine">Iniciando busqueda</string>
+    <string name="show_message_button_other_photo">Usar otra foto</string>
+
+    <string name="show_message_coincidence_wine">Se encontraron coincidencias en la busqueda</string>
+    <string name="tv_wine_spain">España</string>
+    <string name="tv_wine_france">Francia</string>
+    <string name="tv_wine_portugal">Portugal</string>
+    <string name="tv_wine_italy">Italia</string>
+</resources>

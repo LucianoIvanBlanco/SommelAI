@@ -2,6 +2,7 @@ package com.blanco.somelai.data.network.model.responses
 
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 data class Wine(
     @SerializedName("winery")
@@ -16,4 +17,4 @@ data class Wine(
     val image: String,
     @SerializedName("id")
     val id: Int
-)
+) : Serializable

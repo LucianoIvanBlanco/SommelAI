@@ -11,6 +11,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import androidx.lifecycle.viewModelScope
+import com.blanco.somelai.data.firebase.cloud_storage.CloudStorageManager
 import com.blanco.somelai.data.firebase.realtime_database.RealTimeDatabaseManager
 import com.blanco.somelai.data.network.WineApi
 import com.blanco.somelai.data.network.model.body.WineBody
@@ -34,26 +35,78 @@ import java.util.UUID
 
 class WineViewModel : ViewModel() {
 
+    //TODO ver como quitar apikey, si cambiamos por certificado o algo
     private var _apiKey: String = "AIzaSyCzEqyGwZ1a8Cz33HPm3_R8dvzMW4c-9k4"
-
 
     private val _uiState: LiveData<WineUiState> = MutableLiveData(WineUiState())
     val uiState: LiveData<WineUiState> get() = _uiState
 
-
     private val _navigateToWineList = MutableLiveData<Boolean>()
     val navigateToWineList: LiveData<Boolean> get() = _navigateToWineList
-
 
     private val _navigateToWineFeed = MutableLiveData<Boolean>()
     val navigateToWineFeed: LiveData<Boolean> get() = _navigateToWineFeed
 
-
     private val _feedUiState: LiveData<WineBodyUiState> = MutableLiveData(WineBodyUiState())
     val feedUiState: LiveData<WineBodyUiState> get() = _feedUiState
 
-
     private var realTimeDatabaseManager: RealTimeDatabaseManager = RealTimeDatabaseManager()
+    private var cloudStorageManager: CloudStorageManager = CloudStorageManager()
+
+    private var allWinesCache: List<Wine> = emptyList()
+
+    private val prompt: String = """
+    Extrae los siguientes datos de la etiqueta del vino:
+    1. Nombre del vino
+    2. Año del vino
+    3. Bodega que lo produce
+    4. País/Región/Provincia
+    5. Recomendación de maridaje (tipo de comida adecuado al tipo de vino)
+    
+    Devuelve toda la información como una lista de valores separados por comas, en el orden solicitado. 
+    No incluyas los nombres de los campos ni corchetes, solo los datos.
+    Utiliza solo 5 comas (,) en total. Si hay más información del mismo campo, usa guiones (-) para separar los subcampos.
+    Asegúrate de que la respuesta siga exactamente este formato:
+    "Nombre del vino, Año del vino, Bodega que lo produce, País/Región/Provincia, Recomendación de maridaje"
+""".trimIndent()
+
+    init {
+        // Cargar todos los vinos al iniciar la aplicación
+        viewModelScope.launch {
+            loadAllWines()
+        }
+    }
+    private suspend fun loadAllWines() {
+        try {
+            val wines = getAllWines()
+            allWinesCache = wines
+        } catch (e: Exception) {
+            Log.e("WineViewModel", "Error loading all wines: ${e.message}")
+        }
+    }
+
+    private suspend fun getAllWines(): List<Wine> {
+        return withContext(Dispatchers.IO) {
+            val wineResponses = mutableListOf<Wine>()
+            val deferredResponses = listOf(
+                async { fetchWines(WineApi.service::getAllRedsWine) },
+                async { fetchWines(WineApi.service::getAllWhitesWine) },
+                async { fetchWines(WineApi.service::getAllSparklingWine) },
+                async { fetchWines(WineApi.service::getAllRoseWine) }
+            )
+            deferredResponses.awaitAll().forEach { wines ->
+                wineResponses.addAll(wines)
+            }
+            wineResponses
+        }
+    }
+
+    fun searchWinesByName(query: String) {
+        val filteredWines = allWinesCache.filter { wine ->
+            wine.winery.lowercase().contains(query.lowercase(), ignoreCase = true)
+        }
+        (uiState as MutableLiveData).value = WineUiState(response = filteredWines)
+    }
 
     fun getWineForType(typeWine: String) {
         (uiState as MutableLiveData).value = WineUiState(isLoading = true)
@@ -71,23 +124,6 @@ class WineViewModel : ViewModel() {
             } catch (e: Exception) {
                 Log.e("WineViewModel", "Error al cargar los vinos")
             }
-        }
-    }
-
-    private suspend fun getAllWines(): List<Wine> {
-        return withContext(Dispatchers.IO) {
-            val wineResponses = mutableListOf<Wine>()
-
-            val deferredResponses = listOf(
-                async { fetchWines(WineApi.service::getAllRedsWine) },
-                async { fetchWines(WineApi.service::getAllWhitesWine) },
-                async { fetchWines(WineApi.service::getAllSparklingWine) },
-                async { fetchWines(WineApi.service::getAllRoseWine) }
-            )
-            deferredResponses.awaitAll().forEach { wines ->
-                wineResponses.addAll(wines)
-            }
-            wineResponses
         }
     }
 
@@ -110,9 +146,8 @@ class WineViewModel : ViewModel() {
         (uiState as MutableLiveData).value = WineUiState(isLoading = true)
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                val allWines = getAllWines()
                 val filteredWines =
-                    allWines.filter { it.location.contains(country, ignoreCase = true) }
+                    allWinesCache.filter { it.location.contains(country, ignoreCase = true) }
                 viewModelScope.launch(Dispatchers.Main) {
                     (uiState as MutableLiveData).value = WineUiState(response = filteredWines)
                 }
@@ -125,18 +160,18 @@ class WineViewModel : ViewModel() {
 
     fun getWinesAndFilterByName(imageUri: Uri, context: Context) {
         (uiState as MutableLiveData).value = WineUiState(isLoading = true)
-        // TODO mostrar un spinner de carga
         val textLiveData = analyzeWineLabel(imageUri, context)
         textLiveData.observeForever { extractedText ->
             viewModelScope.launch {
                 try {
                     val wineDetails = extractWineDetails(extractedText)
+                    val nameAndYear = wineDetails["name"] + wineDetails["year"]
+                    val moreDetails = getMoreDetails(nameAndYear, wineDetails["winery"] ?: "")
                     val wineName = wineDetails["name"] ?: ""
                     Log.d("WineViewModel", "Extracted wine name: $wineName")
                     withContext(Dispatchers.Main) {
                     }
-                    val allWines = getAllWines()
-                    val filteredWines = allWines.filter { wine ->
+                    val filteredWines = allWinesCache.filter { wine ->
                         wine.wine.lowercase().contains(wineName.lowercase(), ignoreCase = true)
                     }
                     viewModelScope.launch(Dispatchers.Main) {
@@ -144,43 +179,59 @@ class WineViewModel : ViewModel() {
                             filteredWines.forEach { wine ->
                                 Log.d("WineViewModel", "Found wine: ${wine.wine}")
                             }
-                            Toast.makeText(context, "COINCIDENCIAS EN LA BUSQUEDA", Toast.LENGTH_LONG).show()
-                            (uiState as MutableLiveData).value = WineUiState(response = filteredWines)
+                            //TODO no se pueden sacar strings. lo dejamos?
+                            Toast.makeText(
+                                context,
+                                "SE ENCONTRARON COINCIDENCIAS EN LA BUSQUEDA",
+                                Toast.LENGTH_LONG
+                            ).show()
+                            (uiState as MutableLiveData).value =
+                                WineUiState(response = filteredWines)
                             _navigateToWineList.value = true
                         } else {
-                            Toast.makeText(context, "SIN COINCIDENCIAS EN LA BUSQUEDA", Toast.LENGTH_LONG).show()
-                            Toast.makeText(context, "GUARDANDO VINO", Toast.LENGTH_LONG).show()
-                            createAndSaveWine(wineDetails, imageUri)
-                           // _navigateToWineFeed.value = true
+                            Toast.makeText(
+                                context,
+                                "SIN COINCIDENCIAS EN LA BUSQUEDA, GUARDANDO VINO",
+                                Toast.LENGTH_LONG
+                            ).show()
+                            //Toast.makeText(context, "GUARDANDO VINO", Toast.LENGTH_LONG).show()
+
+
+                            val imageWine = uploadImage(imageUri).toString()
+                            createAndSaveWine(wineDetails, moreDetails, imageWine)
+
                         }
                     }
                 } catch (e: Exception) {
                     Log.e("WineViewModel", "Error al filtrar vinos: ${e.message}")
                     (uiState as MutableLiveData).value = WineUiState(isError = true)
                     withContext(Dispatchers.Main) {
-                        Toast.makeText(context, "Error al buscar vinos", Toast.LENGTH_LONG).show()
+                        Toast.makeText(context, "ERROR", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
         }
     }
 
-   // ----------- REGION FEED WINE---------------
-
-    private fun createAndSaveWine(wineDetails: Map<String, String>, imageUri: Uri) {
+    private fun createAndSaveWine(
+        wineDetails: Map<String, String>,
+        moreDetails: String,
+        imageUri: String
+    ) {
         val newWine = WineBody(
             wine = wineDetails["name"] ?: "",
             year = wineDetails["year"] ?: "",
             winery = wineDetails["winery"] ?: "",
             country = wineDetails["country"] ?: "",
-            pairing = wineDetails["pairing"] ?: "",
-            image = imageUri.toString(),
+            pairing = moreDetails,
+            image = imageUri,
             id = UUID.randomUUID().toString(),
             rating = ""
         )
         viewModelScope.launch {
             try {
                 realTimeDatabaseManager.saveWine(newWine)
+
                 fetchSavedWines()
                 _navigateToWineFeed.value = true
                 Log.d("WineViewModel", "Wine saved successfully")
@@ -190,9 +241,22 @@ class WineViewModel : ViewModel() {
         }
     }
 
+
+    private suspend fun uploadImage(selectedImageUri: Uri?): String? {
+        return withContext(Dispatchers.IO) {
+            try {
+                cloudStorageManager.uploadWineImage(selectedImageUri!!)
+            } catch (e: Exception) {
+                Log.e("uploadImage", "Error uploading image: ${e.message}")
+                null
+            }
+        }
+    }
+
     fun fetchSavedWines() {
         viewModelScope.launch {
             try {
+                (feedUiState as MutableLiveData).value = WineBodyUiState(isLoading = true )
                 val savedWines = realTimeDatabaseManager.getSavedWines()
                 (feedUiState as MutableLiveData).value = WineBodyUiState(response = savedWines)
                 Log.d("WineViewModel", "Fetched ${savedWines.size} saved wines")
@@ -214,7 +278,42 @@ class WineViewModel : ViewModel() {
         }
     }
 
-    // ----------- END REGION FEED WINE---------------
+    private fun extractWineDetails(extractedText: String): Map<String, String> {
+        val details = extractedText
+            .removeSurrounding("[", "]")
+            .split(",")
+            .map { it.trim().removeSurrounding("'").trim() }
+
+        return mapOf(
+            "name" to details.getOrNull(0).orEmpty(),
+            "year" to details.getOrNull(1).orEmpty(),
+            "winery" to details.getOrNull(2).orEmpty(),
+            "country" to details.getOrNull(3).orEmpty(),
+            "pairing" to details.getOrNull(4).orEmpty()
+        )
+    }
+
+    fun resetNavigateToWineList() {
+        _navigateToWineList.value = false
+    }
+
+    // TODO ver porque no esta navegando despues de guardar nuevo vino
+    fun resetNavigateToFeedFragment() {
+        _navigateToWineFeed.value = false
+        Log.d("WineViewModel", "navigateToWineFeed")
+    }
+
+    fun updateWine(wine: WineBody) {
+        viewModelScope.launch {
+            try {
+                RealTimeDatabaseManager().updateWineRating(wine)
+                fetchSavedWines()
+            } catch (e: Exception) {
+                Log.e("WineViewModel", "Error update wine", e)
+            }
+        }
+    }
+
     fun analyzeWineLabel(imageUri: Uri, context: Context): LiveData<String> =
         liveData(Dispatchers.IO) {
             try {
@@ -247,21 +346,6 @@ class WineViewModel : ViewModel() {
                     )
                 )
 
-                val prompt = """
-    Extrae los siguientes datos de la etiqueta del vino:
-    1. Nombre del vino
-    2. Año del vino
-    3. Bodega que lo produce
-    4. País/Región/Provincia
-    5. Recomendación de maridaje (tipo de comida adecuado al tipo de vino)
-    
-    Devuelve toda la información como una lista de valores separados por comas, en el orden solicitado. 
-    No incluyas los nombres de los campos ni corchetes, solo los datos.
-    Utiliza solo 5 comas (,) en total. Si hay más información del mismo campo, usa guiones (-) para separar los subcampos.
-    Asegúrate de que la respuesta siga exactamente este formato:
-    "Nombre del vino, Año del vino, Bodega que lo produce, País/Región/Provincia, Recomendación de maridaje"
-""".trimIndent()
-
                 val inputContent = content {
                     text(prompt)
                     image(imageBitmap)
@@ -281,30 +365,54 @@ class WineViewModel : ViewModel() {
             }
         }
 
-    private fun extractWineDetails(extractedText: String): Map<String, String> {
-        val details = extractedText
-            .removeSurrounding("[", "]")
-            .split(",")
-            .map { it.trim().removeSurrounding("'").trim() }
 
-        return mapOf(
-            "name" to details.getOrNull(0).orEmpty(),
-            "year" to details.getOrNull(1).orEmpty(),
-            "winery" to details.getOrNull(2).orEmpty(),
-            "country" to details.getOrNull(3).orEmpty(),
-            "pairing" to details.getOrNull(4).orEmpty()
-        )
+    suspend fun getMoreDetails(wineName: String, winery: String): String {
+        return withContext(Dispatchers.IO) {
+            try {
+                val model = GenerativeModel(
+                    modelName = "gemini-1.5-flash-latest",
+                    apiKey = _apiKey,
+                    generationConfig = generationConfig {
+                        temperature = 1f
+                        topK = 64
+                        topP = 0.95f
+                        maxOutputTokens = 1000
+                    },
+                    safetySettings = listOf(
+                        SafetySetting(HarmCategory.HARASSMENT, BlockThreshold.MEDIUM_AND_ABOVE),
+                        SafetySetting(HarmCategory.HATE_SPEECH, BlockThreshold.MEDIUM_AND_ABOVE),
+                        SafetySetting(
+                            HarmCategory.SEXUALLY_EXPLICIT,
+                            BlockThreshold.MEDIUM_AND_ABOVE
+                        ),
+                        SafetySetting(
+                            HarmCategory.DANGEROUS_CONTENT,
+                            BlockThreshold.MEDIUM_AND_ABOVE
+                        )
+                    )
+                )
+                val prompt = """
+                Proporciona información concisa sobre el vino "$wineName" de la bodega "$winery" en un máximo de 60 palabras. 
+                Si no hay coincidencia exacta, proporciona información de un vino similar sin mencionarlo explícitamente.
+            """.trimIndent()
+                val inputContent = content {
+                    text(prompt)
+                }
+
+                val response = model.generateContent(inputContent)
+                val extractedText = response.candidates.first().content.parts.first().asTextOrNull()
+                Log.d("WineViewModel", "Extracted text: $extractedText")
+                extractedText ?: ""
+            } catch (e: Exception) {
+                Log.e(
+                    "WineViewModel",
+                    "Error analyzing wine label with Gemini: ${e.localizedMessage}",
+                    e
+                )
+                "No hay más informacion disponible sobre este vino."
+            }
+        }
     }
-
-    fun resetNavigateToWineList() {
-        _navigateToWineList.value = false
-    }
-
-    fun resetNavigateToFeedFragment() {
-        _navigateToWineFeed.value = false
-    }
-
-
 }
 
 

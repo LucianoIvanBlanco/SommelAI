@@ -4,17 +4,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.home.search.SearchFragment" >
-
+    android:background="@color/md_theme_dark_onSurface"
+    tools:context=".ui.home.search.SearchFragment">
 
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/textField"
+        android:id="@+id/tf_search_name"
+        style="@style/TextField"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
+        android:layout_marginStart="12dp"
         android:layout_marginTop="32dp"
-        android:layout_marginEnd="24dp"
+        android:layout_marginEnd="12dp"
+        android:clickable="true"
         android:hint="@string/search_wine_hint"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -26,11 +28,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="18dp"
-            android:hint="@string/search_wine_hint"
+            android:focusableInTouchMode="false"
             android:paddingStart="40dp"
+            android:selectAllOnFocus="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
+            app:textInputLayoutFocusedRectEnabled="false"
             tools:ignore="TextContrastCheck,VisualLintTextFieldSize" />
 
 
@@ -41,12 +45,15 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:paddingStart="12dp"
+        android:fontFamily="@font/poppins_semibold"
+        android:paddingStart="24dp"
         android:text="@string/title_category_wine_type"
         android:textAppearance="?attr/textAppearanceTitleMedium"
-        app:layout_constraintEnd_toEndOf="@+id/textField"
-        app:layout_constraintStart_toStartOf="@+id/textField"
-        app:layout_constraintTop_toBottomOf="@+id/textField" />
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/tf_search_name"
+        app:layout_constraintStart_toStartOf="@+id/tf_search_name"
+        app:layout_constraintTop_toBottomOf="@+id/tf_search_name" />
 
     <LinearLayout
         android:id="@+id/linearLayoutH1"
@@ -77,11 +84,12 @@
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/mcv_wine_red"
-                android:clickable="true"
-                android:focusable="true"
                 style="?attr/materialCardViewElevatedStyle"
                 android:layout_width="160dp"
                 android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardBackgroundColor="@color/md_theme_light_background"
                 app:cardElevation="4dp"
                 tools:layout_editor_absoluteX="8dp">
 
@@ -114,11 +122,12 @@
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/mcv_wine_white"
                 style="?attr/materialCardViewElevatedStyle"
-                android:clickable="true"
-                android:focusable="true"
                 android:layout_width="160dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardBackgroundColor="@color/md_theme_light_background"
                 app:cardElevation="4dp"
                 tools:layout_editor_absoluteX="8dp">
 
@@ -154,7 +163,6 @@
             android:id="@+id/linearLayoutV2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
             android:clipToPadding="false"
             android:orientation="vertical"
             android:paddingStart="2dp"
@@ -168,11 +176,12 @@
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/mcv_wine_sparkling"
-                android:clickable="true"
-                android:focusable="true"
                 style="?attr/materialCardViewElevatedStyle"
                 android:layout_width="160dp"
                 android:layout_height="wrap_content"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardBackgroundColor="@color/md_theme_light_background"
                 app:cardElevation="4dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -207,12 +216,13 @@
 
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/mcv_wine_rose"
-                android:clickable="true"
-                android:focusable="true"
                 style="?attr/materialCardViewElevatedStyle"
                 android:layout_width="160dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                app:cardBackgroundColor="@color/md_theme_light_background"
                 app:cardElevation="4dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -254,10 +264,12 @@
         android:id="@+id/fab_camera"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="50dp"
-        android:layout_marginBottom="30dp"
+        android:layout_marginEnd="25dp"
+        android:layout_marginBottom="25dp"
+        android:background="@color/md_theme_light_background"
         android:clickable="true"
         android:src="@drawable/photo_camera_24px"
+        app:backgroundTint="@color/md_theme_light_background"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
@@ -265,10 +277,13 @@
         android:id="@+id/tv_wine_country_type"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:paddingStart="12dp"
+        android:layout_marginTop="24dp"
+        android:fontFamily="@font/poppins_semibold"
+        android:paddingStart="24dp"
         android:text="@string/title_wine_country"
         android:textAppearance="?attr/textAppearanceTitleMedium"
+        android:textSize="20sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="@+id/tv_wine_type_title"
         app:layout_constraintStart_toStartOf="@+id/tv_wine_type_title"
         app:layout_constraintTop_toBottomOf="@+id/linearLayoutH1" />
@@ -305,6 +320,7 @@
                 android:layout_margin="8dp"
                 android:clickable="true"
                 android:focusable="true"
+                app:cardBackgroundColor="@color/md_theme_light_background"
                 app:cardElevation="4dp"
                 tools:ignore="MissingConstraints"
                 tools:layout_editor_absoluteX="8dp">
@@ -337,7 +353,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:gravity="center_horizontal"
-                            android:text="España"
+                            android:text="@string/tv_wine_spain"
                             android:textAppearance="?attr/textAppearanceTitleMedium" />
 
                     </LinearLayout>
@@ -355,6 +371,7 @@
                 android:layout_margin="8dp"
                 android:clickable="true"
                 android:focusable="true"
+                app:cardBackgroundColor="@color/md_theme_light_background"
                 app:cardElevation="4dp"
                 tools:ignore="MissingConstraints"
                 tools:layout_editor_absoluteX="8dp">
@@ -387,7 +404,7 @@
                             android:id="@+id/tv_wine_country_france"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Francia"
+                            android:text="@string/tv_wine_france"
                             android:textAppearance="?attr/textAppearanceTitleMedium" />
 
                     </LinearLayout>
@@ -403,10 +420,9 @@
             android:id="@+id/linerLayoutV7"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_marginEnd="16dp"
+            android:clipToPadding="false"
             android:gravity="center"
             android:orientation="vertical"
-            android:clipToPadding="false"
             android:paddingStart="2dp"
             android:paddingLeft="2dp"
             android:paddingTop="2dp"
@@ -422,6 +438,7 @@
                 android:layout_margin="8dp"
                 android:clickable="true"
                 android:focusable="true"
+                app:cardBackgroundColor="@color/md_theme_light_background"
                 app:cardElevation="4dp"
                 tools:ignore="MissingConstraints"
                 tools:layout_editor_absoluteX="8dp">
@@ -454,7 +471,7 @@
                             android:id="@+id/tv_wine_country_portugal"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Portugal"
+                            android:text="@string/tv_wine_portugal"
                             android:textAppearance="?attr/textAppearanceTitleMedium" />
 
                     </LinearLayout>
@@ -472,6 +489,7 @@
                 android:layout_margin="8dp"
                 android:clickable="true"
                 android:focusable="true"
+                app:cardBackgroundColor="@color/md_theme_light_background"
                 app:cardElevation="4dp"
                 tools:ignore="MissingConstraints"
                 tools:layout_editor_absoluteX="8dp">
@@ -503,7 +521,7 @@
                             android:id="@+id/tv_wine_country_italy"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Italia"
+                            android:text="@string/tv_wine_italy"
                             android:textAppearance="?attr/textAppearanceTitleMedium" />
 
                     </LinearLayout>

@@ -5,7 +5,8 @@
     android:id="@+id/frameLayout2"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.home.profile.ProfileFragment" >
+    android:background="@color/md_theme_dark_onSurface"
+    tools:context=".ui.home.profile.ProfileFragment">
 
     <TextView
         android:id="@+id/tv_user_name"
@@ -24,11 +25,10 @@
 
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/iv_profile"
-        android:layout_width="205dp"
-        android:layout_height="172dp"
+        android:layout_width="201dp"
+        android:layout_height="174dp"
         android:layout_marginTop="100dp"
-        android:src="@drawable/ic_emoji"
-        app:contentPadding="32dp"
+        android:src="@drawable/default_user"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -62,7 +62,7 @@
         style="@style/DangerButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="64dp"
         android:text="@string/btn_delete_account"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/btn_log_out"
@@ -73,8 +73,8 @@
         style="@style/CustomButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
+        android:layout_marginStart="64dp"
+        android:layout_marginEnd="64dp"
         android:layout_marginBottom="24dp"
         android:text="@string/profile_edit_bouton"
         app:layout_constraintBottom_toTopOf="@+id/btn_log_out"

@@ -9,10 +9,13 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.blanco.somelai.R
 import com.blanco.somelai.databinding.FragmentFeedBinding
 import com.blanco.somelai.ui.adapter.WineFeedAdapter
 import com.blanco.somelai.ui.home.search.WineViewModel
+import com.google.android.material.progressindicator.CircularProgressIndicator
 import okhttp3.ResponseBody
 
 class FeedFragment : Fragment() {
@@ -22,6 +25,7 @@ class FeedFragment : Fragment() {
 
     private lateinit var adapter: WineFeedAdapter
     private val wineViewModel: WineViewModel by activityViewModels()
+    private lateinit var progressIndicator: CircularProgressIndicator
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,13 +39,16 @@ class FeedFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         adapter = WineFeedAdapter(
-            deleteWine = { wine ->
-                wineViewModel.deleteWine(wine)
-                Toast.makeText(context, "Vino eliminado", Toast.LENGTH_LONG).show()
+            goToDetail = { wine ->
+                val bundle = Bundle().apply {
+                    putSerializable("wine", wine)
+                }
+                findNavController().navigate(R.id.action_feedFragment_to_wineDetailFragment, bundle)
             }
         )
         binding.rvFeed.layoutManager = LinearLayoutManager(requireContext())
         binding.rvFeed.adapter = adapter
+        progressIndicator = binding.progressCircular
 
         observeWineList()
     }
@@ -50,10 +57,12 @@ class FeedFragment : Fragment() {
         wineViewModel.fetchSavedWines()
         wineViewModel.feedUiState.observe(viewLifecycleOwner, Observer { feedUiState ->
             if (feedUiState.isLoading) {
-                // TODO agregar spinner de carga aqui
+                showLoadingSpinner()
             } else if (feedUiState.isError) {
+                hideLoadingSpinner()
                 showErrorMessage(errorBody = null)
             } else {
+                hideLoadingSpinner()
                 feedUiState.response?.let { wines ->
                     adapter.submitList(wines)
                 }
@@ -61,11 +70,17 @@ class FeedFragment : Fragment() {
         })
     }
 
-    private fun showErrorMessage(errorBody: ResponseBody?) {
-        val message = "Ha habido un error al recuperar los anuncios"
-        Log.e("WineList", errorBody.toString())
-        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    private fun showLoadingSpinner() {
+        progressIndicator.visibility = View.VISIBLE
     }
 
+    private fun hideLoadingSpinner() {
+        progressIndicator.visibility = View.GONE
+    }
 
+    private fun showErrorMessage(errorBody: ResponseBody?) {
+        val message = getString(R.string.error_wine_message)
+        Log.e("FeedFragment", errorBody.toString())
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
 }

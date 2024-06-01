@@ -2,11 +2,16 @@ package com.blanco.somelai.ui.home.profile
 
 import android.Manifest
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -32,7 +37,8 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.Calendar
+import java.io.ByteArrayOutputStream
+import java.io.InputStream
 
 class EditProfileFragment : Fragment() {
 
@@ -45,39 +51,36 @@ class EditProfileFragment : Fragment() {
 
     private var selectedImageUri: Uri? = null
     private var uploadedImageUrl: String? = null
+    private var tempBase64Image: String? = null
 
 
     private lateinit var cloudStorageManager: CloudStorageManager
     private lateinit var profileImageButton: ImageButton
 
 
-    //region --- Launchers ---
     private val requestPermissionLauncher: ActivityResultLauncher<String> =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
             if (isGranted) {
-                //El permiso ha sido concedido, podemos realizar la acción que lo necesitaba
                 openGallery()
             } else {
                 showDeniedPermissionMessage()
-                requireActivity().finish()
             }
         }
 
     private var imageGalleryLauncher =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == Activity.RESULT_OK) {
-                val data: Intent? = result.data
-                if (data != null) {
-                    selectedImageUri = data.data
-                    uploadImage(selectedImageUri)
-                } else {
+                result.data?.data?.let { uri ->
+                    selectedImageUri = uri
+                    uploadImage(uri)
+                    handleImageUri(uri)
+                } ?: run {
                     showErrorMessageNoImage()
                 }
             } else {
                 showErrorMessageNoImage()
             }
         }
-    //endregion --- Launchers ---
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -94,30 +97,25 @@ class EditProfileFragment : Fragment() {
         cloudStorageManager = CloudStorageManager()
         realTimeDatabaseManager = RealTimeDatabaseManager()
         auth = FirebaseAuth.getInstance()
-        // Inicializa tu ImageButton
         profileImageButton = view.findViewById(R.id.img_btn_profile)
 
-        // Carga la foto de perfil del usuario logueado
         loadUserProfilePicture()
         setClicks()
         getUserData()
     }
-
-    //region --- UI Related ---
 
     private fun setClicks() {
         binding.btnSaveChanges.setOnClickListener {
             if (isDataValid()) {
                 if (uploadedImageUrl != null) {
                     updateUserProfile()
-                    showMessage("Datos actualizados")
+                    showMessage(getString(R.string.show_message_update_image))
                 } else {
-                    // Manejar el caso en que uploadedImageUrl es null
-                    showMessage("No se ha subido ninguna imagen.")
+                    showMessage(getString(R.string.show_message_dont_have_image))
                 }
                 findNavController().popBackStack()
             } else {
-                showMessage("Error, debes completar todos los campos")
+                showMessage(getString(R.string.show_message_error_complete_all))
             }
         }
 
@@ -130,47 +128,39 @@ class EditProfileFragment : Fragment() {
         }
     }
 
-    private fun loadUserProfilePicture() {
-        lifecycleScope.launch {
-            val userPhotoUrl = cloudStorageManager.getUserProfilePicture()
-            if (userPhotoUrl != null) {
-                Glide.with(requireContext())
-                    .asBitmap() // Forzar a tratar la imagen como un bitmap
-                    .load(userPhotoUrl?: R.drawable.default_user)
-                    .placeholder(R.drawable.default_user)
-                    .fallback(R.drawable.default_user)
-                    .into(profileImageButton)
 
-            } else {
-                // Carga una imagen por defecto si no hay foto de perfil
-                Glide.with(requireContext())
-                    .load(R.drawable.default_user) // Asegúrate de que ic_emoji exista en tus recursos de drawable
-                    .into(profileImageButton)
+    // TODO ver si no navega coorectamente por esto
+    private fun navigateToPreviousFragment() {
+        findNavController().navigateUp()
+    }
+
+    private fun loadUserProfilePicture() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            val userPhotoUrl = cloudStorageManager.getUserProfilePicture()
+            withContext(Dispatchers.Main) {
+                if (userPhotoUrl != null) {
+                    Glide.with(requireContext())
+                        .asBitmap()
+                        .load(userPhotoUrl)
+                        .into(profileImageButton)
+                }
             }
         }
     }
 
     private fun setImagePreview(uploadedImageResponse: String) {
-
         Glide.with(requireContext())
-            .asBitmap() // Forzar a tratar la imagen como un bitmap
+            .asBitmap()
             .load(uploadedImageResponse)
             .centerCrop()
-            .placeholder(R.drawable.default_user)
-            .fallback(R.drawable.default_user)
             .into(profileImageButton)
     }
-
-    //endregion --- UI RElated ---
-
-    //region --- Firebase - CloudStorage ---
 
     private fun uploadImage(selectedImageUri: Uri?) {
         lifecycleScope.launch(Dispatchers.IO) {
             val uploadedImageResponse = cloudStorageManager.uploadProfileImage(selectedImageUri!!)
             withContext(Dispatchers.Main) {
                 if (uploadedImageResponse != null) {
-                    //Mostramos la imagen cuando recibamos el link
                     uploadedImageUrl = uploadedImageResponse
                     setImagePreview(uploadedImageResponse)
                 }
@@ -181,46 +171,54 @@ class EditProfileFragment : Fragment() {
     private fun deleteImageAndOpenGallery() {
         lifecycleScope.launch(Dispatchers.IO) {
             if (uploadedImageUrl != null) {
-                //Esperamos a que nos retorne si la foto se borró a partir del enlace o no
                 val wasDeleted: Boolean = CloudStorageManager().deleteImage(uploadedImageUrl!!)
                 if (wasDeleted) {
-                    Log.i("Users", "Foto eliminada")
+                    Log.i("EditProfileFragment", "Foto eliminada")
                 }
                 openGallery()
             }
         }
     }
-    //endregion --- Firebase - CloudStorage ---
 
     private fun isDataValid(): Boolean {
-        // Expresiones regulares para email y password
         val userNamePattern = "^[a-zA-Z0-9]{4,}$".toRegex()
         val fullNamePattern = "^[a-zA-Z]{3,20}\\s[a-zA-Z]{4,20}$".toRegex()
         val passwordPattern = ".{6,10}".toRegex()
         val password = binding.etProfilePassword.text.toString().trim()
+        val repeatPassword = binding.etRepeatPassword.text.toString().trim()
         val userName = binding.etProfileUserName.text.toString().trim()
         val fullName = binding.etProfileFullName.text.toString().trim()
 
-        return fullName.matches(fullNamePattern) && fullName.isNotEmpty() &&
-                password.matches(passwordPattern) && password.isNotEmpty() &&
-                userName.matches(userNamePattern) && userName.isNotEmpty()
+        if (!userName.matches(userNamePattern) || userName.isEmpty()) {
+            return false
+        }
+
+        if (!fullName.matches(fullNamePattern) || fullName.isEmpty()) {
+            return false
+        }
+
+        if (!password.matches(passwordPattern) || password.isEmpty()) {
+            return false
+        }
+        if (!repeatPassword.matches(passwordPattern) || repeatPassword.isEmpty()) {
+            return false
+        }
+        if (password != repeatPassword) {
+            showPasswordMismatchMessage()
+            return false
+        }
+        return true
     }
 
-    // TODO se puede subir la foto pero no se puede ver desde profile ni desde editProfile una vez guardada. tampoco da opcion a
-    // abrir la camara
-
-    fun updateUserProfile() {
-        // Recopila los datos de los campos EditText
+    // TODO agregamos opcion de tomar fotografia?
+    private fun updateUserProfile() {
         val userName = binding.etProfileUserName.text.toString()
         val userFullName = binding.etProfileFullName.text.toString()
         val userPassword = binding.etProfilePassword.text.toString()
-        // Asegúrate de que el usuario tenga una clave válida para actualizar su perfil
-        val userUid =
-            auth.currentUser?.uid.toString()// Aquí debes obtener la clave del usuario actual
+        val userUid = auth.currentUser?.uid.toString()
         val userEmail = auth.currentUser?.email.toString()
         val userPhotoUrl = uploadedImageUrl!!
 
-        // Crea un objeto UserData con los datos recopilados
         val userData = UserData(
             uid = userUid,
             userEmail = userEmail,
@@ -229,8 +227,58 @@ class EditProfileFragment : Fragment() {
             userPassword = userPassword,
             userPhotoUrl = userPhotoUrl
         )
-        // Llama a la función updateUser del RealTimeDatabaseManager para actualizar los datos del usuario
-        realTimeDatabaseManager.updateUser(userData)
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                realTimeDatabaseManager.updateUser(userData)
+                updateUserDataInDataStore(userEmail, userPassword, userUid, userFullName,userName)
+
+                withContext(Dispatchers.Main) {
+                    showMessage(getString(R.string.show_message_data_updated))
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    showMessage(getString(R.string.show_message_error_update_data))
+                }
+            }
+        }
+    }
+
+    private suspend fun updateUserDataInDataStore(email: String, password: String, id: String, fullName: String, userName: String) {
+        dataStoreManager.saveUserData(email, password, id, fullName, userName)
+        tempBase64Image?.let {
+            dataStoreManager.savedUserPhoto(it)
+        }
+    }
+
+    private fun handleImageUri(imageUri: Uri?) {
+        val base64Image = convertImageToBase64(requireContext(), imageUri)
+        if (base64Image != null) {
+            tempBase64Image = base64Image
+        } else {
+            Log.e("EditProfileFragment", "La imagen en Base64 es nula, no se puede convertir.")
+        }
+    }
+
+    private fun convertImageToBase64(context: Context, imageUri: Uri?): String? {
+        return try {
+            val inputStream: InputStream? = imageUri?.let {
+                context.contentResolver.openInputStream(it)
+            }
+            if (inputStream != null) {
+                val bitmap = BitmapFactory.decodeStream(inputStream)
+                val byteArrayOutputStream = ByteArrayOutputStream()
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream)
+                val byteArray = byteArrayOutputStream.toByteArray()
+                Base64.encodeToString(byteArray, Base64.DEFAULT)
+            } else {
+                Log.e("EditProfileFragment", "Error al abrir el InputStream de la imagen: No se pudo abrir el archivo de imagen desde el URI proporcionado.")
+                null
+            }
+        } catch (e: Exception) {
+            Log.e("EditProfileFragment", "Error al convertir la imagen a Base64: ${e.message}")
+            null
+        }
     }
 
     private fun getUserData() {
@@ -245,46 +293,39 @@ class EditProfileFragment : Fragment() {
                     if (userData != null) {
                         setOldUserData(userData)
                     } else {
-                        showMessage("No se encontraron datos del usuario.")
+                        showMessage(getString(R.string.show_message_error_not_found_data))
                     }
                 }
             }
         } else {
-            showMessage("No hay un usuario autenticado.")
+            showMessage(getString(R.string.show_message_error_not_found_user_login))
         }
     }
 
     private fun setOldUserData(user: UserData) {
         binding.etProfileUserName.setText(user.userName)
         binding.etProfileFullName.setText(user.userFullName)
-        binding.etProfilePassword.setText(user.userPassword)
 
         Glide.with(requireContext())
-            .asBitmap() // Forzar a tratar la imagen como un bitmap
-            .load(user.userPhotoUrl?: R.drawable.default_user)
+            .asBitmap()
+            .load(user.userPhotoUrl)
             .placeholder(R.drawable.default_user)
             .fallback(R.drawable.default_user)
             .into(profileImageButton)
-
     }
-
 
     private fun showMessage(message: String) {
         lifecycleScope.launch(Dispatchers.Main) {
             Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
-
         }
     }
 
-
-    //region --- Messages ---
-
     private fun showPermissionRationaleDialog(externalStoragePermission: String) {
 
-        val title = getString(R.string.new_advertisement_permission_dialog_title)
-        val message = getString(R.string.new_advertisement_permission_dialog_message)
-        val positiveButton = getString(R.string.new_advertisement_permission_dialog_positive_button)
-        val negativeButton = getString(R.string.new_advertisement_permission_dialog_negative_button)
+        val title = getString(R.string.show_permission_necessary)
+        val message = getString(R.string.show_permission_necessary_photo)
+        val positiveButton = getString(R.string.show_permission_dialog_positive_button)
+        val negativeButton = getString(R.string.show_permission_dialog_negative_button)
 
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(title)
@@ -297,78 +338,49 @@ class EditProfileFragment : Fragment() {
     }
 
     private fun showDeniedPermissionMessage() {
-        val message = getString(R.string.new_advertisement_denied_permission)
+        val message = getString(R.string.show_message_denied_permission)
         Snackbar.make(binding.root, message, Snackbar.LENGTH_SHORT).show()
     }
 
     private fun showErrorMessageNoImage() {
-        val message = getString(R.string.new_advertisement_no_select_image_error)
+        val message = getString(R.string.show_message_no_select_image_error)
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
-    //endregion --- Messages ---
 
-    //region --- Photo gallery ---
+    private fun showPasswordMismatchMessage() {
+        Toast.makeText(requireContext(), R.string.sign_up_password_mismatch_error, Toast.LENGTH_SHORT).show()
+    }
+
     private fun checkIfWeAlreadyHaveThisPermission() {
-        val externalStoragePermission: String = Manifest.permission.READ_EXTERNAL_STORAGE
-        val permissionStatus = ContextCompat.checkSelfPermission(requireActivity(), externalStoragePermission)
+        val permissionToRequest = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Manifest.permission.READ_MEDIA_IMAGES
+        } else {
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        }
+
+        val permissionStatus =
+            ContextCompat.checkSelfPermission(requireContext(), permissionToRequest)
 
         if (permissionStatus == PackageManager.PERMISSION_GRANTED) {
             openGallery()
         } else {
-            val shouldRequestPermission = shouldShowRequestPermissionRationale(externalStoragePermission)
+            val shouldRequestPermission = shouldShowRequestPermissionRationale(permissionToRequest)
             if (shouldRequestPermission) {
-                showPermissionRationaleDialog(externalStoragePermission)
+                showPermissionRationaleDialog(permissionToRequest)
             } else {
-                requestPermissionLauncher.launch(externalStoragePermission)
+                requestPermissionLauncher.launch(permissionToRequest)
             }
         }
     }
 
     private fun openGallery() {
-        val intent = Intent(
-            Intent.ACTION_PICK,
-            MediaStore.Images.Media.EXTERNAL_CONTENT_URI
-        )
-        intent.type = "image/*"
-        imageGalleryLauncher.launch(intent)
-    }
-
-    //endregion --- Photo gallery ---
-
-    //region --- Others: data validations, strings... ---
-
-
-    // TODO podemos usar para avisar de campos vacios al usuario
-
-    private fun checkData(title: String, price: Double, description: String): Boolean {
-
-        var isDataValid = true
-        if (title.isNullOrEmpty()) {
-            isDataValid = false
-            showMessage("Debes poner un título al anuncio")
-        } else if (price <= 0.0) {
-            isDataValid = false
-            showMessage("Necesitas poner un precio al artículo")
-        } else if (description.isNullOrEmpty()) {
-            isDataValid = false
-            showMessage("Debes poner una descripción al anuncio")
-        } else if (uploadedImageUrl == null) {
-            isDataValid = false
-            showMessage("Necesitas subir una foto para el anuncio")
+        val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI).apply {
+            type = "image/*"
         }
-        return isDataValid
+        try {
+            imageGalleryLauncher.launch(intent)
+        } catch (e: Exception) {
+            Log.e("EditProfileFragment", "Failed to open gallery", e)
+        }
     }
-
-    // para obtener la fecha actual no se usa
-
-    private fun getCurrentDate(): String {
-        //Obtenemos la fecha actual
-        val calendar = Calendar.getInstance()
-        // Obtener la hora, minutos y segundos actuales
-        val year = calendar.get(Calendar.YEAR)
-        val month = calendar.get(Calendar.MONTH)
-        val day = calendar.get(Calendar.DAY_OF_MONTH)
-        return "$day/$month/$year"
-    }
-    //endregion --- Others: data validations, strings... ---
 }

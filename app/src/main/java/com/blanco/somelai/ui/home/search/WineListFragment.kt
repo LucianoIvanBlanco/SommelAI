@@ -9,9 +9,12 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.blanco.somelai.R
 import com.blanco.somelai.databinding.FragmentWineListBinding
 import com.blanco.somelai.ui.adapter.WineListAdapter
+import com.google.android.material.progressindicator.CircularProgressIndicator
 
 class WineListFragment : Fragment() {
 
@@ -19,7 +22,10 @@ class WineListFragment : Fragment() {
     private val binding: FragmentWineListBinding get() = _binding
 
     private val viewModel: WineViewModel by activityViewModels()
-    val adapter = WineListAdapter()
+    private lateinit var adapter: WineListAdapter
+
+    private lateinit var progressIndicator: CircularProgressIndicator
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -32,30 +38,53 @@ class WineListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        adapter = WineListAdapter(
+            goToDetail = { wine ->
+                val bundle = Bundle().apply {
+                    putSerializable("wine", wine)
+                }
+                findNavController().navigate(R.id.action_wineListFragment_to_wineResponseDetailFragment,bundle)
+            }
+        )
+
         binding.rveWineListType.layoutManager = LinearLayoutManager(requireContext())
         binding.rveWineListType.adapter = adapter
 
+        progressIndicator = view.findViewById(R.id.progress_circular)
+
         observeViewModel()
+    }
+
+
+
+    private fun showLoadingSpinner() {
+        progressIndicator.visibility = View.VISIBLE
+    }
+
+    private fun hideLoadingSpinner() {
+        progressIndicator.visibility = View.GONE
     }
 
     private fun observeViewModel() {
         viewModel.uiState.observe(viewLifecycleOwner, Observer { uiState ->
             if (uiState.isLoading) {
-                // TODO agregar spinner de carga aqui
+                showLoadingSpinner()
             } else if (uiState.isError) {
                 Log.e("WineListFragment", "isError")
                 showErrorMessage()
+                hideLoadingSpinner()
             } else {
                 // Verificar si la respuesta no es nula y luego actualizar el adaptador
                 uiState.response?.let { wines ->
                     adapter.submitList(wines)
                 }
+                hideLoadingSpinner()
             }
         })
     }
 
     private fun showErrorMessage() {
-        val message = "Ha ocurrido un error al recuperar los datos"
+        val message = getString(R.string.error_wine_message)
         Log.e("WineListFragment", message)
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }

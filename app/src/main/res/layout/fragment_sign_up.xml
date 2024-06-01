@@ -2,38 +2,36 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/frameLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@drawable/background_wine_3"
     tools:context=".ui.login.SignUpFragment">
+
 
     <TextView
         android:id="@+id/tv_sign_up_title"
+        style="@style/ViewTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="60dp"
         android:layout_marginEnd="32dp"
         android:text="@string/sign_up_title"
         android:textAlignment="center"
-        android:textAppearance="@style/ViewTitle"
+        android:textColor="@color/white"
+        android:textSize="32sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/til_sign_up_user_name"
+        style="@style/TextField"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:hint="@string/sign_up_user_name_hint"
-        app:boxBackgroundMode="outline"
-        app:boxCornerRadiusBottomEnd="8dp"
-        app:boxCornerRadiusBottomStart="8dp"
-        app:boxCornerRadiusTopEnd="8dp"
-        app:boxCornerRadiusTopStart="8dp"
+        android:layout_marginTop="64dp"
         app:layout_constraintEnd_toEndOf="@+id/tv_sign_up_title"
         app:layout_constraintStart_toStartOf="@+id/tv_sign_up_title"
         app:layout_constraintTop_toBottomOf="@+id/tv_sign_up_title">
@@ -43,21 +41,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/sign_up_user_name_hint"
+            android:singleLine="true"
             tools:ignore="TextContrastCheck,VisualLintTextFieldSize" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/til_sign_up_name"
+        style="@style/TextField"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:hint="@string/sign_up_name_hint"
-        app:boxBackgroundMode="outline"
-        app:boxCornerRadiusBottomEnd="8dp"
-        app:boxCornerRadiusBottomStart="8dp"
-        app:boxCornerRadiusTopEnd="8dp"
-        app:boxCornerRadiusTopStart="8dp"
         app:layout_constraintEnd_toEndOf="@+id/tv_sign_up_title"
         app:layout_constraintStart_toStartOf="@+id/tv_sign_up_title"
         app:layout_constraintTop_toBottomOf="@+id/til_sign_up_user_name">
@@ -67,21 +61,17 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/sign_up_name_hint"
+            android:singleLine="true"
             tools:ignore="TextContrastCheck,VisualLintTextFieldSize" />
 
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/til_sign_up_email"
+        style="@style/TextField"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:hint="@string/login_mail_hint"
-        app:boxBackgroundMode="outline"
-        app:boxCornerRadiusBottomEnd="8dp"
-        app:boxCornerRadiusBottomStart="8dp"
-        app:boxCornerRadiusTopEnd="8dp"
-        app:boxCornerRadiusTopStart="8dp"
         app:layout_constraintEnd_toEndOf="@+id/tv_sign_up_title"
         app:layout_constraintStart_toStartOf="@+id/tv_sign_up_title"
         app:layout_constraintTop_toBottomOf="@+id/til_sign_up_name">
@@ -91,6 +81,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/sign_up_mail_hint"
+            android:singleLine="true"
             android:inputType="textEmailAddress"
             tools:ignore="TextContrastCheck,VisualLintTextFieldSize" />
 
@@ -98,14 +89,10 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/til_login_password"
+        style="@style/TextField"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:hint="@string/login_password_hint"
-        app:boxCornerRadiusBottomEnd="8dp"
-        app:boxCornerRadiusBottomStart="8dp"
-        app:boxCornerRadiusTopEnd="8dp"
-        app:boxCornerRadiusTopStart="8dp"
         app:layout_constraintEnd_toEndOf="@+id/tv_sign_up_title"
         app:layout_constraintStart_toStartOf="@+id/tv_sign_up_title"
         app:layout_constraintTop_toBottomOf="@+id/til_sign_up_email"
@@ -121,17 +108,39 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/til_repeat_password"
+        style="@style/TextField"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="@+id/tv_sign_up_title"
+        app:layout_constraintStart_toStartOf="@+id/tv_sign_up_title"
+        app:layout_constraintTop_toBottomOf="@+id/til_login_password"
+        app:passwordToggleEnabled="true">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_repeat_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/repeat_password_hin"
+            android:inputType="textPassword"
+            tools:ignore="TextContrastCheck,VisualLintTextFieldSize" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
     <Button
         android:id="@+id/btn_sign_up"
         style="@style/CustomButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
-        android:backgroundTint="?attr/colorSecondary"
+        android:layout_marginStart="64dp"
+        android:layout_marginEnd="64dp"
+        android:layout_marginBottom="64dp"
         android:text="@string/sign_up_button_description"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/til_login_password"
-        app:layout_constraintStart_toStartOf="@+id/til_login_password"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         tools:ignore="VisualLintButtonSize" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

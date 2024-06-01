@@ -16,6 +16,7 @@ import com.blanco.somelai.ui.home.HomeActivity
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class LoginFragment : BottomSheetDialogFragment() {
 
@@ -37,9 +38,21 @@ class LoginFragment : BottomSheetDialogFragment() {
 
         dataStoreManager = DataStoreManager(requireContext())
         setClicks()
+        checkUserLogged()
     }
 
-    private fun cleanData(){
+    // Chekeamos login en datastore para no tener que iniciar sesion nuevamente
+    private fun checkUserLogged() {
+        lifecycleScope.launch(Dispatchers.IO) {
+            if (dataStoreManager.isUserLogged()) {
+                withContext(Dispatchers.IO) {
+                    navigateToHome()
+                }
+            }
+        }
+    }
+
+    private fun cleanData() {
         binding.etLoginEmail.setText("")
         binding.etLoginPassword.setText("")
     }
@@ -77,7 +90,6 @@ class LoginFragment : BottomSheetDialogFragment() {
             .commit()
     }
 
-
     private fun sendLogin(email: String, password: String) {
         lifecycleScope.launch(Dispatchers.IO) {
             val resultIsSuccessful =
@@ -86,13 +98,12 @@ class LoginFragment : BottomSheetDialogFragment() {
                 dataStoreManager.saveUser(email, password)
                 navigateToHome()
             } else {
-                // TODO Manejar que pasa cuando el useuario pone una contraseña incorrecta
                 showInvalidCredentialsMessage()
             }
         }
     }
 
-   private fun navigateToHome() {
+    private fun navigateToHome() {
         val intent = Intent(requireContext(), HomeActivity::class.java)
         startActivity(intent)
         requireActivity().finish()
@@ -113,5 +124,4 @@ class LoginFragment : BottomSheetDialogFragment() {
             ).show()
         }
     }
-
 }
