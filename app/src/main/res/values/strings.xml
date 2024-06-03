@@ -81,7 +81,7 @@
     <string name="toast_message_update_wine">Vino actualizado</string>
 
     <string name="show_message_update_image">Imagen actualizada</string>
-    <string name="show_message_dont_have_image">No se ha subido ninguna imagen</string>
+    <string name="show_message_dont_have_image">No se ha actualizado la imagen</string>
     <string name="show_message_error_complete_all">"Error, debes completar todos los campos"</string>
     <string name="show_message_data_updated">Datos actualizados</string>
     <string name="show_message_error_update_data">Error al actualizar los datos</string>
@@ -106,4 +106,5 @@
     <string name="tv_wine_france">Francia</string>
     <string name="tv_wine_portugal">Portugal</string>
     <string name="tv_wine_italy">Italia</string>
+    <string name="show_message_no_changes_detected">No hay datos para actualizar</string>
 </resources>

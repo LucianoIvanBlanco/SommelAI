@@ -106,17 +106,7 @@ class EditProfileFragment : Fragment() {
 
     private fun setClicks() {
         binding.btnSaveChanges.setOnClickListener {
-            if (isDataValid()) {
-                if (uploadedImageUrl != null) {
-                    updateUserProfile()
-                    showMessage(getString(R.string.show_message_update_image))
-                } else {
-                    showMessage(getString(R.string.show_message_dont_have_image))
-                }
-                findNavController().popBackStack()
-            } else {
-                showMessage(getString(R.string.show_message_error_complete_all))
-            }
+            handleSaveChanges()
         }
 
         binding.imgBtnProfile.setOnClickListener {
@@ -127,6 +117,81 @@ class EditProfileFragment : Fragment() {
             }
         }
     }
+
+    private fun handleSaveChanges() {
+        Log.d("EditProfileFragment", "handleSaveChanges: Start")
+        if (isDataValid()) {
+            Log.d("EditProfileFragment", "handleSaveChanges: Data is valid")
+            if (uploadedImageUrl != null) {
+                Log.d("EditProfileFragment", "handleSaveChanges: Image has been uploaded")
+                val newUserName = binding.etProfileUserName.text.toString().trim()
+                val newFullName = binding.etProfileFullName.text.toString().trim()
+                val newPassword = binding.etProfilePassword.text.toString().trim()
+                val newImageUrl = uploadedImageUrl!!
+                Log.d("EditProfileFragment", "handleSaveChanges: newImageUrl: $newImageUrl")
+                updateUserProfile(newUserName, newFullName, newPassword, newImageUrl) {
+                    setImagePreview(newImageUrl) // Asegúrate de actualizar la vista con la nueva imagen
+                    showMessage(getString(R.string.show_message_update_image))
+                    findNavController().popBackStack()
+                }
+            } else {
+                Log.d("EditProfileFragment", "handleSaveChanges: Image has not been uploaded")
+                // Obtener los datos actuales del usuario
+                val currentUser = auth.currentUser
+                if (currentUser != null) {
+                    val uid = currentUser.uid
+                    Log.d("EditProfileFragment", "handleSaveChanges: Current user UID: $uid")
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        val userData = realTimeDatabaseManager.readUser(uid)
+                        withContext(Dispatchers.Main) {
+                            if (userData != null) {
+                                Log.d("EditProfileFragment", "handleSaveChanges: User data retrieved")
+                                // Verificar si los datos han sido actualizados
+                                val newUserName = binding.etProfileUserName.text.toString().trim()
+                                val newFullName = binding.etProfileFullName.text.toString().trim()
+                                val newPassword = binding.etProfilePassword.text.toString().trim()
+
+                                Log.d("EditProfileFragment", "handleSaveChanges: New UserName: $newUserName")
+                                Log.d("EditProfileFragment", "handleSaveChanges: New FullName: $newFullName")
+                                Log.d("EditProfileFragment", "handleSaveChanges: New Password: $newPassword")
+
+                                val isUserNameUpdated = newUserName != userData.userName
+                                val isFullNameUpdated = newFullName != userData.userFullName
+                                val isPasswordUpdated = newPassword.isNotEmpty() && newPassword != userData.userPassword
+
+                                Log.d("EditProfileFragment", "handleSaveChanges: isUserNameUpdated: $isUserNameUpdated")
+                                Log.d("EditProfileFragment", "handleSaveChanges: isFullNameUpdated: $isFullNameUpdated")
+                                Log.d("EditProfileFragment", "handleSaveChanges: isPasswordUpdated: $isPasswordUpdated")
+
+                                if (isUserNameUpdated || isFullNameUpdated || isPasswordUpdated) {
+                                    Log.d("EditProfileFragment", "handleSaveChanges: Data has been updated")
+                                    updateUserProfile(newUserName, newFullName, newPassword, uploadedImageUrl) {
+                                        showMessage(getString(R.string.show_message_data_updated))
+                                        findNavController().popBackStack()
+                                    }
+                                } else {
+                                    Log.d("EditProfileFragment", "handleSaveChanges: No changes detected")
+                                    showMessage(getString(R.string.show_message_no_changes_detected))
+                                    findNavController().popBackStack()
+                                }
+                            } else {
+                                Log.d("EditProfileFragment", "handleSaveChanges: User data is null")
+                            }
+                        }
+                    }
+                } else {
+                    Log.d("EditProfileFragment", "handleSaveChanges: Current user is null")
+                }
+            }
+        } else {
+            Log.d("EditProfileFragment", "handleSaveChanges: Data is not valid")
+            showMessage(getString(R.string.show_message_error_complete_all))
+        }
+        Log.d("EditProfileFragment", "handleSaveChanges: End")
+    }
+
+
+
 
 
     // TODO ver si no navega coorectamente por esto
@@ -211,32 +276,32 @@ class EditProfileFragment : Fragment() {
     }
 
     // TODO agregamos opcion de tomar fotografia?
-    private fun updateUserProfile() {
-        val userName = binding.etProfileUserName.text.toString()
-        val userFullName = binding.etProfileFullName.text.toString()
-        val userPassword = binding.etProfilePassword.text.toString()
+    private fun updateUserProfile(newUserName: String, newFullName: String, newPassword: String, newImageUrl: String?, onComplete: () -> Unit) {
         val userUid = auth.currentUser?.uid.toString()
         val userEmail = auth.currentUser?.email.toString()
-        val userPhotoUrl = uploadedImageUrl!!
-
-        val userData = UserData(
-            uid = userUid,
-            userEmail = userEmail,
-            userName = userName,
-            userFullName = userFullName,
-            userPassword = userPassword,
-            userPhotoUrl = userPhotoUrl
-        )
 
         lifecycleScope.launch(Dispatchers.IO) {
             try {
-                realTimeDatabaseManager.updateUser(userData)
-                updateUserDataInDataStore(userEmail, userPassword, userUid, userFullName,userName)
+                val userData = realTimeDatabaseManager.readUser(userUid)
+                if (userData != null) {
+                    val updatedUserData = userData.copy(
+                        userName = newUserName,
+                        userFullName = newFullName,
+                        userPassword = newPassword,
+                        userPhotoUrl = newImageUrl ?: userData.userPhotoUrl // Mantener la URL actual si newImageUrl es null
+                    )
 
-                withContext(Dispatchers.Main) {
-                    showMessage(getString(R.string.show_message_data_updated))
+                    realTimeDatabaseManager.updateUser(updatedUserData)
+                    updateUserDataInDataStore(userEmail, newPassword, userUid, newFullName, newUserName)
+
+                    withContext(Dispatchers.Main) {
+                        onComplete()
+                    }
+                } else {
+                    Log.e("EditProfileFragment", "updateUserProfile: User data is null")
                 }
             } catch (e: Exception) {
+                Log.e("EditProfileFragment", "updateUserProfile: Error updating user data", e)
                 withContext(Dispatchers.Main) {
                     showMessage(getString(R.string.show_message_error_update_data))
                 }
