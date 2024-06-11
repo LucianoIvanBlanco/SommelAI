@@ -7,32 +7,32 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
-
+import kotlinx.coroutines.flow.map
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "SOMELAI_STORE")
 
-class DataStoreManager(val context: Context) {
+class DataStoreManager(private val context: Context) {
 
-    private val emailKey = "EMAIL"
-    private val passwordKey = "PASSWORD"
-    private val jwtKey = "JWT"
-    private val userNameKey = "USERNAME"
-    private val fullNameKey = "FULLNAME"
-    private val userPhotoUrl = "PHTOTO_URL"
-    private val userIdKey = "USER_ID"
-    private val isLoggedKey = "IS_LOGGED"
+    private val emailKey = stringPreferencesKey("EMAIL")
+    private val passwordKey = stringPreferencesKey("PASSWORD")
+    private val jwtKey = stringPreferencesKey("JWT")
+    private val userNameKey = stringPreferencesKey("USERNAME")
+    private val fullNameKey = stringPreferencesKey("FULLNAME")
+    private val userPhotoUrl = stringPreferencesKey("PHOTO_URL")
+    private val userIdKey = stringPreferencesKey("USER_ID")
+    private val isLoggedKey = booleanPreferencesKey("IS_LOGGED")
 
-
-    private suspend fun putString(key: String, value: String) {
+    private suspend fun putString(key: Preferences.Key<String>, value: String) {
         context.dataStore.edit { editor ->
-            editor[stringPreferencesKey(key)] = value
+            editor[key] = value
         }
     }
 
-    private suspend fun putBoolean(key: String, value: Boolean) {
+    private suspend fun putBoolean(key: Preferences.Key<Boolean>, value: Boolean) {
         context.dataStore.edit { editor ->
-            editor[booleanPreferencesKey(key)] = value
+            editor[key] = value
         }
     }
 
@@ -43,58 +43,57 @@ class DataStoreManager(val context: Context) {
     }
 
     suspend fun saveUserData(email: String, password: String, id: String, fullName: String, userName: String) {
-        putString(emailKey, email)
-        putString(passwordKey, password)
-        putString(userIdKey, id)
-        putString(fullNameKey, fullName)
-        putString(userNameKey, userName)
+        context.dataStore.edit { editor ->
+            editor[emailKey] = email
+            editor[passwordKey] = password
+            editor[userIdKey] = id
+            editor[fullNameKey] = fullName
+            editor[userNameKey] = userName
+        }
     }
 
-    suspend fun savedUserPhoto(photo: String) {
+    suspend fun saveUserPhoto(photo: String) {
         putString(userPhotoUrl, photo)
     }
+
     suspend fun getToken(): String? {
         val preferences = context.dataStore.data.first()
-        return preferences[stringPreferencesKey(jwtKey)]
+        return preferences[jwtKey]
     }
 
-    suspend fun getUserData(): Map<String, String> {
-        val preferences = context.dataStore.data.first()
-        val userName = preferences[stringPreferencesKey(userNameKey)] ?: ""
-        val fullName = preferences[stringPreferencesKey(fullNameKey)] ?: ""
-        val email = preferences[stringPreferencesKey(emailKey)] ?: ""
-        val id = preferences[stringPreferencesKey(userIdKey)] ?: ""
-        val photo = preferences[stringPreferencesKey(userPhotoUrl)] ?: ""
-        val password = preferences[stringPreferencesKey(passwordKey)] ?: ""
-
-        return mapOf(
-            "userName" to userName,
-            "fullName" to fullName,
-            "email" to email,
-            "id" to id,
-            "photo" to photo,
-            "password" to password
-        )
+    fun getUserData(): Flow<Map<String, String>> {
+        return context.dataStore.data.map { preferences ->
+            mapOf(
+                "userName" to (preferences[userNameKey] ?: ""),
+                "fullName" to (preferences[fullNameKey] ?: ""),
+                "email" to (preferences[emailKey] ?: ""),
+                "id" to (preferences[userIdKey] ?: ""),
+                "photo" to (preferences[userPhotoUrl] ?: ""),
+                "password" to (preferences[passwordKey] ?: "")
+            )
+        }
     }
 
     suspend fun isUserLogged(): Boolean {
         val preferences = context.dataStore.data.first()
-        return preferences[booleanPreferencesKey(isLoggedKey)] ?: false
+        return preferences[isLoggedKey] ?: false
     }
 
     suspend fun logOut() {
-        putBoolean(isLoggedKey, false)
+        context.dataStore.edit { editor ->
+            editor[isLoggedKey] = false
+        }
     }
 
     suspend fun deleteUserData() {
         context.dataStore.edit { editor ->
-            editor.remove(stringPreferencesKey(emailKey))
-            editor.remove(stringPreferencesKey(passwordKey))
-            editor.remove(stringPreferencesKey(userIdKey))
-            editor.remove(stringPreferencesKey(fullNameKey))
-            editor.remove(stringPreferencesKey(userNameKey))
-            editor.remove(stringPreferencesKey(userPhotoUrl))
-            editor.remove(booleanPreferencesKey(isLoggedKey))
+            editor.remove(emailKey)
+            editor.remove(passwordKey)
+            editor.remove(userIdKey)
+            editor.remove(fullNameKey)
+            editor.remove(userNameKey)
+            editor.remove(userPhotoUrl)
+            editor.remove(isLoggedKey)
         }
     }
 

@@ -312,7 +312,7 @@ class EditProfileFragment : Fragment() {
     private suspend fun updateUserDataInDataStore(email: String, password: String, id: String, fullName: String, userName: String) {
         dataStoreManager.saveUserData(email, password, id, fullName, userName)
         tempBase64Image?.let {
-            dataStoreManager.savedUserPhoto(it)
+            dataStoreManager.saveUserPhoto(it)
         }
     }
 

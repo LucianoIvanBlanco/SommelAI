@@ -24,6 +24,7 @@ import com.bumptech.glide.Glide
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -76,10 +77,11 @@ class ProfileFragment : Fragment() {
     }
 
 
-    // TODO despues de cambiar la imagen, hay que moverse por el nabvar para que cargue aqui.
     private fun loadUserDataFromDataStore() {
         lifecycleScope.launch(Dispatchers.IO) {
-            val userData = dataStoreManager.getUserData()
+            val userDataFlow = dataStoreManager.getUserData()
+            val userData = userDataFlow.first()  // Recolecta el primer valor del Flow
+
             withContext(Dispatchers.Main) {
                 if (userData.isNotEmpty()) {
                     Log.d("ProfileFragment", "Datos del usuario: ${userData["email"]}, ${userData["userName"]}")
@@ -137,7 +139,6 @@ class ProfileFragment : Fragment() {
         }
     }
 
-
     private fun deleteAccount() {
         try {
             val currentUser = auth.currentUser
@@ -171,32 +172,37 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    private fun logOutStoredData() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            dataStoreManager.logOut()
+    private fun logOut() {
+        lifecycleScope.launch(Dispatchers.Main) {
+            try {
+                // Log out from Firebase
+                withContext(Dispatchers.IO) {
+                    val manager = EmailAndPasswordAuthenticationManager()
+                    manager.signOut()
+                    logOutStoredData()
+                }
+
+                // Navigate to login
+                goLogin()
+            } catch (e: Exception) {
+                Log.e("ProfileFragment", "Error during logout: ${e.message}")
+            }
         }
     }
 
-    private fun logoutFirebase() {
-        val manager = EmailAndPasswordAuthenticationManager()
-        manager.signOut()
-    }
-
-    private fun logOut() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            logoutFirebase()
-            logOutStoredData()
-            withContext(Dispatchers.Main) {
-                goLogin()
-            }
+    private suspend fun logOutStoredData() {
+        withContext(Dispatchers.IO) {
+            dataStoreManager.logOut()
         }
     }
 
     private fun goLogin() {
         val intent = Intent(requireContext(), MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         requireActivity().finish()
     }
+
 
     private fun showDialogDeleteAccount() {
         val title = getString(R.string.account_delete_dialog_title)
@@ -220,42 +226,3 @@ class ProfileFragment : Fragment() {
         }
     }
 }
-
-//--------------------- CARGA DE DATOS DESDE FIREBASE ---------------------------------
-
-//    private fun setUserData(user: UserData) {
-//        binding.tvMail.text = user.userEmail
-//        binding.tvUserName.text = user.userName
-//
-//        Glide.with(requireContext())
-//            .asBitmap()
-//            .centerCrop()
-//            .load(user.userPhotoUrl)
-//            .placeholder(R.drawable.default_user)
-//            .error(R.drawable.default_user)
-//            .diskCacheStrategy(DiskCacheStrategy.ALL)
-//            .into(binding.ivProfile)
-//    }
-
-//    private fun getUserData() {
-//        lifecycleScope.launch(Dispatchers.IO) {
-//            try {
-//                val currentUser =
-//                    auth.currentUser ?: throw IllegalStateException("No hay usuario autentificado.")
-//                val uid = currentUser.uid
-//                val userData = realTimeDatabaseManager.readUser(uid)
-//                withContext(Dispatchers.Main) {
-//                    if (userData != null) {
-//                        setUserData(userData)
-//                    } else {
-//                        showMessage("No se encontraron datos del usuario.")
-//                    }
-//                }
-//            } catch (e: Exception) {
-//                withContext(Dispatchers.Main) {
-//                    showMessage("Error al obtener los datos del usuario: ${e.message}")
-//                }
-//            }
-//        }
-//    }
-//-------------------------------------------------------------------------------------------------
