@@ -6,10 +6,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.blanco.somelai.databinding.FragmentSommelBinding
 import com.blanco.somelai.ui.home.search.WineViewModel
 import com.google.android.material.progressindicator.CircularProgressIndicator
-
+import kotlinx.coroutines.launch
 
 class SommelFragment : Fragment() {
 
@@ -32,6 +33,36 @@ class SommelFragment : Fragment() {
 
         progressIndicator = binding.progressCircular
 
+        setClicks()
+        observeResponse()
     }
 
+    private fun setClicks() {
+        binding.imageButton.setOnClickListener {
+            sendPrompt()
+            binding.etAsk.text?.clear()
+        }
+    }
+
+    private fun sendPrompt() {
+        val prompt = binding.etAsk.text.toString().trim()
+        if (prompt.isNotEmpty()) {
+            lifecycleScope.launch {
+                wineViewModel.sendAsk(prompt)
+               // binding.etAsk.text?.clear()
+            }
+            showProgressIndicator(true)
+        }
+    }
+
+    private fun observeResponse() {
+        wineViewModel.response.observe(viewLifecycleOwner) { response ->
+            binding.tvResponse.text = response
+            showProgressIndicator(false)
+        }
+    }
+
+    private fun showProgressIndicator(show: Boolean) {
+        binding.progressCircular.visibility = if (show) View.VISIBLE else View.GONE
+    }
 }

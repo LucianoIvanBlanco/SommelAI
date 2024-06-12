@@ -50,6 +50,9 @@ class WineViewModel : ViewModel() {
     private val _feedUiState: LiveData<WineBodyUiState> = MutableLiveData(WineBodyUiState())
     val feedUiState: LiveData<WineBodyUiState> get() = _feedUiState
 
+    private val _response = MutableLiveData<String>()
+    val response: LiveData<String> get() = _response
+
     private var realTimeDatabaseManager: RealTimeDatabaseManager = RealTimeDatabaseManager()
     private var cloudStorageManager: CloudStorageManager = CloudStorageManager()
 
@@ -413,7 +416,55 @@ class WineViewModel : ViewModel() {
             }
         }
     }
+
+    suspend fun sendAsk(prompt: String) {
+        withContext(Dispatchers.IO) {
+            try {
+                val model = GenerativeModel(
+                    modelName = "gemini-1.5-flash-latest",
+                    apiKey = _apiKey,
+                    generationConfig = generationConfig {
+                        temperature = 1f
+                        topK = 64
+                        topP = 0.95f
+                        maxOutputTokens = 1000
+                    },
+                    safetySettings = listOf(
+                        SafetySetting(HarmCategory.HARASSMENT, BlockThreshold.MEDIUM_AND_ABOVE),
+                        SafetySetting(HarmCategory.HATE_SPEECH, BlockThreshold.MEDIUM_AND_ABOVE),
+                        SafetySetting(
+                            HarmCategory.SEXUALLY_EXPLICIT,
+                            BlockThreshold.MEDIUM_AND_ABOVE
+                        ),
+                        SafetySetting(
+                            HarmCategory.DANGEROUS_CONTENT,
+                            BlockThreshold.MEDIUM_AND_ABOVE
+                        )
+                    )
+                )
+                val rules = """
+                   Eres un experto en vinos. Limitate a responder en ese contexto la pregunta ingresada de forma puntual. Cada respuesta no debe tener mas de 150 palabras.
+                """.trimIndent()
+                val inputContent = content {
+                    text(rules + prompt)
+                }
+
+                val response = model.generateContent(inputContent)
+                val extractedText = response.candidates.first().content.parts.first().asTextOrNull()
+                Log.d("WineViewModel", "Response: $extractedText")
+                _response.postValue(extractedText ?: "")
+            } catch (e: Exception) {
+                Log.e(
+                    "WineViewModel",
+                    "Error analyzing wine label with Gemini: ${e.localizedMessage}",
+                    e
+                )
+                _response.postValue("Ha ocurrido un error, por favor intenta de nuevo.")
+            }
+        }
+    }
 }
+
 
 
 

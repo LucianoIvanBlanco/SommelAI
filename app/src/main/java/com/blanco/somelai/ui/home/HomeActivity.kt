@@ -29,7 +29,7 @@ class HomeActivity : AppCompatActivity() {
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
-                R.id.feedFragment, R.id.searchFragment, R.id.profileFragment -> {
+                R.id.feedFragment, R.id.searchFragment, R.id.profileFragment, R.id.sommelFragment -> {
                     binding.bnvHome.visibility = View.VISIBLE
                 }
                 else -> {

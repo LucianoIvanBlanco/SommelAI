@@ -8,12 +8,12 @@
     tools:context=".ui.home.sommel.SommelFragment">
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/tv_response"
         style="@style/TVSommelai"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="55dp"
+        android:layout_marginTop="50dp"
         android:layout_marginEnd="8dp"
         android:text="@string/title_sommelai"
         app:layout_constraintEnd_toEndOf="parent"
@@ -26,7 +26,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="100dp"
+        android:layout_marginBottom="50dp"
         android:orientation="horizontal"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -37,14 +37,13 @@
             style="@style/TextField"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:hint="@string/hint_sommelai">
+            android:layout_weight="1">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_ask"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/hint_sommelai"/>
+                android:hint="@string/hint_sommelai" />
 
         </com.google.android.material.textfield.TextInputLayout>
 
