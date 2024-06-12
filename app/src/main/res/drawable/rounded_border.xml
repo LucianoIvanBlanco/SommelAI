@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#E5C3D3"/>
+    <stroke
+        android:width="2dp"
+        android:color="@android:color/black"/> <!-- Color y ancho del borde -->
+    <corners android:radius="14dp"/> <!-- Radio de las esquinas redondeadas -->
+    <padding
+        android:left="10dp"
+        android:top="10dp"
+        android:right="10dp"
+        android:bottom="10dp"/> <!-- Padding dentro del TextView -->
+</shape>

@@ -14,6 +14,13 @@
             android:id="@+id/action_profileFragment_to_editProfileFragment"
             app:destination="@id/editProfileFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/sommelFragment"
+        android:name="com.blanco.somelai.ui.home.sommel.SommelFragment"
+        android:label="fragment_sommel"
+        tools:layout="@layout/fragment_sommel" />
+
     <fragment
         android:id="@+id/feedFragment"
         android:name="com.blanco.somelai.ui.home.feed.FeedFragment"
@@ -93,4 +100,5 @@
             android:id="@+id/action_searchNameFragment_to_wineResponseDetailFragment"
             app:destination="@id/wineResponseDetailFragment" />
     </fragment>
+
 </navigation>

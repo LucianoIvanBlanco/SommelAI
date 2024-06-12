@@ -27,13 +27,22 @@
 
     <style name="TextField" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay.MyApp.TextInputLayout.Rounded</item>
-        <item name="android:fontFamily">@font/poppins</item>
+        <item name="android:fontFamily">@font/poppins_semibold</item>
         <item name="boxBackgroundColor">#E5C3D3</item>
     </style>
 
     <style name="ShapeAppearanceOverlay.MyApp.TextInputLayout.Rounded" parent="">
         <item name="cornerSize">16dp</item>
+        <item name="strokeWidth">2dp</item> <!-- Ancho del borde -->
+        <item name="strokeColor">#000000</item> <!-- Color del borde -->
     </style>
+
+    <style name="TVSommelai">
+        <item name="android:fontFamily">@font/poppins_semibold</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:background">@drawable/rounded_border</item>
+    </style>
+
 
 
 

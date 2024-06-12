@@ -17,4 +17,8 @@
         <item name="cornerSize">100%</item>
     </style>
 
+    <style name="BotonDentroDeTextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <!-- Aquí puedes incluir cualquier otro atributo de estilo que desees aplicar al botón -->
+    </style>
+
 </resources>

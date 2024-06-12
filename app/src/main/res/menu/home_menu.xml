@@ -4,6 +4,9 @@
 
     <item
         android:id="@+id/feedFragment"
+        android:icon="@drawable/ic_history_24px" />
+    <item
+        android:id="@+id/sommelFragment"
         android:icon="@drawable/ic_home" />
     <item
         android:id="@+id/searchFragment"

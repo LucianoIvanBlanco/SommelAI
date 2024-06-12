@@ -57,12 +57,6 @@
     <string name="account_delete_failed_message">Error al eliminar la cuenta</string>
 
 
-
-
-
-
-
-
     <string name="take_photo">Tomar foto</string>
     <string name="start_capture">Comenzar captura</string>
     <string name="stop_capture">Detener captura</string>
@@ -107,4 +101,6 @@
     <string name="tv_wine_portugal">Portugal</string>
     <string name="tv_wine_italy">Italia</string>
     <string name="show_message_no_changes_detected">No hay datos para actualizar</string>
+    <string name="title_sommelai"> Hola!!!\nSoy SommelAI, tu IA especializada en vinos. ¿En que te puedo ayudar?</string>
+    <string name="hint_sommelai">Escribe tu pregunta</string>
 </resources>
