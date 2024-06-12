@@ -101,6 +101,6 @@
     <string name="tv_wine_portugal">Portugal</string>
     <string name="tv_wine_italy">Italia</string>
     <string name="show_message_no_changes_detected">No hay datos para actualizar</string>
-    <string name="title_sommelai"> Hola!!!\nSoy SommelAI, tu IA especializada en vinos. ¿En que te puedo ayudar?</string>
+    <string name="title_sommelai">" Hola!!! Soy SommelAI, tu IA especializada en vinos. ¿En que te puedo ayudar?"</string>
     <string name="hint_sommelai">Escribe tu pregunta</string>
 </resources>

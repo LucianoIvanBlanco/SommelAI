@@ -84,4 +84,7 @@
     <string name="tv_wine_france">France</string>
     <string name="tv_wine_portugal">Portugal</string>
     <string name="tv_wine_italy">Italy</string>
+    <string name="show_message_no_changes_detected">There is no data to update</string>
+    <string name="title_sommelai">Hello!!! I\'m SommelAI, your AI specialized in wines. How can I assist you?</string>
+    <string name="hint_sommelai">Write your question</string>
 </resources>
