@@ -172,7 +172,7 @@ class EditProfileFragment : Fragment() {
                                 } else {
                                     Log.d("EditProfileFragment", "handleSaveChanges: No changes detected")
                                     showMessage(getString(R.string.show_message_no_changes_detected))
-                                    findNavController().popBackStack()
+                                    navigateToPreviousFragment()
                                 }
                             } else {
                                 Log.d("EditProfileFragment", "handleSaveChanges: User data is null")
@@ -190,13 +190,8 @@ class EditProfileFragment : Fragment() {
         Log.d("EditProfileFragment", "handleSaveChanges: End")
     }
 
-
-
-
-
-    // TODO ver si no navega coorectamente por esto
     private fun navigateToPreviousFragment() {
-        findNavController().navigateUp()
+        findNavController().popBackStack()
     }
 
     private fun loadUserProfilePicture() {

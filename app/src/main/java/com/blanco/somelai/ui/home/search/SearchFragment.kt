@@ -32,7 +32,6 @@ class SearchFragment : Fragment() {
         setupSearch()
     }
 
-    // TODO usamos las funciones de tipo especifico del service?
     private fun setClicks() {
 
         binding.mcvWineRed.setOnClickListener {

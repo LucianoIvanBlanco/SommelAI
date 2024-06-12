@@ -173,7 +173,6 @@ class ScannerCameraFragment : Fragment() {
             adjustViewBounds = true
         }
 
-        // TODO meter en strings
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(getString(R.string.show_select_photo))
             .setMessage(getString(R.string.show_select_photo_advertisement))
