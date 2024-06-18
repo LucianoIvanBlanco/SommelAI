@@ -35,7 +35,6 @@ import java.util.UUID
 
 class WineViewModel : ViewModel() {
 
-    //TODO ver como quitar apikey, si cambiamos por certificado o algo
     private var _apiKey: String = "AIzaSyCzEqyGwZ1a8Cz33HPm3_R8dvzMW4c-9k4"
 
     private val _uiState: LiveData<WineUiState> = MutableLiveData(WineUiState())
@@ -299,7 +298,6 @@ class WineViewModel : ViewModel() {
         _navigateToWineList.value = false
     }
 
-    // TODO ver porque no esta navegando despues de guardar nuevo vino
     fun resetNavigateToFeedFragment() {
         _navigateToWineFeed.value = false
         Log.d("WineViewModel", "navigateToWineFeed")
