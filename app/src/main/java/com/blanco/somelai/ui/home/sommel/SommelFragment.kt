@@ -1,6 +1,7 @@
 package com.blanco.somelai.ui.home.sommel
 
 import android.os.Bundle
+import android.text.method.ScrollingMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -33,6 +34,8 @@ class SommelFragment : Fragment() {
 
         progressIndicator = binding.progressCircular
 
+        binding.tvResponse.movementMethod = ScrollingMovementMethod()
+
         setClicks()
         observeResponse()
     }
@@ -49,7 +52,6 @@ class SommelFragment : Fragment() {
         if (prompt.isNotEmpty()) {
             lifecycleScope.launch {
                 wineViewModel.sendAsk(prompt)
-               // binding.etAsk.text?.clear()
             }
             showProgressIndicator(true)
         }

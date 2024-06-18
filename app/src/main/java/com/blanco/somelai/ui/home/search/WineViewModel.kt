@@ -461,10 +461,3 @@ class WineViewModel : ViewModel() {
         }
     }
 }
-
-
-
-
-
-
-
