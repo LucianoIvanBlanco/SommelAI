@@ -270,7 +270,6 @@ class EditProfileFragment : Fragment() {
         return true
     }
 
-    // TODO agregamos opcion de tomar fotografia?
     private fun updateUserProfile(newUserName: String, newFullName: String, newPassword: String, newImageUrl: String?, onComplete: () -> Unit) {
         val userUid = auth.currentUser?.uid.toString()
         val userEmail = auth.currentUser?.email.toString()

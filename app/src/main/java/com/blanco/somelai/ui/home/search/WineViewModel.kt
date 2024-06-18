@@ -182,7 +182,6 @@ class WineViewModel : ViewModel() {
                             filteredWines.forEach { wine ->
                                 Log.d("WineViewModel", "Found wine: ${wine.wine}")
                             }
-                            //TODO no se pueden sacar strings. lo dejamos?
                             Toast.makeText(
                                 context,
                                 "SE ENCONTRARON COINCIDENCIAS EN LA BUSQUEDA",

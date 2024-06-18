@@ -17,9 +17,6 @@
 
     </androidx.camera.view.PreviewView>
 
-    <!--TODO falta lograr que se difumine alrededor del recuadro-->
-
-    <!-- Recuadro de enfoque transparente con bordes marcados -->
     <FrameLayout
         android:id="@+id/focus_frame"
         android:layout_width="300dp"
