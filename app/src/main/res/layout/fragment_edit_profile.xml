@@ -7,16 +7,33 @@
     android:background="@color/md_theme_dark_onSurface"
     tools:context=".ui.home.profile.EditProfileFragment">
 
-    <ImageButton
-        android:id="@+id/img_btn_profile"
+    <FrameLayout
+        android:id="@+id/frame_img_btn_profile"
         android:layout_width="201dp"
         android:layout_height="174dp"
         android:layout_marginTop="50dp"
-        android:background="@android:color/transparent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:src="@drawable/default_user" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/img_btn_profile"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            tools:src="@drawable/default_user" />
+
+        <ImageView
+            android:id="@+id/iv_add_photo"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="bottom|end"
+            android:background="@drawable/circle_background"
+            android:cropToPadding="false"
+            android:padding="5dp"
+            android:src="@drawable/ic_add_photo_24px"
+            app:tint="@android:color/white" />
+    </FrameLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/textInputLayout2"
@@ -28,7 +45,7 @@
         android:layout_marginEnd="24dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/img_btn_profile">
+        app:layout_constraintTop_toBottomOf="@+id/frame_img_btn_profile">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/et_profile_user_name"

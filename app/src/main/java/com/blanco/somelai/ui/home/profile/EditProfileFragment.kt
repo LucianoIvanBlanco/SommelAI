@@ -241,8 +241,8 @@ class EditProfileFragment : Fragment() {
     }
 
     private fun isDataValid(): Boolean {
-        val userNamePattern = "^[a-zA-Z0-9]{4,}$".toRegex()
-        val fullNamePattern = "^[a-zA-Z]{3,20}\\s[a-zA-Z]{4,20}$".toRegex()
+        val userNamePattern = "^[a-zA-Z0-9]{3,}$".toRegex()
+        val fullNamePattern = "^[a-zA-Z]{3,20}(\\s[a-zA-Z]{3,20}){1,5}$".toRegex()
         val passwordPattern = ".{6,10}".toRegex()
         val password = binding.etProfilePassword.text.toString().trim()
         val repeatPassword = binding.etRepeatPassword.text.toString().trim()
