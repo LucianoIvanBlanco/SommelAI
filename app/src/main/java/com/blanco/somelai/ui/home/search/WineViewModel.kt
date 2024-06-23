@@ -171,10 +171,8 @@ class WineViewModel : ViewModel() {
                     val moreDetails = getMoreDetails(nameAndYear, wineDetails["winery"] ?: "")
                     val wineName = wineDetails["name"] ?: ""
                     Log.d("WineViewModel", "Extracted wine name: $wineName")
-                    withContext(Dispatchers.Main) {
-                    }
                     val filteredWines = allWinesCache.filter { wine ->
-                        wine.wine.lowercase().contains(wineName.lowercase(), ignoreCase = true)
+                        wine.winery.lowercase().contains(wineName.lowercase())
                     }
                     viewModelScope.launch(Dispatchers.Main) {
                         if (filteredWines.isNotEmpty()) {
